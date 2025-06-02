@@ -1,19 +1,1343 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Enhanced Flow Planner</title>
-    <script type="module">
-      import React      from 'https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js';
-      import ReactDOM  from 'https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js';
-      import App       from './App.jsx';         // ← your canvas file
-      ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-    </script>
-    <!-- Tailwind JIT CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <style>[data-mode="dark"]{background:#111}</style>
-  </head>
-  <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Power Automate Cost & License Planner</title>
+  <style>
+    /* Base styles - keep as is or refine with CSS variables */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 8px;
+      color: #1f2937;
+    }
+    
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 4px; }
+    h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: 12px; }
+    h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    
+    .grid { display: grid; gap: 12px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: white;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    /* New: Input validation styling */
+    input.invalid, select.invalid {
+        border-color: #ef4444; /* Red border */
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    }
+    .validation-message {
+        color: #ef4444;
+        font-size: 0.75rem;
+        margin-top: 4px;
+    }
+    
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 12px;
+      transition: background-color 0.2s ease; /* Smooth transition */
+    }
+    
+    button:hover { background: #2563eb; }
+    
+    .preset-btn {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 8px 12px;
+      margin: 0;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      width: auto;
+      font-size: 0.75rem;
+    }
+    
+    .preset-btn:hover { background: #bfdbfe; }
+    
+    .analysis {
+      border-left: 4px solid #10b981;
+      padding-left: 16px;
+    }
+    
+    .analysis.medium { border-left-color: #f59e0b; }
+    .analysis.high { border-left-color: #ef4444; }
+    
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .metric:last-child { border-bottom: none; }
+    
+    .metric-label { font-size: 0.875rem; color: #6b7280; }
+    .metric-value { font-weight: 600; font-size: 1rem; }
+    
+    .cost-breakdown {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      margin: 12px 0;
+    }
+    
+    .license-option {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 12px;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .license-option:hover { background: #f3f4f6; }
+    .license-option.selected { 
+      background: #dbeafe; 
+      border-color: #3b82f6; 
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    
+    .license-option.best { 
+      background: #d1fae5; 
+      border-color: #10b981;
+    }
+    
+    .license-title { font-weight: 600; margin-bottom: 4px; }
+    .license-price { font-size: 1.125rem; font-weight: bold; color: #1f2937; }
+    .license-details { font-size: 0.75rem; color: #6b7280; margin-top: 4px; }
+    .license-savings { font-size: 0.875rem; color: #059669; font-weight: 600; }
+    
+    .warning {
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
+      color: #92400e;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 0.875rem;
+    }
+    
+    .info {
+      background: #dbeafe;
+      border: 1px solid #60a5fa;
+      color: #1e40af;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 0.875rem;
+    }
+    
+    .savings-highlight {
+      background: #d1fae5;
+      border: 1px solid #10b981;
+      color: #065f46;
+      padding: 16px;
+      border-radius: 6px;
+      margin: 12px 0;
+      text-align: center;
+    }
+    
+    .status {
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 0.875rem;
+    }
+    
+    .status.low { background: #d1fae5; color: #065f46; }
+    .status.medium { background: #fef3c7; color: #92400e; }
+    .status.high { background: #fee2e2; color: #991b1b; }
+    
+    .toggle-btn {
+      background: #6b7280;
+      color: white;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      width: auto;
+      margin: 0 0 8px 0;
+    }
+    
+    .critical-warning {
+      background: #fee2e2 !important;
+      border: 2px solid #dc2626 !important;
+      color: #991b1b !important;
+      padding: 16px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-weight: bold;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+    
+    @media (min-width: 768px) {
+      body { padding: 20px; }
+      h1 { font-size: 1.875rem; }
+      .container { max-width: 1200px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>⚙️ Power Automate Cost & License Planner</h1>
+      <p style="color: #6b7280; font-size: 0.875rem;">Calculate costs, compare licenses, and optimize your Power Automate investments</p>
+    </div>
+
+    <div class="card">
+      <h2>🏢 Your Current Setup</h2>
+      
+      <div class="grid grid-2" style="margin-bottom: 16px;">
+        <div>
+          <label for="userType">You are:</label>
+          <select id="userType" onchange="calculate()">
+            <option value="internal">Internal IT/Employee</option>
+            <option value="consultant">External Consultant</option>
+            <option value="partner">Microsoft Partner</option>
+          </select>
+        </div>
+        <div>
+          <label for="clientUsers">Users who will use this flow:</label>
+          <input type="number" id="clientUsers" value="10" min="1" onchange="validateAndCalculate(this)">
+          <div id="clientUsers-validation" class="validation-message"></div>
+        </div>
+      </div>
+
+      <div id="currentLicenseSection">
+        <h3>Current Licenses Available</h3>
+        <div class="grid grid-2">
+          <div>
+            <label for="currentPremium">Premium User Licenses Available:</label>
+            <input type="number" id="currentPremium" value="0" min="0" onchange="validateAndCalculate(this)">
+            <div id="currentPremium-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="currentProcess">Process Licenses Available:</label>
+            <input type="number" id="currentProcess" value="0" min="0" onchange="validateAndCalculate(this)">
+            <div id="currentProcess-validation" class="validation-message"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🚀 Quick Start Templates</h2>
+      <button class="preset-btn" onclick="loadPreset('small')">Small Automation (500 items)</button>
+      <button class="preset-btn" onclick="loadPreset('medium')">Daily Processing (5K items)</button>
+      <button class="preset-btn" onclick="loadPreset('large')">Enterprise Sync (25K items)</button>
+      <button class="preset-btn" onclick="loadPreset('massive')">Data Migration (100K items)</button>
+    </div>
+
+    <div class="card">
+      <h2>⚙️ Flow Configuration</h2>
+      
+      <div style="margin-bottom: 12px;">
+        <label for="scenarioName">Scenario Name</label>
+        <input type="text" id="scenarioName" value="My Flow" onchange="calculate()">
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom: 12px;">
+        <div>
+          <label for="items">Items to Process</label>
+          <input type="number" id="items" value="5000" min="0" onchange="validateAndCalculate(this)">
+          <div id="items-validation" class="validation-message"></div>
+        </div>
+        <div>
+          <label for="actionsPerItem">Actions per Item</label>
+          <input type="number" id="actionsPerItem" value="2" min="1" onchange="validateAndCalculate(this)">
+          <div id="actionsPerItem-validation" class="validation-message"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom: 12px;">
+        <div>
+          <label for="avgMs">Avg Time per Action (ms)</label>
+          <input type="number" id="avgMs" value="500" min="1" onchange="validateAndCalculate(this)">
+          <div id="avgMs-validation" class="validation-message"></div>
+        </div>
+        <div>
+          <label for="concurrency">Concurrency Level</label>
+          <input type="number" id="concurrency" value="4" min="1" max="50" onchange="validateAndCalculate(this)">
+          <div id="concurrency-validation" class="validation-message"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom: 12px;">
+        <div>
+          <label for="connector">Primary Connector</label>
+          <select id="connector" onchange="calculate()">
+            <option value="SharePoint">SharePoint (600 RPM)</option>
+            <option value="GraphAPI">Microsoft Graph (150 RPM)</option>
+            <option value="CustomHTTP">Custom HTTP (60 RPM)</option>
+            <option value="Teams">Teams (120 RPM)</option>
+            <option value="SQL">SQL Server (300 RPM)</option>
+          </select>
+        </div>
+        <div>
+          <label for="executions">Runs per Day</label>
+          <input type="number" id="executions" value="1" min="1" onchange="validateAndCalculate(this)">
+          <div id="executions-validation" class="validation-message"></div>
+        </div>
+      </div>
+
+      <button class="toggle-btn" onclick="toggleAdvanced()">Advanced Settings</button>
+      
+      <div id="advancedSettings" class="hidden">
+        <h3>Retry & Throttling Configuration</h3>
+        <div class="grid grid-2" style="margin-bottom: 12px;">
+          <div>
+            <label for="retryAttempts">Retry Attempts (per failed action)</label>
+            <input type="number" id="retryAttempts" value="3" min="0" max="10" onchange="validateAndCalculate(this)">
+            <div id="retryAttempts-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="retryInterval">Retry Interval (seconds)</label>
+            <select id="retryInterval" onchange="calculate()">
+              <option value="1">1 second (Fixed)</option>
+              <option value="2">2 seconds (Fixed)</option>
+              <option value="5">5 seconds (Fixed)</option>
+              <option value="exponential" selected>Exponential Backoff</option>
+              <option value="linear">Linear Backoff</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid grid-2" style="margin-bottom: 12px;">
+          <div>
+            <label for="timeoutMinutes">Flow Timeout (minutes)</label>
+            <input type="number" id="timeoutMinutes" value="30" min="1" max="300" onchange="validateAndCalculate(this)">
+            <div id="timeoutMinutes-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="throttleHandling">Throttling Handling</label>
+            <select id="throttleHandling" onchange="calculate()">
+              <option value="fail">Fail immediately</option>
+              <option value="retry" selected>Retry with backoff</option>
+              <option value="queue">Queue for later</option>
+            </select>
+          </div>
+        </div>
+
+        <h3>Error & Performance Settings</h3>
+        <div class="grid grid-2" style="margin-bottom: 12px;">
+          <div>
+            <label for="errorRate">Expected Error Rate (%)</label>
+            <input type="number" id="errorRate" value="5" min="0" max="100" onchange="validateAndCalculate(this)">
+            <div id="errorRate-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="premiumConnectors">Premium Connectors Used (count)</label>
+            <input type="number" id="premiumConnectors" value="0" min="0" onchange="validateAndCalculate(this)">
+            <div id="premiumConnectors-validation" class="validation-message"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label for="networkLatency">Network Latency (ms)</label>
+            <input type="number" id="networkLatency" value="50" min="0" max="1000" onchange="validateAndCalculate(this)">
+            <div id="networkLatency-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="flowPattern">Flow Pattern</label>
+            <select id="flowPattern" onchange="calculate()">
+              <option value="simple">Simple Sequential Actions</option>
+              <option value="apply_to_each" selected>Apply to Each Loop</option>
+              <option value="nested_apply">Nested Apply to Each</option>
+              <option value="parallel_branches">Parallel Branches</option>
+              <option value="child_flows">Parent-Child Flows</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="dataOperations">Data Operations Used</label>
+            <select id="dataOperations" onchange="calculate()">
+              <option value="none">None / Simple Variables</option>
+              <option value="filter" selected>Filter Array</option>
+              <option value="select">Select (Transform)</option>
+              <option value="compose">Compose Objects</option>
+              <option value="parse_json">Parse JSON</option>
+              <option value="multiple">Multiple Operations</option>
+            </select>
+          </div>
+          <div style="display: none;"> <label for="batchSize">Batch Size (items)</label>
+            <input type="number" id="batchSize" value="250" min="1" onchange="validateAndCalculate(this)">
+            <div id="batchSize-validation" class="validation-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveScenario()">💾 Save Scenario</button>
+    </div>
+
+    <div class="card">
+      <div id="analysisCard" class="analysis">
+        <h2>📊 Analysis: <span id="currentScenarioName">My Flow</span></h2>
+        
+        <div class="metric">
+          <span class="metric-label">Total Actions per Run</span>
+          <span class="metric-value" id="totalActions">10,000</span>
+        </div>
+        
+        <div class="metric">
+          <span class="metric-label">Actions per Month</span>
+          <span class="metric-value" id="monthlyActions">300,000</span>
+        </div>
+        
+        <div class="metric">
+          <span class="metric-label">Runtime per Run</span>
+          <span class="metric-value" id="runtime">20.8 min</span>
+        </div>
+        
+        <div class="metric">
+          <span class="metric-label">Requests per Minute (RPM)</span>
+          <span class="metric-value" id="rpm">480 / 600</span>
+        </div>
+
+        <div id="statusMessage" class="status low">
+          ✅ Low Risk: Configuration looks good
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>💰 License & Cost Analysis</h2>
+      
+      <div class="info">
+        <strong>💡 Power Automate Licensing (2024):</strong><br>
+        • <strong>Power Automate Premium</strong>: £12.20/month per user - Full capabilities, **40k PPR/day**<br>
+        • <strong>Power Automate Process</strong>: £81.90/month per flow - Capacity license, **250k PPR/day**<br>
+        • <strong>Power Automate Free</strong>: £0/month - Standard connectors only, no premium features, **2k PPR/day**<br>
+        • <strong>Key:</strong> Licensing is based on users and capacity, NOT per action or per run<br>
+        • <strong>PPR:</strong> Power Platform Requests (API calls) are the main consumption metric
+      </div>
+
+      <div id="costBreakdown" class="cost-breakdown">
+        </div>
+
+      <h3>🎯 Recommended License Options</h3>
+      <div id="licenseOptions"></div>
+
+      <div id="savingsSection"></div>
+    </div>
+
+    <div class="card" id="scenariosCard" style="display: none;">
+      <h2>📋 Saved Scenarios</h2>
+      <div id="scenariosList"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Constants and Global State ---
+    const CONNECTORS = {
+      SharePoint: { rpm: 600, premium: false, timeout: 120, throttleDelay: 60 },
+      GraphAPI: { rpm: 150, premium: false, timeout: 120, throttleDelay: 30 },
+      CustomHTTP: { rpm: 60, premium: true, timeout: 120, throttleDelay: 15 },
+      Teams: { rpm: 120, premium: false, timeout: 120, throttleDelay: 45 },
+      SQL: { rpm: 300, premium: true, timeout: 300, throttleDelay: 20 }
+    };
+
+    const LICENSES = {
+      premium: {
+        price: 12.20,
+        name: "Power Automate Premium (Per User)",
+        description: "Users can run any flow, full capabilities.",
+        pprLimit: 40000 // PPR/day for Premium User license
+      },
+      process: {
+        price: 81.90,
+        name: "Power Automate Process (Per Flow)",
+        description: "Unlimited users can run this specific flow.",
+        pprLimit: 250000 // PPR/day for Process license
+      },
+      free: { // Added Free license for PPR comparison
+          price: 0,
+          name: "Power Automate Free",
+          description: "Standard connectors only, limited usage.",
+          pprLimit: 2000 // PPR/day for Free license
+      }
+      // Pay-per-use is calculated dynamically based on PPR blocks, not a fixed run price anymore.
+      // Assuming £0.0000004 for 1 PPR if purchased in blocks of 10,000 for £4.
+      // Microsoft pricing is complex here, but focusing on PPR consumption.
+    };
+
+    // Constants for pricing reference (PPR is the main unit)
+    const PPR_BLOCK_PRICE = 4.00; // Price for 10,000 PPR block
+    const PPR_PER_BLOCK = 10000;
+    const COST_PER_PPR = PPR_BLOCK_PRICE / PPR_PER_BLOCK; // £0.0004 per PPR
+
+    const PRESET_SCENARIOS = {
+      small: { scenarioName: 'Small Automation', items: 500, actionsPerItem: 2, avgMs: 300, concurrency: 2, executions: 1, flowPattern: 'simple', dataOperations: 'none', errorRate: 2, premiumConnectors: 0 },
+      medium: { scenarioName: 'Daily Processing', items: 5000, actionsPerItem: 3, avgMs: 500, concurrency: 4, executions: 1, flowPattern: 'apply_to_each', dataOperations: 'filter', errorRate: 5, premiumConnectors: 0 },
+      large: { scenarioName: 'Enterprise Sync', items: 25000, actionsPerItem: 4, avgMs: 800, concurrency: 6, executions: 1, flowPattern: 'child_flows', dataOperations: 'select', errorRate: 8, premiumConnectors: 1 },
+      massive: { scenarioName: 'Data Migration', items: 100000, actionsPerItem: 2, avgMs: 400, concurrency: 8, executions: 1, flowPattern: 'nested_apply', dataOperations: 'parse_json', errorRate: 10, premiumConnectors: 2 }
+    };
+
+    let scenarios = [];
+    let advancedVisible = false;
+
+    // --- Utility Functions ---
+
+    /**
+     * Validates an input field based on its min/max attributes and type.
+     * Updates styling and displays a validation message.
+     * @param {HTMLInputElement} inputElement - The input element to validate.
+     * @returns {boolean} True if valid, false otherwise.
+     */
+    function validateInput(inputElement) {
+        const value = parseInt(inputElement.value);
+        const min = parseInt(inputElement.min);
+        const max = parseInt(inputElement.max);
+        const validationMessageElement = document.getElementById(`${inputElement.id}-validation`);
+
+        let isValid = true;
+        let message = '';
+
+        if (isNaN(value)) {
+            isValid = false;
+            message = 'Please enter a number.';
+        } else if (min !== undefined && value < min) {
+            isValid = false;
+            message = `Value must be at least ${min}.`;
+        } else if (max !== undefined && value > max) {
+            isValid = false;
+            message = `Value must be no more than ${max}.`;
+        }
+
+        if (isValid) {
+            inputElement.classList.remove('invalid');
+            if (validationMessageElement) validationMessageElement.textContent = '';
+        } else {
+            inputElement.classList.add('invalid');
+            if (validationMessageElement) validationMessageElement.textContent = message;
+        }
+        return isValid;
+    }
+
+    /**
+     * Validates an input and then triggers calculation if valid.
+     * @param {HTMLInputElement} inputElement - The input element that changed.
+     */
+    function validateAndCalculate(inputElement) {
+        if (validateInput(inputElement)) {
+            calculate();
+        }
+    }
+
+    // --- Core Calculation Logic ---
+
+    function calculate() {
+      // Get all inputs
+      const items = parseInt(document.getElementById('items').value) || 0;
+      const actionsPerItem = parseInt(document.getElementById('actionsPerItem').value) || 0;
+      const avgMs = parseInt(document.getElementById('avgMs').value) || 0;
+      const concurrency = parseInt(document.getElementById('concurrency').value) || 1;
+      const connector = document.getElementById('connector').value;
+      const executions = parseInt(document.getElementById('executions').value) || 0;
+      const scenarioName = document.getElementById('scenarioName').value;
+      const errorRate = parseInt(document.getElementById('errorRate').value) || 0; // Changed default to 0
+      const premiumConnectors = parseInt(document.getElementById('premiumConnectors').value) || 0;
+      const clientUsers = parseInt(document.getElementById('clientUsers').value) || 1;
+      const currentPremium = parseInt(document.getElementById('currentPremium').value) || 0;
+      const currentProcess = parseInt(document.getElementById('currentProcess').value) || 0;
+      
+      const retryAttempts = parseInt(document.getElementById('retryAttempts').value) || 0; // Changed default to 0
+      const retryInterval = document.getElementById('retryInterval').value;
+      const timeoutMinutes = parseInt(document.getElementById('timeoutMinutes').value) || 30;
+      const throttleHandling = document.getElementById('throttleHandling').value;
+      const networkLatency = parseInt(document.getElementById('networkLatency').value) || 50;
+      const flowPattern = document.getElementById('flowPattern').value;
+      const dataOperations = document.getElementById('dataOperations').value;
+      const batchSize = parseInt(document.getElementById('batchSize').value) || 250;
+
+      // Basic Calculations
+      const baseActions = items * actionsPerItem;
+      const connectorData = CONNECTORS[connector];
+      const hasPremiumConnectors = connectorData.premium || premiumConnectors > 0;
+
+      // Flow pattern and Data operations overhead
+      const patternMultipliers = {
+        simple: 1.0,
+        apply_to_each: 1.1, // 10% overhead for Apply to Each (internal processing)
+        nested_apply: 1.4, // 40% overhead for nested loops
+        parallel_branches: 0.9, // 10% efficiency gain from true parallelization, but higher peak RPM
+        child_flows: 1.1 // 10% overhead for parent-child communication/overhead
+      };
+      const dataOperationOverhead = {
+        none: 1.0,
+        filter: 1.05,
+        select: 1.08,
+        compose: 1.03,
+        parse_json: 1.1,
+        multiple: 1.15
+      };
+      const patternAdjustedActions = baseActions * patternMultipliers[flowPattern];
+      const dataAdjustedActions = patternAdjustedActions * dataOperationOverhead[dataOperations];
+
+      // Retry Overhead Calculation
+      const retryMultiplier = calculateRetryMultiplier(errorRate, retryAttempts);
+      const totalActionsWithRetries = Math.round(dataAdjustedActions * retryMultiplier);
+
+      // Runtime Calculation (considering concurrency, avgMs, latency, and potential batching)
+      let effectiveConcurrency = Math.min(concurrency, 20); // Apply to Each concurrency limit
+      if (flowPattern === 'simple' || flowPattern === 'child_flows') {
+          effectiveConcurrency = 1; // These patterns are typically sequential or parallel by design
+      }
+      if (flowPattern === 'parallel_branches') {
+          // Parallel branches can hit connectors simultaneously, but often have a max effective concurrency of 10-20
+          effectiveConcurrency = Math.min(concurrency, 10); // Or higher depending on exact setup
+      }
+
+      // Calculate execution time for a single "action unit" (action + network latency)
+      const timePerActionUnitMs = avgMs + networkLatency;
+
+      // Estimate total "processing time" needed for all actions if run sequentially
+      const totalSequentialProcessingMs = totalActionsWithRetries * timePerActionUnitMs;
+
+      // Calculate base runtime without throttling or batching
+      const baseRuntimeMinutes = (totalSequentialProcessingMs / (effectiveConcurrency * 1000 * 60)); // Convert ms to minutes
+
+      // RPM Calculation (actual rate hitting the connector)
+      // This is the rate at which the flow would *attempt* to call the connector actions
+      const actionsPerSecond = effectiveConcurrency / (timePerActionUnitMs / 1000);
+      const actualRPM = actionsPerSecond * 60;
+
+      // Throttling Impact (estimated additional delay if throttling occurs)
+      const throttlingImpact = calculateThrottlingImpact(actualRPM, connectorData.rpm, connectorData.throttleDelay, throttleHandling);
+      const adjustedRuntime = baseRuntimeMinutes + throttlingImpact.delayMinutes;
+
+      // Timeout Risk assessment
+      const timeoutRisk = adjustedRuntime > timeoutMinutes;
+      const batchingNeeded = timeoutRisk || (items > batchSize && flowPattern === 'apply_to_each');
+      const numberOfBatches = batchingNeeded ? Math.ceil(items / batchSize) : 1;
+      const batchingRuntime = numberOfBatches > 1 ? adjustedRuntime / numberOfBatches : adjustedRuntime; // If batched, each batch has its own runtime
+
+      // Monthly calculations
+      const monthlyActions = totalActionsWithRetries * executions * 30;
+      const estimatedPPR = monthlyActions * 1; // Assuming 1 PPR per action for simplicity, adjust based on MS documentation
+
+      // Cost calculations
+      const payPerUseCost = (estimatedPPR / PPR_PER_BLOCK) * PPR_BLOCK_PRICE + (hasPremiumConnectors ? 20.00 : 0); // Premium connectors might have a minimum fee
+
+      // Risk assessment
+      let riskScore = 0;
+      let riskFactors = [];
+      let criticalIssues = [];
+      let powerAutomateGuidance = [];
+
+      // Add PPR guidance / warnings
+      const dailyPPR = estimatedPPR / 30;
+      if (dailyPPR > LICENSES.premium.pprLimit && dailyPPR <= LICENSES.process.pprLimit) {
+          riskFactors.push(`⚠️ Your daily PPR (${dailyPPR.toLocaleString()}) exceeds a single Premium User license's limit.`);
+          powerAutomateGuidance.push('Consider a Power Automate Process license or multiple Premium User licenses.');
+      } else if (dailyPPR > LICENSES.process.pprLimit * 2) { // Example: If it's very high
+          riskScore += 20;
+          criticalIssues.push(`🚨 EXTREMELY HIGH PPR: ${dailyPPR.toLocaleString()}/day. This will require significant Process license capacity.`);
+          powerAutomateGuidance.push('Review design for efficiency, consider API Management for governance, or breaking into multiple, smaller flows.');
+      }
+
+
+      // Flow pattern specific risks
+      if (flowPattern === 'nested_apply' && items > 1000) {
+        riskScore += 25;
+        criticalIssues.push('🔄 NESTED APPLY TO EACH: High performance overhead detected.');
+        powerAutomateGuidance.push('Consider flattening nested loops or using child flows for better scale.');
+      }
+      if (flowPattern === 'apply_to_each' && concurrency > 20) {
+        riskScore += 15;
+        riskFactors.push('⚠️ Apply to Each concurrency is capped at 20 by Power Automate. Your higher setting will be ignored.');
+      }
+      
+      // Data operations impact
+      if (dataOperations === 'multiple' && items > 5000) {
+        riskScore += 10;
+        riskFactors.push('📊 Multiple data operations may cause memory issues with large datasets.');
+        powerAutomateGuidance.push('Consider processing data in smaller chunks or using Compose actions for complex transformations.');
+      }
+      
+      // Throttling risk
+      if (actualRPM > connectorData.rpm) {
+        const overage = actualRPM - connectorData.rpm;
+        const overagePercent = (overage / connectorData.rpm * 100).toFixed(0);
+        riskScore += 40;
+        criticalIssues.push(`🚨 SEVERE THROTTLING: ${actualRPM.toFixed(0)} RPM over limit (+${overagePercent}%)`);
+        riskFactors.push('Requests will be rejected or severely delayed.');
+        powerAutomateGuidance.push('Reduce "Concurrency Level", add "Delay" actions, or implement robust retry policies.');
+      } else if (actualRPM > connectorData.rpm * 0.9) {
+        riskScore += 30;
+        criticalIssues.push(`⚠️ HIGH THROTTLING RISK: Only ${(connectorData.rpm - actualRPM).toFixed(0)} RPM headroom remaining.`);
+        riskFactors.push('Very close to throttling - add delays or reduce concurrency proactively.');
+      } else if (actualRPM > connectorData.rpm * 0.8) {
+        riskScore += 20;
+        riskFactors.push(`⚠️ Moderate throttling risk: ${((actualRPM / connectorData.rpm) * 100).toFixed(0)}% of limit used.`);
+      } else if (actualRPM > connectorData.rpm * 0.6) {
+        riskScore += 10;
+        riskFactors.push(`📊 Monitor throttling: ${((actualRPM / connectorData.rpm) * 100).toFixed(0)}% of limit used.`);
+      }
+      
+      // Timeout risk
+      if (timeoutRisk) {
+        riskScore += 35;
+        criticalIssues.push('⏰ TIMEOUT RISK: Runtime exceeds flow timeout limit.');
+        powerAutomateGuidance.push('Break into child flows, reduce batch sizes, or optimize actions for speed.');
+      } else if (adjustedRuntime > timeoutMinutes * 0.8) {
+        riskScore += 15;
+        riskFactors.push('⏱️ Runtime approaching timeout limit. Monitor closely.');
+      }
+      
+      // Error rate risk
+      if (errorRate > 10) {
+        riskScore += 15;
+        riskFactors.push('🔄 High error rate expected. This will increase actions and runtime.');
+        powerAutomateGuidance.push('Implement robust Try-Catch scopes and error logging for reliability.');
+      } else if (errorRate > 5) {
+        riskScore += 8;
+        riskFactors.push('📊 Moderate error rate. Account for retries in planning.');
+      }
+      
+      // Retry complexity risk
+      if (retryAttempts > 5) {
+        riskScore += 10;
+        riskFactors.push('🔁 High number of retry attempts. May lead to extended runtimes and increased PPR.');
+      }
+
+      const riskClass = riskScore > 60 ? 'high' : riskScore > 30 ? 'medium' : 'low';
+      const statusMessage = generateEnhancedStatusMessage(criticalIssues, riskFactors, riskClass, batchingNeeded, numberOfBatches, connectorData, actualRPM, concurrency, flowPattern, dataOperations, powerAutomateGuidance);
+
+      // License options analysis
+      const licenseAnalysis = calculateLicenseOptions(dailyPPR, clientUsers, currentPremium, currentProcess, hasPremiumConnectors);
+
+      // Update display with enhanced metrics
+      updateDisplay({
+        scenarioName,
+        totalActionsWithRetries,
+        monthlyActions,
+        adjustedRuntime,
+        actualRPM,
+        connectorData,
+        riskClass,
+        statusMessage,
+        payPerUseCost,
+        premiumFee: hasPremiumConnectors ? 20.00 : 0, // Placeholder for potential fixed premium connector cost if any
+        licenseAnalysis,
+        retryMultiplier,
+        throttlingImpact,
+        batchingNeeded,
+        numberOfBatches,
+        timeoutRisk,
+        baseActions
+      });
+    }
+
+    /**
+     * Calculates the multiplier for total actions due to retries based on error rate.
+     * Assumes a simple retry model where each failed action is retried N times.
+     * @param {number} errorRate - Expected error rate as a percentage (0-100).
+     * @param {number} retryAttempts - Number of retry attempts.
+     * @returns {number} Multiplier for total actions.
+     */
+    function calculateRetryMultiplier(errorRate, retryAttempts) {
+      if (errorRate === 0 || retryAttempts === 0) return 1;
+      
+      const failureRate = errorRate / 100;
+      let multiplier = 1; // Original attempt
+      
+      // Add additional attempts based on failure rate and retries
+      for (let i = 0; i < retryAttempts; i++) {
+        multiplier += Math.pow(failureRate, i + 1);
+      }
+      
+      return multiplier;
+    }
+
+    /**
+     * Calculates estimated delay due to throttling.
+     * @param {number} actualRPM - The calculated RPM the flow will generate.
+     * @param {number} connectorLimitRPM - The connector's RPM limit.
+     * @param {number} throttleDelaySeconds - Average delay per throttled request in seconds.
+     * @param {string} throttleHandling - How throttling is handled ('fail', 'retry', 'queue').
+     * @returns {object} An object with delayMinutes and throttled status.
+     */
+    function calculateThrottlingImpact(actualRPM, connectorLimitRPM, throttleDelaySeconds, throttleHandling) {
+        if (actualRPM <= connectorLimitRPM) {
+            return { delayMinutes: 0, throttled: false, failures: 0 };
+        }
+
+        const excessRPM = actualRPM - connectorLimitRPM;
+        let delayMinutes = 0;
+        let failures = 0;
+
+        switch (throttleHandling) {
+            case 'fail':
+                failures = excessRPM; // Estimate how many requests will fail
+                // No delay added as they fail immediately
+                break;
+            case 'retry':
+                // Estimate the extra time needed for the excess requests to clear after retries
+                delayMinutes = (excessRPM / connectorLimitRPM) * (throttleDelaySeconds / 60);
+                break;
+            case 'queue':
+                // Estimate queueing time (simplified)
+                delayMinutes = (excessRPM / connectorLimitRPM); // Each excess request takes one "slot" of time
+                break;
+        }
+        return { delayMinutes, throttled: true, failures };
+    }
+
+    /**
+     * Generates a comprehensive status message with risk analysis and recommendations.
+     */
+    function generateEnhancedStatusMessage(criticalIssues, riskFactors, riskClass, batchingNeeded, numberOfBatches, connectorData, actualRPM, concurrency, flowPattern, dataOperations, powerAutomateGuidance) {
+      let message = '';
+      
+      // Critical issues first (in red boxes)
+      if (criticalIssues.length > 0) {
+        message += `<div class="critical-warning">${criticalIssues.join('<br>')}</div>`;
+        
+        // Add specific throttling solutions
+        if (actualRPM > connectorData.rpm) {
+          const suggestedConcurrency = Math.max(1, Math.floor(concurrency * connectorData.rpm / actualRPM));
+          message += `<br><strong>🔧 IMMEDIATE FIXES REQUIRED:</strong><br>`;
+          if (flowPattern === 'apply_to_each') {
+             message += `• Set Apply to Each concurrency to ${suggestedConcurrency > 0 ? suggestedConcurrency : 1} (current: ${concurrency})<br>`;
+          }
+          message += `• Add a 'Delay' action (e.g., 1-2 seconds) between calls to ${connectorData.name || 'this connector'}<br>`;
+          message += `• Implement explicit retry logic for 429 (Too Many Requests) errors.<br>`;
+        }
+      }
+      
+      // Power Automate specific guidance
+      if (powerAutomateGuidance.length > 0) {
+        if (message) message += '<br>'; // Add space if previous content exists
+        message += `<strong>🎯 POWER AUTOMATE BEST PRACTICES:</strong><br>`;
+        message += powerAutomateGuidance.map(guide => `• ${guide}`).join('<br>');
+      }
+      
+      // Flow pattern specific advice
+      if (message) message += '<br>';
+      message += getFlowPatternAdvice(flowPattern, dataOperations, actualRPM, connectorData, concurrency);
+      
+      // Other risk factors
+      if (riskFactors.length > 0) {
+        if (message) message += '<br>';
+        message += `<strong>Considerations:</strong><br>${riskFactors.map(factor => `• ${factor}`).join('<br>')}`;
+      }
+      
+      // Batching recommendations
+      if (batchingNeeded && numberOfBatches > 1) {
+        if (message) message += '<br>';
+        message += `📦 Recommended: Split into ${numberOfBatches} batches for better reliability and to manage timeouts/throttling.`;
+      }
+      
+      // Success message if no issues
+      if (criticalIssues.length === 0 && riskFactors.length === 0 && powerAutomateGuidance.length === 0) {
+        message = '✅ Low Risk: Your flow configuration is well optimized and within Power Automate limits.';
+      }
+      
+      return message;
+    }
+
+    /**
+     * Provides flow pattern specific advice.
+     */
+    function getFlowPatternAdvice(flowPattern, dataOperations, actualRPM, connectorData, concurrency) {
+      let advice = `<strong>📋 WHAT THIS MEANS FOR YOUR FLOW DESIGN:</strong><br>`;
+      
+      switch (flowPattern) {
+        case 'apply_to_each':
+          advice += `• "Apply to Each" processes items concurrently (up to 20 by default). Your setting: ${concurrency}.<br>`;
+          advice += `• Each iteration consumes PPR and makes connector calls, contributing to ${actualRPM.toFixed(0)} RPM.<br>`;
+          if (actualRPM > connectorData.rpm * 0.7) {
+            advice += `• **Action needed:** Reduce concurrency in 'Apply to Each' settings or introduce delays.<br>`;
+          }
+          break;
+        case 'nested_apply':
+          advice += `• Nested "Apply to Each" loops are performance intensive and prone to timeouts/memory issues.<br>`;
+          advice += `• Consider flattening data or using child flows for better scalability.<br>`;
+          break;
+        case 'parallel_branches':
+          advice += `• Parallel branches can improve throughput but significantly increase instantaneous connector load.<br>`;
+          advice += `• Monitor for throttling as all branches hit connectors simultaneously. Consider staggering branch execution.<br>`;
+          break;
+        case 'child_flows':
+          advice += `• Parent-child flows provide better error isolation and separate 30-minute timeout limits.<br>`;
+          advice += `• Ideal for processing large datasets in manageable chunks, or isolating complex logic.<br>`;
+          break;
+        case 'simple':
+            advice += `• Simple sequential flows are generally predictable but can be slow for large datasets.<br>`;
+            break;
+      }
+      
+      switch (dataOperations) {
+        case 'filter':
+          advice += `• 'Filter Array' operations process data in memory. Large datasets can hit memory limits.<br>`;
+          advice += `• Consider server-side filtering (OData queries) if the data source supports it.<br>`;
+          break;
+        case 'select':
+          advice += `• 'Select' operations efficiently transform data but still consume memory.<br>`;
+          break;
+        case 'parse_json':
+          advice += `• 'Parse JSON' operations are memory-intensive for very large JSON payloads.<br>`;
+          advice += `• Ensure payload sizes are reasonable or process in chunks.<br>`;
+          break;
+        case 'multiple':
+          advice += `• Using multiple data operations increases memory usage and processing time.<br>`;
+          advice += `• Consider consolidating operations or using 'Compose' actions where possible.<br>`;
+          break;
+      }
+      
+      return advice;
+    }
+
+    /**
+     * Calculates and recommends the most cost-effective license options.
+     * @param {number} dailyPPR - Estimated daily PPR consumption.
+     * @param {number} clientUsers - Number of users who will use the flow.
+     * @param {number} currentPremium - Number of existing Premium licenses.
+     * @param {number} currentProcess - Number of existing Process licenses.
+     * @param {boolean} hasPremiumConnectors - True if the flow uses premium connectors.
+     * @returns {object} Analysis of license options, including the cheapest.
+     */
+    function calculateLicenseOptions(dailyPPR, clientUsers, currentPremium, currentProcess, hasPremiumConnectors) {
+        const options = [];
+
+        // Option 1: Power Automate Free (if no premium connectors and low PPR)
+        if (!hasPremiumConnectors && dailyPPR <= LICENSES.free.pprLimit) {
+            options.push({
+                type: 'free',
+                name: LICENSES.free.name,
+                cost: LICENSES.free.price,
+                description: `Provides ${LICENSES.free.pprLimit.toLocaleString()} PPR/day.`,
+                savings: 'Completely free!',
+                covered: true
+            });
+        }
+
+        // Option 2: Use existing Premium licenses
+        if (currentPremium > 0) {
+            const pprCapacity = currentPremium * LICENSES.premium.pprLimit;
+            const sufficientPPR = dailyPPR <= pprCapacity;
+            options.push({
+                type: 'existing_premium',
+                name: `Use Existing Premium Licenses (${currentPremium} users)`,
+                cost: 0,
+                description: `${currentPremium} Premium licenses provide ${pprCapacity.toLocaleString()} PPR/day capacity.`,
+                savings: 'Leveraging existing licenses!',
+                covered: sufficientPPR,
+                warning: !sufficientPPR ? `⚠️ Insufficient PPR capacity (need ${dailyPPR.toLocaleString()})` : null
+            });
+        }
+
+        // Option 3: Use existing Process license(s)
+        if (currentProcess > 0) {
+            const pprCapacity = currentProcess * LICENSES.process.pprLimit;
+            const sufficientPPR = dailyPPR <= pprCapacity;
+            options.push({
+                type: 'existing_process',
+                name: `Use Existing Process License(s) (${currentProcess})`,
+                cost: 0,
+                description: `${currentProcess} Process licenses provide ${pprCapacity.toLocaleString()} PPR/day capacity.`,
+                savings: 'Leveraging existing capacity!',
+                covered: sufficientPPR,
+                warning: !sufficientPPR ? `⚠️ Insufficient PPR capacity (need ${dailyPPR.toLocaleString()})` : null
+            });
+        }
+
+        // Option 4: Buy new Premium licenses (user-based)
+        // Only consider if premium connectors are used or if users need premium features
+        if (hasPremiumConnectors || dailyPPR > LICENSES.free.pprLimit) {
+            const premiumLicensesNeeded = Math.ceil(dailyPPR / LICENSES.premium.pprLimit);
+            const actualPremiumUsersToBuy = Math.max(clientUsers, premiumLicensesNeeded); // Buy for users, or enough for PPR if users are fewer than needed for PPR
+            
+            const premiumCost = actualPremiumUsersToBuy * LICENSES.premium.price;
+            const totalPremiumPPR = actualPremiumUsersToBuy * LICENSES.premium.pprLimit;
+            options.push({
+                type: 'buy_premium',
+                name: `Buy Power Automate Premium (${actualPremiumUsersToBuy} users)`,
+                cost: premiumCost,
+                description: `${actualPremiumUsersToBuy} × £${LICENSES.premium.price}/month = ${totalPremiumPPR.toLocaleString()} PPR/day capacity.`,
+                covered: dailyPPR <= totalPremiumPPR,
+                warning: dailyPPR > totalPremiumPPR ? `⚠️ This number of licenses may not cover your PPR. Consider more or Process license.` : null
+            });
+        }
+
+        // Option 5: Buy new Process license(s) (flow-based)
+        if (hasPremiumConnectors || dailyPPR > LICENSES.free.pprLimit) {
+            const processLicensesNeeded = Math.ceil(dailyPPR / LICENSES.process.pprLimit);
+            const processCost = processLicensesNeeded * LICENSES.process.price;
+            const totalProcessPPR = processLicensesNeeded * LICENSES.process.pprLimit;
+            options.push({
+                type: 'buy_process',
+                name: `Buy Power Automate Process License(s) (${processLicensesNeeded} needed)`,
+                cost: processCost,
+                description: `${processLicensesNeeded} × £${LICENSES.process.price}/month = ${totalProcessPPR.toLocaleString()} PPR/day capacity.`,
+                covered: dailyPPR <= totalProcessPPR,
+                warning: dailyPPR > totalProcessPPR ? `⚠️ This number of licenses may not cover your PPR. Consider more.` : null
+            });
+        }
+
+        // Option 6: Pay-per-use PPR blocks (if no other license covers it)
+        const pprBlocksNeeded = Math.ceil(dailyPPR * 30 / PPR_PER_BLOCK); // Monthly PPR needed
+        const payPerUseCost = pprBlocksNeeded * PPR_BLOCK_PRICE;
+        options.push({
+            type: 'pay_per_use',
+            name: `Pay-as-you-go (PPR Blocks)`,
+            cost: payPerUseCost,
+            description: `Estimated ${pprBlocksNeeded} blocks/month (${(dailyPPR*30).toLocaleString()} PPR/month).`,
+            covered: true // Always covers if you pay enough
+        });
+
+
+        // Determine best value option
+        let cheapestOption = { cost: Infinity, name: 'N/A' };
+        options.forEach(opt => {
+            if (opt.covered && opt.cost < cheapestOption.cost) {
+                cheapestOption = opt;
+            }
+        });
+
+        // Mark best option(s)
+        options.forEach(opt => {
+            opt.bestValue = (opt.cost === cheapestOption.cost && opt.covered);
+            opt.recommended = opt.bestValue; // If it's best value and covers, it's recommended
+        });
+
+        // If no 'covered' option is found, recommend the cheapest that *could* cover, or the pay-per-use
+        if (cheapestOption.cost === Infinity) {
+            const sortedOptions = [...options].sort((a,b) => a.cost - b.cost);
+            if (sortedOptions.length > 0) {
+                cheapestOption = sortedOptions[0];
+                cheapestOption.recommended = true; // Recommend the cheapest even if it doesn't fully cover, but add warning.
+                cheapestOption.warning = cheapestOption.warning || "⚠️ This option may not fully cover your estimated PPR consumption. Review pricing details.";
+            }
+        }
+
+        return { options, cheapest: cheapestOption, needsPremiumForConnectors: hasPremiumConnectors };
+    }
+
+
+    /**
+     * Updates the HTML display with all calculated metrics and recommendations.
+     * @param {object} data - Object containing all calculated data.
+     */
+    function updateDisplay(data) {
+      document.getElementById('currentScenarioName').textContent = data.scenarioName;
+      document.getElementById('totalActions').textContent = data.totalActionsWithRetries.toLocaleString();
+      document.getElementById('monthlyActions').textContent = data.monthlyActions.toLocaleString();
+      document.getElementById('runtime').textContent = data.adjustedRuntime.toFixed(1) + ' min';
+      document.getElementById('rpm').textContent = `${data.actualRPM.toFixed(0)} / ${data.connectorData.rpm}`;
+
+      // Enhanced cost breakdown with retry overhead
+      const retryOverheadActions = data.totalActionsWithRetries - data.baseActions;
+      const costBreakdownElement = document.getElementById('costBreakdown');
+      costBreakdownElement.innerHTML = `
+        <h3>Current Flow Analysis</h3>
+        <div class="metric">
+          <span class="metric-label">Estimated PPR per Day</span>
+          <span class="metric-value">${(data.monthlyActions / 30).toLocaleString()}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Estimated PPR per Month</span>
+          <span class="metric-value">${data.monthlyActions.toLocaleString()}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Uses Premium Connectors</span>
+          <span class="metric-value">${data.needsPremiumForConnectors ? 'Yes' : 'No'}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Retry Overhead Actions</span>
+          <span class="metric-value">+${retryOverheadActions.toLocaleString()} (${((data.retryMultiplier - 1) * 100).toFixed(1)}%)</span>
+        </div>
+        ${data.throttlingImpact.delayMinutes > 0 ? `
+        <div class="metric">
+          <span class="metric-label">Throttling Delay per Run</span>
+          <span class="metric-value">+${data.throttlingImpact.delayMinutes.toFixed(1)} min</span>
+        </div>
+        ` : ''}
+        ${data.throttlingImpact.failures > 0 ? `
+        <div class="warning">
+          <strong>🚨 WARNING:</strong> Estimated ${data.throttlingImpact.failures.toFixed(0)} requests/min will fail due to throttling!
+        </div>
+        ` : ''}
+        <div class="info" style="margin-top: 12px; padding: 8px; font-size: 0.75rem;">
+          <strong>Key:</strong> Power Automate licensing is based on users/capacity and PPR consumption, not per-action costs. 
+          Premium connectors require Premium or Process licenses.
+        </div>
+      `;
+
+      // Risk analysis
+      const analysisCard = document.getElementById('analysisCard');
+      analysisCard.className = 'analysis ' + data.riskClass;
+      const statusElement = document.getElementById('statusMessage');
+      statusElement.className = 'status ' + data.riskClass;
+      statusElement.innerHTML = data.statusMessage;
+
+
+      // License options
+      const optionsContainer = document.getElementById('licenseOptions');
+      optionsContainer.innerHTML = '';
+
+      data.licenseAnalysis.options.forEach(option => {
+        const div = document.createElement('div');
+        div.className = `license-option ${option.recommended ? 'selected' : ''} ${option.bestValue ? 'best' : ''}`;
+        
+        let savingsText = '';
+        if (option.bestValue && option.cost < data.licenseAnalysis.cheapest.cost) { // Ensure savings only shown if it's genuinely cheaper
+             savingsText = `<div class="license-savings">🏆 Best Value Option</div>`;
+        } else if (option.savings) {
+             savingsText = `<div class="license-savings">${option.savings}</div>`;
+        }
+
+        div.innerHTML = `
+          <div class="license-title">${option.name}</div>
+          <div class="license-price">£${option.cost.toFixed(2)}/month</div>
+          <div class="license-details">${option.description}</div>
+          ${savingsText}
+          ${option.warning ? `<div class="warning" style="margin-top:4px; padding: 4px 8px; font-size: 0.7rem; color: #92400e; background-color: #fef3c7; border: 1px solid #fbbf24;">${option.warning}</div>` : ''}
+        `;
+        
+        optionsContainer.appendChild(div);
+      });
+
+      // Savings summary
+      const savingsContainer = document.getElementById('savingsSection');
+      if (data.licenseAnalysis.cheapest && data.licenseAnalysis.cheapest.cost !== Infinity) {
+          const yearlySavings = data.licenseAnalysis.cheapest.cost * 12; // Use the cheapest option's cost
+          savingsContainer.innerHTML = `
+            <div class="savings-highlight">
+              <h3>💰 Cheapest License Option Recommended</h3>
+              <div style="font-size: 1.25rem; font-weight: bold; margin: 8px 0;">
+                <span style="color: #065f46;">£${data.licenseAnalysis.cheapest.cost.toFixed(2)}/month</span>
+                (£${yearlySavings.toFixed(2)}/year)
+              </div>
+              <div style="font-size: 0.875rem;">
+                Based on your estimated usage, the **${data.licenseAnalysis.cheapest.name}** is the most cost-effective.
+              </div>
+            </div>
+          `;
+      } else {
+        savingsContainer.innerHTML = '';
+      }
+    }
+
+    // --- User Interaction Functions ---
+
+    function toggleAdvanced() {
+      advancedVisible = !advancedVisible;
+      const section = document.getElementById('advancedSettings');
+      const btn = document.querySelector('.toggle-btn');
+      
+      if (advancedVisible) {
+        section.classList.remove('hidden');
+        btn.textContent = 'Hide Advanced Settings';
+      } else {
+        section.classList.add('hidden');
+        btn.textContent = 'Advanced Settings';
+      }
+    }
+
+    function loadPreset(size) {
+      const preset = PRESET_SCENARIOS[size];
+      document.getElementById('scenarioName').value = preset.scenarioName;
+      document.getElementById('items').value = preset.items;
+      document.getElementById('actionsPerItem').value = preset.actionsPerItem;
+      document.getElementById('avgMs').value = preset.avgMs;
+      document.getElementById('concurrency').value = preset.concurrency;
+      document.getElementById('executions').value = preset.executions;
+      // Load advanced settings from preset
+      document.getElementById('errorRate').value = preset.errorRate;
+      document.getElementById('premiumConnectors').value = preset.premiumConnectors;
+      document.getElementById('flowPattern').value = preset.flowPattern;
+      document.getElementById('dataOperations').value = preset.dataOperations;
+      
+      calculate();
+    }
+
+    function saveScenario() {
+      // Ensure all inputs are valid before saving
+      const inputs = document.querySelectorAll('input[type="number"]');
+      let allValid = true;
+      inputs.forEach(input => {
+          if (!validateInput(input)) {
+              allValid = false;
+          }
+      });
+      if (!allValid) {
+          alert('Please correct invalid inputs before saving the scenario.');
+          return;
+      }
+
+      const scenario = {
+        id: Date.now(),
+        name: document.getElementById('scenarioName').value,
+        items: parseInt(document.getElementById('items').value),
+        actionsPerItem: parseInt(document.getElementById('actionsPerItem').value),
+        avgMs: parseInt(document.getElementById('avgMs').value),
+        concurrency: parseInt(document.getElementById('concurrency').value),
+        connector: document.getElementById('connector').value,
+        executions: parseInt(document.getElementById('executions').value),
+        clientUsers: parseInt(document.getElementById('clientUsers').value),
+        currentPremium: parseInt(document.getElementById('currentPremium').value),
+        currentProcess: parseInt(document.getElementById('currentProcess').value),
+        // Advanced Settings
+        retryAttempts: parseInt(document.getElementById('retryAttempts').value),
+        retryInterval: document.getElementById('retryInterval').value,
+        timeoutMinutes: parseInt(document.getElementById('timeoutMinutes').value),
+        throttleHandling: document.getElementById('throttleHandling').value,
+        errorRate: parseInt(document.getElementById('errorRate').value),
+        premiumConnectors: parseInt(document.getElementById('premiumConnectors').value),
+        networkLatency: parseInt(document.getElementById('networkLatency').value),
+        flowPattern: document.getElementById('flowPattern').value,
+        dataOperations: document.getElementById('dataOperations').value,
+        batchSize: parseInt(document.getElementById('batchSize').value)
+      };
+
+      scenarios.push(scenario);
+      saveScenariosToLocalStorage(); // Save to local storage
+      updateScenariosList();
+      
+      alert(`Scenario "${scenario.name}" saved!`);
+      // Optionally reset form for next scenario
+      // document.getElementById('scenarioName').value = 'New Scenario';
+      // calculate();
+    }
+
+    function loadScenario(id) {
+      const scenario = scenarios.find(s => s.id === id);
+      if (scenario) {
+        // Populate all fields from the saved scenario
+        Object.keys(scenario).forEach(key => {
+          const element = document.getElementById(key);
+          if (element && key !== 'id') { // Don't try to set the ID input
+            element.value = scenario[key];
+          }
+        });
+        calculate(); // Recalculate based on loaded values
+      }
+    }
+
+    function deleteScenario(id) {
+        if (confirm('Are you sure you want to delete this scenario?')) {
+            scenarios = scenarios.filter(s => s.id !== id);
+            saveScenariosToLocalStorage();
+            updateScenariosList();
+            alert('Scenario deleted.');
+        }
+    }
+
+    // --- Local Storage Functions ---
+    function saveScenariosToLocalStorage() {
+        localStorage.setItem('powerAutomateScenarios', JSON.stringify(scenarios));
+    }
+
+    function loadScenariosFromLocalStorage() {
+        const storedScenarios = localStorage.getItem('powerAutomateScenarios');
+        if (storedScenarios) {
+            scenarios = JSON.parse(storedScenarios);
+            updateScenariosList();
+        }
+    }
+
+    /**
+     * Updates the list of saved scenarios displayed in the UI.
+     */
+    function updateScenariosList() {
+      const container = document.getElementById('scenariosList');
+      const card = document.getElementById('scenariosCard');
+      
+      if (scenarios.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      card.style.display = 'block';
+      container.innerHTML = ''; // Clear existing list
+
+      scenarios.forEach(scenario => {
+        // Recalculate metrics for display from saved scenario data
+        const tempBaseActions = scenario.items * scenario.actionsPerItem;
+        const tempConnectorData = CONNECTORS[scenario.connector];
+        const tempPatternAdjustedActions = tempBaseActions * (PRESET_SCENARIOS[scenario.flowPattern] ? PRESET_SCENARIOS[scenario.flowPattern].patternMultipliers[scenario.flowPattern] : 1.0); // Use pattern multiplier if defined in preset
+        const tempDataAdjustedActions = tempPatternAdjustedActions * (PRESET_SCENARIOS[scenario.dataOperations] ? PRESET_SCENARIOS[scenario.dataOperations].dataOperationOverhead[scenario.dataOperations] : 1.0); // Use data op multiplier if defined in preset
+        const tempRetryMultiplier = calculateRetryMultiplier(scenario.errorRate, scenario.retryAttempts);
+        const tempTotalActionsWithRetries = Math.round(tempDataAdjustedActions * tempRetryMultiplier);
+        const tempMonthlyPPR = tempTotalActionsWithRetries * scenario.executions * 30;
+        
+        // Find the cheapest license cost for this saved scenario
+        const tempLicenseAnalysis = calculateLicenseOptions(tempMonthlyPPR / 30, scenario.clientUsers, scenario.currentPremium, scenario.currentProcess, (tempConnectorData.premium || scenario.premiumConnectors > 0));
+        const savedScenarioCost = tempLicenseAnalysis.cheapest ? tempLicenseAnalysis.cheapest.cost : 'N/A';
+
+        const div = document.createElement('div');
+        div.className = 'license-option';
+        div.innerHTML = `
+          <div class="license-title">${scenario.name}</div>
+          <div class="license-details">
+            Runs: ${scenario.executions} daily • Total Actions: ${tempTotalActionsWithRetries.toLocaleString()}/run • Monthly PPR: ${tempMonthlyPPR.toLocaleString()}
+          </div>
+          <div class="license-price" style="font-size: 0.9rem; margin-top: 4px;">
+            Estimated Monthly Cost: £${typeof savedScenarioCost === 'number' ? savedScenarioCost.toFixed(2) : savedScenarioCost}
+          </div>
+          <button class="preset-btn" onclick="loadScenario(${scenario.id})" style="margin-top: 8px; margin-right: 8px;">Load</button>
+          <button class="preset-btn" style="background: #fee2e2; color: #991b1b;" onclick="deleteScenario(${scenario.id})">Delete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+
+    // --- Initialization ---
+    // Initial calculation on page load
+    loadScenariosFromLocalStorage(); // Load any previously saved scenarios
+    calculate(); // Perform initial calculation
+  </script>
+</body>
 </html>
+
