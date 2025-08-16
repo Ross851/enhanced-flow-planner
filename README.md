@@ -1,11 +1,12 @@
-# ⚙️ Power Automate Cost & License Planner
+# ⚙️ Power Automate Ultimate Cost & License Planner v2.0
 
-A comprehensive web-based calculator that helps you estimate costs, analyze performance risks, and choose the right Microsoft Power Automate licenses for your automation projects.
+The industry-leading web-based calculator for Power Automate cost estimation, performance analysis, and license optimization. Now with URL parameters, 2024 licensing updates, and PowerDocu integration!
 
-![Power Automate Planner](https://img.shields.io/badge/Power%20Automate-Cost%20Planner-blue?style=for-the-badge&logo=microsoft)
+![Power Automate Planner](https://img.shields.io/badge/Power%20Automate-Ultimate%20Planner%20v2.0-blue?style=for-the-badge&logo=microsoft)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![New](https://img.shields.io/badge/NEW-URL%20Parameters-red?style=for-the-badge)
 
 ## 🎯 What This Tool Does
 
@@ -18,6 +19,33 @@ This calculator analyzes your Power Automate flow configuration and provides:
 - 📊 **PPR (Power Platform Request) consumption analysis**
 - 🔄 **Retry and error handling impact calculations**
 
+## 🆕 What's New in v2.0
+
+### 🔗 URL Parameters Support
+- Prepopulate fields via URL for easy sharing
+- Base64 encoded full configuration support
+- Create bookmarkable scenarios
+- Perfect for integration with documentation
+
+### 📊 2024 Licensing Updates
+- Power Automate Process: £81.90/flow (250k PPR/day)
+- Power Automate Hosted Process: £118.60/flow
+- Process license stacking for additional PPR
+- Flow association (up to 25 child flows per Process)
+- **⚠️ April 1, 2025 Premium Connector Enforcement Warning**
+
+### 📄 PowerDocu Integration
+- Dedicated tab for PowerDocu workflow
+- Extract metrics from documented flows
+- Map PowerDocu output to cost calculations
+- Future automated import capabilities
+
+### 🛡️ Governance Risk Calculator
+- Based on real Kaplan case study (2,490 flows, ZERO governance)
+- GDPR/compliance risk assessment
+- Potential fine calculations
+- Implementation roadmap
+
 ## 🚀 Features
 
 ### 📈 Advanced Analytics
@@ -25,23 +53,28 @@ This calculator analyzes your Power Automate flow configuration and provides:
 - Throttling detection and mitigation suggestions
 - Runtime estimation with timeout warnings
 - Retry overhead calculations
+- PPR stacking calculations
 
 ### 💡 Smart Recommendations
 - Automatic license option comparison
-- Cost optimization suggestions
-- Flow pattern best practices
+- Cost optimization with 2024 pricing
+- Flow pattern best practices from real implementations
 - Connector-specific guidance
+- Enforcement deadline alerts
 
 ### 🛠️ Configuration Options
 - Multiple flow patterns (Apply to Each, Parallel Branches, Child Flows)
 - Retry and error handling settings
 - Data operation overhead calculations
 - Network latency considerations
+- Governance level assessment
 
-### 💾 Scenario Management
-- Save and load multiple scenarios
-- Quick start templates
-- Scenario comparison capabilities
+### 💾 Enhanced Management
+- Import/Export JSON configurations
+- Copy shareable URLs with parameters
+- Quick start templates including Kaplan scenario
+- Auto-save to localStorage
+- Multiple comparison tabs
 
 ## 📋 How to Use
 
@@ -172,11 +205,30 @@ const patternMultipliers = {
 
 ## 🚀 Getting Started
 
-1. **Clone or download** the HTML file
-2. **Open in any modern web browser**
-3. **Fill in your flow configuration**
-4. **Review recommendations and optimize**
-5. **Save scenarios** for future reference
+### Quick Start
+1. **Open** `enhanced-index.html` in any modern browser
+2. **Choose** a preset template or enter your flow details
+3. **Review** cost analysis and recommendations
+4. **Share** via URL or export configuration
+
+### Using URL Parameters
+Share specific configurations by adding parameters to the URL:
+
+```
+enhanced-index.html?items=5000&actionsPerItem=3&executions=24&scenarioName=Daily%20Sync
+```
+
+Or use base64 encoding for complete configurations:
+```javascript
+const config = { items: 5000, actionsPerItem: 3, /* ... */ };
+const url = `enhanced-index.html?config=${btoa(JSON.stringify(config))}`;
+```
+
+### PowerDocu Integration
+1. Run PowerDocu on your existing flows
+2. Note the action counts and connectors
+3. Input metrics into the planner
+4. Get accurate cost estimates based on actual flow structure
 
 ## 📱 Browser Compatibility
 
@@ -207,4 +259,4 @@ This tool provides estimates based on publicly available Microsoft documentation
 
 **Made with ❤️ for the Power Platform community**
 
-*Last updated: June 2025*
+*Last updated: August 2025 - Version 2.0 with URL Parameters and PowerDocu Integration*
