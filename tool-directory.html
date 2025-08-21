@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Optimization Suite - Complete Tool Collection</title>
+    <style>
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #004578;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-90: #605e5c;
+            --ms-gray-130: #323130;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: var(--ms-blue-dark);
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .header p {
+            color: var(--ms-gray-90);
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .best-practices {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        .best-practices h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .practices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .practice-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid white;
+        }
+
+        .practice-item strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .practice-item span {
+            font-size: 14px;
+            line-height: 1.4;
+            opacity: 0.95;
+        }
+
+        .tools-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 3px solid var(--ms-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title h2 {
+            color: var(--ms-blue-dark);
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title .badge {
+            background: var(--ms-green);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .tool-card {
+            background: var(--ms-gray-10);
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: var(--ms-blue);
+        }
+
+        .tool-card.featured {
+            border-color: var(--ms-green);
+            background: linear-gradient(135deg, #f0fff4 0%, #e8f5e9 100%);
+        }
+
+        .tool-card.featured::before {
+            content: '⭐ FEATURED';
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background: var(--ms-green);
+            color: white;
+            padding: 5px 40px;
+            font-size: 10px;
+            font-weight: bold;
+            transform: rotate(45deg);
+        }
+
+        .tool-card h3 {
+            color: var(--ms-blue-dark);
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tool-card p {
+            color: var(--ms-gray-90);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .tool-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .tool-features li {
+            font-size: 13px;
+            color: var(--ms-gray-90);
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tool-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--ms-green);
+            font-weight: bold;
+        }
+
+        .tool-card a {
+            display: inline-block;
+            background: var(--ms-blue);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .tool-card a:hover {
+            background: var(--ms-blue-dark);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-active {
+            background: #e8f5e9;
+            color: var(--ms-green);
+        }
+
+        .status-legacy {
+            background: #fff3e0;
+            color: var(--ms-orange);
+        }
+
+        .quick-links {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .quick-links h3 {
+            color: var(--ms-blue-dark);
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--ms-gray-10);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--ms-gray-130);
+            transition: all 0.3s;
+        }
+
+        .quick-link:hover {
+            background: var(--ms-blue);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .server-status {
+            background: #e8f5e9;
+            border: 2px solid var(--ms-green);
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--ms-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--ms-gray-90);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Power Automate Optimization Suite</h1>
+            <p>
+                A comprehensive collection of tools to help you optimize Power Automate flows BEFORE deployment. 
+                Understand licensing costs, API throttling impacts, and performance implications to make informed decisions.
+            </p>
+            <div class="server-status">
+                <span class="status-dot"></span>
+                <strong>Server Active:</strong> http://localhost:8081
+            </div>
+        </div>
+
+        <!-- Best Practices Section -->
+        <div class="best-practices">
+            <h2>📋 Power Automate Licensing Best Practices</h2>
+            <div class="practices-grid">
+                <div class="practice-item">
+                    <strong>1. Know the Difference</strong>
+                    <span>CDs are included per user and per flow plans. Each covers different scenarios.</span>
+                </div>
+                <div class="practice-item">
+                    <strong>2. Check Premium Connectors</strong>
+                    <span>Using them requires per-user (£12.20) or per-flow (£81.90) licensing.</span>
+                </div>
+                <div class="practice-item">
+                    <strong>3. Mind the Environment</strong>
+                    <span>Licensing rules vary between production, sandbox, and trial environments.</span>
+                </div>
+                <div class="practice-item">
+                    <strong>4. Plan for Scale</strong>
+                    <span>If critical across the org, per-flow licensing may be cheaper long-term.</span>
+                </div>
+                <div class="practice-item">
+                    <strong>5. Audit Regularly</strong>
+                    <span>Review unused licenses and flows - don't pay for what you don't need.</span>
+                </div>
+                <div class="practice-item">
+                    <strong>6. Combine Smartly</strong>
+                    <span>Mix CD licenses for basic tasks and premium for business-critical flows.</span>
+                </div>
+                <div class="practice-item">
+                    <strong>7. Map Your Audience</strong>
+                    <span>Always map flows against user types before deciding licenses.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <h3>🔥 Quick Access</h3>
+            <div class="links-grid">
+                <a href="enhanced-visual-flow-builder.html" class="quick-link">
+                    <span>⭐</span>
+                    <span>Main Flow Builder</span>
+                </a>
+                <a href="user-impact-analyzer.html" class="quick-link">
+                    <span>👥</span>
+                    <span>User Impact Analyzer</span>
+                </a>
+                <a href="complete-optimization-tool.html" class="quick-link">
+                    <span>📊</span>
+                    <span>Complete Optimizer</span>
+                </a>
+                <a href="flow-analytics-dashboard.html" class="quick-link">
+                    <span>📈</span>
+                    <span>Analytics Dashboard</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Primary Tools -->
+        <div class="tools-section">
+            <div class="section-title">
+                <h2>🎯 Primary Tools <span class="badge">RECOMMENDED</span></h2>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card featured">
+                    <h3>⭐ Enhanced Visual Flow Builder</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>The most advanced flow builder with real-time optimization and cost analysis.</p>
+                    <ul class="tool-features">
+                        <li>Drag-and-drop flow building</li>
+                        <li>16 triggers & 50+ actions</li>
+                        <li>Real-time cost calculation</li>
+                        <li>API throttling analysis</li>
+                        <li>Integrated with User Impact Analyzer</li>
+                        <li>Best practices guidance</li>
+                    </ul>
+                    <a href="enhanced-visual-flow-builder.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card featured">
+                    <h3>👥 User Impact Analyzer</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Analyze how user count and account type affect API limits and licensing costs.</p>
+                    <ul class="tool-features">
+                        <li>User count impact calculations</li>
+                        <li>Service account vs individual analysis</li>
+                        <li>Per-connector API limit tracking</li>
+                        <li>Visual throttling risk indicators</li>
+                        <li>Licensing recommendations</li>
+                    </ul>
+                    <a href="user-impact-analyzer.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>📊 Complete Optimization Tool</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Comprehensive optimization analysis with detailed cost breakdowns and recommendations.</p>
+                    <ul class="tool-features">
+                        <li>Detailed PPR calculations</li>
+                        <li>License type recommendations</li>
+                        <li>Performance optimization tips</li>
+                        <li>Cost comparison charts</li>
+                        <li>Export capabilities</li>
+                    </ul>
+                    <a href="complete-optimization-tool.html">Launch Tool →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Builders -->
+        <div class="tools-section">
+            <div class="section-title">
+                <h2>🔧 Interactive Flow Builders</h2>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>🎨 Modern Flow Builder</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Clean, modern interface for flow building with animations and enhanced UX.</p>
+                    <ul class="tool-features">
+                        <li>Smooth animations</li>
+                        <li>Modern UI design</li>
+                        <li>Contextual help system</li>
+                        <li>Keyboard shortcuts</li>
+                    </ul>
+                    <a href="modern-flow-builder.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>🔄 Interactive Flow Builder</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Original interactive builder with core drag-and-drop functionality.</p>
+                    <ul class="tool-features">
+                        <li>Basic drag-and-drop</li>
+                        <li>Flow visualization</li>
+                        <li>Action configuration</li>
+                        <li>Simple interface</li>
+                    </ul>
+                    <a href="interactive-flow-builder.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>👁️ Flow Builder Preview</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Preview version with experimental features and testing capabilities.</p>
+                    <ul class="tool-features">
+                        <li>Preview features</li>
+                        <li>Testing mode</li>
+                        <li>Debug information</li>
+                        <li>Experimental UI</li>
+                    </ul>
+                    <a href="flow-builder-preview.html">Launch Tool →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics & Planning -->
+        <div class="tools-section">
+            <div class="section-title">
+                <h2>📈 Analytics & Planning Tools</h2>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>📈 Flow Analytics Dashboard</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Executive dashboard with charts and analytics for flow performance.</p>
+                    <ul class="tool-features">
+                        <li>Performance metrics</li>
+                        <li>Cost analytics</li>
+                        <li>Usage patterns</li>
+                        <li>Executive reporting</li>
+                    </ul>
+                    <a href="flow-analytics-dashboard.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>💡 Smart Tips System</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Intelligent tips and recommendations based on flow configuration.</p>
+                    <ul class="tool-features">
+                        <li>Contextual suggestions</li>
+                        <li>Best practice hints</li>
+                        <li>Performance tips</li>
+                        <li>Cost-saving advice</li>
+                    </ul>
+                    <a href="smart-tips-system.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>🔒 Security Environment Planner</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Plan flows with security and environment considerations in mind.</p>
+                    <ul class="tool-features">
+                        <li>Environment analysis</li>
+                        <li>Security recommendations</li>
+                        <li>Compliance checks</li>
+                        <li>Data governance</li>
+                    </ul>
+                    <a href="security-environment-planner.html">Launch Tool →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legacy Versions -->
+        <div class="tools-section">
+            <div class="section-title">
+                <h2>📚 Legacy Versions</h2>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>🎯 Visual Flow Planner v6</h3>
+                    <span class="status-indicator status-legacy">Legacy</span>
+                    <p>Version 6 of the visual flow planner with established features.</p>
+                    <ul class="tool-features">
+                        <li>Stable version</li>
+                        <li>Original features</li>
+                        <li>Classic interface</li>
+                    </ul>
+                    <a href="visual-flow-planner-v6.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>🔄 Ultimate Optimizer v8</h3>
+                    <span class="status-indicator status-legacy">Legacy</span>
+                    <p>Version 8 of the optimization tool with comprehensive analysis.</p>
+                    <ul class="tool-features">
+                        <li>Full optimization suite</li>
+                        <li>Advanced analytics</li>
+                        <li>Historical version</li>
+                    </ul>
+                    <a href="ultimate-optimizer-v8.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>🌐 Community Flow Builder</h3>
+                    <span class="status-indicator status-legacy">Legacy</span>
+                    <p>Community edition with sharing and collaboration features.</p>
+                    <ul class="tool-features">
+                        <li>Community features</li>
+                        <li>Sharing capabilities</li>
+                        <li>Collaboration tools</li>
+                    </ul>
+                    <a href="community-flow-builder.html">Launch Tool →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Tools -->
+        <div class="tools-section">
+            <div class="section-title">
+                <h2>🛠️ Additional Tools</h2>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>🧪 License Detection Test</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Test tool for license detection and validation logic.</p>
+                    <ul class="tool-features">
+                        <li>License validation</li>
+                        <li>Connector detection</li>
+                        <li>Testing utilities</li>
+                    </ul>
+                    <a href="test-license-detection.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>📝 Professional Planner v5</h3>
+                    <span class="status-indicator status-legacy">Legacy</span>
+                    <p>Professional edition with advanced planning capabilities.</p>
+                    <ul class="tool-features">
+                        <li>Professional features</li>
+                        <li>Advanced planning</li>
+                        <li>Enterprise focus</li>
+                    </ul>
+                    <a href="professional-planner-v5.html">Launch Tool →</a>
+                </div>
+
+                <div class="tool-card">
+                    <h3>🌍 GitHub Community Integration</h3>
+                    <span class="status-indicator status-active">● Active</span>
+                    <p>Integration with GitHub for community sharing and templates.</p>
+                    <ul class="tool-features">
+                        <li>GitHub integration</li>
+                        <li>Template sharing</li>
+                        <li>Community contributions</li>
+                    </ul>
+                    <a href="github-community-integration.html">Launch Tool →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <strong>Power Automate Optimization Suite</strong> - Built to help you make informed licensing decisions<br>
+                Server running at: <a href="http://localhost:8081" style="color: var(--ms-blue);">http://localhost:8081</a><br>
+                <br>
+                💡 <em>Remember: The goal is to understand the FULL cost impact BEFORE building your flows!</em>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

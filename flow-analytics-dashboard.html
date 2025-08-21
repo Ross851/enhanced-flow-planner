@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Power Automate Flow Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0078d4;
+            --primary-dark: #005a9e;
+            --success: #107c10;
+            --warning: #ffb900;
+            --danger: #d13438;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #323130;
+            --text-secondary: #605e5c;
+            --border: #e1dfdd;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Dashboard Container */
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .kpi-card.success::before {
+            background: var(--success);
+        }
+
+        .kpi-card.warning::before {
+            background: var(--warning);
+        }
+
+        .kpi-card.danger::before {
+            background: var(--danger);
+        }
+
+        .kpi-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-change.positive {
+            color: var(--success);
+        }
+
+        .kpi-change.negative {
+            color: var(--danger);
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-control {
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .chart-control.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Performance Chart */
+        .performance-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 250px;
+            padding: 20px 0;
+        }
+
+        .performance-bar {
+            width: 40px;
+            background: linear-gradient(to top, var(--primary), #40a9ff);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .performance-bar:hover {
+            transform: translateY(-5px);
+        }
+
+        .performance-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .performance-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Cost Breakdown */
+        .cost-breakdown {
+            padding: 20px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cost-item:last-child {
+            border-bottom: none;
+        }
+
+        .cost-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cost-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .cost-details {
+            text-align: right;
+        }
+
+        .cost-amount {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .cost-percentage {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Flow List */
+        .flow-list-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .flow-list-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flow-list-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .flow-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .flow-table th {
+            text-align: left;
+            padding: 12px 24px;
+            background: var(--bg-primary);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .flow-table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .flow-table tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .flow-name {
+            font-weight: 500;
+        }
+
+        .flow-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .flow-status.active {
+            background: #e7f6e7;
+            color: var(--success);
+        }
+
+        .flow-status.warning {
+            background: #fff4e6;
+            color: var(--warning);
+        }
+
+        .flow-status.error {
+            background: #fde7e9;
+            color: var(--danger);
+        }
+
+        /* Optimization Suggestions */
+        .suggestions-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .suggestion-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow);
+        }
+
+        .suggestion-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .suggestion-icon.high {
+            background: #fde7e9;
+            color: var(--danger);
+        }
+
+        .suggestion-icon.medium {
+            background: #fff4e6;
+            color: var(--warning);
+        }
+
+        .suggestion-icon.low {
+            background: #e3f2fd;
+            color: var(--primary);
+        }
+
+        .suggestion-content {
+            flex: 1;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .suggestion-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .suggestion-impact {
+            text-align: right;
+        }
+
+        .impact-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .impact-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Real-time Indicator */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            background: #e7f6e7;
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--success);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            font-size: 14px;
+        }
+
+        /* Export Modal */
+        .export-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .export-modal.active {
+            display: flex;
+        }
+
+        .export-content {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .export-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .export-options {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .export-option {
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .export-option:hover,
+        .export-option.selected {
+            border-color: var(--primary);
+            background: #f0f8ff;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <h1>📊 Flow Analytics Dashboard</h1>
+            <div class="live-indicator">
+                <span class="live-dot"></span>
+                Real-time monitoring
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn" onclick="refreshData()">🔄 Refresh</button>
+            <button class="btn" onclick="showExportModal()">📤 Export</button>
+            <button class="btn btn-primary" onclick="showSettings()">⚙️ Settings</button>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="dashboard">
+        <div class="filter-bar">
+            <div class="filter-group">
+                <span class="filter-label">Time Range:</span>
+                <select class="filter-select" id="timeRange">
+                    <option value="today">Today</option>
+                    <option value="week" selected>Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                    <option value="quarter">Last Quarter</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Environment:</span>
+                <select class="filter-select" id="environment">
+                    <option value="all">All Environments</option>
+                    <option value="production">Production</option>
+                    <option value="test">Test</option>
+                    <option value="dev">Development</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Flow Type:</span>
+                <select class="filter-select" id="flowType">
+                    <option value="all">All Types</option>
+                    <option value="automated">Automated</option>
+                    <option value="instant">Instant</option>
+                    <option value="scheduled">Scheduled</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card success">
+                <div class="kpi-label">Total Flows</div>
+                <div class="kpi-value">247</div>
+                <div class="kpi-change positive">
+                    ↑ 12% from last month
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Success Rate</div>
+                <div class="kpi-value">98.7%</div>
+                <div class="kpi-change positive">
+                    ↑ 2.3% improvement
+                </div>
+            </div>
+            <div class="kpi-card warning">
+                <div class="kpi-label">Monthly Cost</div>
+                <div class="kpi-value">£2,847</div>
+                <div class="kpi-change negative">
+                    ↑ £320 from budget
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">PPR Usage</div>
+                <div class="kpi-value">1.2M</div>
+                <div class="kpi-change positive">
+                    68% of limit
+                </div>
+            </div>
+            <div class="kpi-card success">
+                <div class="kpi-label">Avg Runtime</div>
+                <div class="kpi-value">8.3s</div>
+                <div class="kpi-change positive">
+                    ↓ 2.1s faster
+                </div>
+            </div>
+            <div class="kpi-card danger">
+                <div class="kpi-label">Failed Runs</div>
+                <div class="kpi-value">142</div>
+                <div class="kpi-change negative">
+                    ↑ 23 incidents
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <!-- Performance Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Performance Trends</div>
+                    <div class="chart-controls">
+                        <button class="chart-control active">Day</button>
+                        <button class="chart-control">Week</button>
+                        <button class="chart-control">Month</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="performance-bars">
+                        <div class="performance-bar" style="height: 70%">
+                            <span class="performance-value">8.2s</span>
+                            <span class="performance-label">Mon</span>
+                        </div>
+                        <div class="performance-bar" style="height: 85%">
+                            <span class="performance-value">9.8s</span>
+                            <span class="performance-label">Tue</span>
+                        </div>
+                        <div class="performance-bar" style="height: 60%">
+                            <span class="performance-value">7.1s</span>
+                            <span class="performance-label">Wed</span>
+                        </div>
+                        <div class="performance-bar" style="height: 75%">
+                            <span class="performance-value">8.5s</span>
+                            <span class="performance-label">Thu</span>
+                        </div>
+                        <div class="performance-bar" style="height: 90%">
+                            <span class="performance-value">10.2s</span>
+                            <span class="performance-label">Fri</span>
+                        </div>
+                        <div class="performance-bar" style="height: 45%">
+                            <span class="performance-value">5.3s</span>
+                            <span class="performance-label">Sat</span>
+                        </div>
+                        <div class="performance-bar" style="height: 40%">
+                            <span class="performance-value">4.8s</span>
+                            <span class="performance-label">Sun</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Breakdown -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Cost Breakdown</div>
+                    <div class="chart-controls">
+                        <button class="chart-control active">Current</button>
+                        <button class="chart-control">Projected</button>
+                    </div>
+                </div>
+                <div class="cost-breakdown">
+                    <div class="cost-item">
+                        <div class="cost-name">
+                            <div class="cost-icon" style="background: #e3f2fd;">💎</div>
+                            <div>
+                                <div>Premium Connectors</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">23 users</div>
+                            </div>
+                        </div>
+                        <div class="cost-details">
+                            <div class="cost-amount">£1,220</div>
+                            <div class="cost-percentage">43%</div>
+                        </div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-name">
+                            <div class="cost-icon" style="background: #fff4e6;">⚡</div>
+                            <div>
+                                <div>Process Licenses</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">8 flows</div>
+                            </div>
+                        </div>
+                        <div class="cost-details">
+                            <div class="cost-amount">£655</div>
+                            <div class="cost-percentage">23%</div>
+                        </div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-name">
+                            <div class="cost-icon" style="background: #fde7e9;">🤖</div>
+                            <div>
+                                <div>AI Builder Credits</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">450K tokens</div>
+                            </div>
+                        </div>
+                        <div class="cost-details">
+                            <div class="cost-amount">£450</div>
+                            <div class="cost-percentage">16%</div>
+                        </div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-name">
+                            <div class="cost-icon" style="background: #e7f6e7;">☁️</div>
+                            <div>
+                                <div>Hosted RPA</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">4 bots</div>
+                            </div>
+                        </div>
+                        <div class="cost-details">
+                            <div class="cost-amount">£474</div>
+                            <div class="cost-percentage">17%</div>
+                        </div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-name">
+                            <div class="cost-icon" style="background: #f3e5ff;">📊</div>
+                            <div>
+                                <div>Other</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Storage & misc</div>
+                            </div>
+                        </div>
+                        <div class="cost-details">
+                            <div class="cost-amount">£48</div>
+                            <div class="cost-percentage">2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optimization Suggestions -->
+        <div class="suggestions-card">
+            <div class="chart-header">
+                <div class="chart-title">🎯 Optimization Opportunities</div>
+                <button class="btn">View All</button>
+            </div>
+            
+            <div class="suggestion-item">
+                <div class="suggestion-icon high">⚠️</div>
+                <div class="suggestion-content">
+                    <div class="suggestion-title">Replace SQL connector with SharePoint in Invoice Processing</div>
+                    <div class="suggestion-description">This flow runs 50K times/month. Switching to SharePoint Lists would eliminate premium licensing.</div>
+                </div>
+                <div class="suggestion-impact">
+                    <div class="impact-value">£340/mo</div>
+                    <div class="impact-label">Potential Savings</div>
+                </div>
+            </div>
+
+            <div class="suggestion-item">
+                <div class="suggestion-icon medium">🔄</div>
+                <div class="suggestion-content">
+                    <div class="suggestion-title">Implement child flow pattern for Approval Workflows</div>
+                    <div class="suggestion-description">Convert 12 similar approval flows into a single parent with child flows.</div>
+                </div>
+                <div class="suggestion-impact">
+                    <div class="impact-value">£980/mo</div>
+                    <div class="impact-label">Potential Savings</div>
+                </div>
+            </div>
+
+            <div class="suggestion-item">
+                <div class="suggestion-icon low">⚡</div>
+                <div class="suggestion-content">
+                    <div class="suggestion-title">Add OData filtering to SharePoint queries</div>
+                    <div class="suggestion-description">Current flows retrieve all items then filter. Add $filter to reduce data by 90%.</div>
+                </div>
+                <div class="suggestion-impact">
+                    <div class="impact-value">12x</div>
+                    <div class="impact-label">Performance Gain</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flow List -->
+        <div class="flow-list-card">
+            <div class="flow-list-header">
+                <div class="flow-list-title">Top Flows by Usage</div>
+                <button class="btn">View All Flows</button>
+            </div>
+            <table class="flow-table">
+                <thead>
+                    <tr>
+                        <th>Flow Name</th>
+                        <th>Type</th>
+                        <th>Runs Today</th>
+                        <th>Success Rate</th>
+                        <th>Avg Runtime</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="flow-name">Invoice Processing Automation</td>
+                        <td>Automated</td>
+                        <td>1,247</td>
+                        <td>99.2%</td>
+                        <td>6.3s</td>
+                        <td><span class="flow-status active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flow-name">Daily Report Generator</td>
+                        <td>Scheduled</td>
+                        <td>24</td>
+                        <td>100%</td>
+                        <td>45.2s</td>
+                        <td><span class="flow-status active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flow-name">Customer Onboarding</td>
+                        <td>Instant</td>
+                        <td>89</td>
+                        <td>94.3%</td>
+                        <td>12.7s</td>
+                        <td><span class="flow-status warning">Issues</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flow-name">SharePoint Document Sync</td>
+                        <td>Automated</td>
+                        <td>3,456</td>
+                        <td>87.1%</td>
+                        <td>3.2s</td>
+                        <td><span class="flow-status error">Failed</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flow-name">Email Notifications</td>
+                        <td>Automated</td>
+                        <td>567</td>
+                        <td>99.8%</td>
+                        <td>1.1s</td>
+                        <td><span class="flow-status active">Active</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="export-modal" id="exportModal">
+        <div class="export-content">
+            <div class="export-title">📤 Export Analytics Report</div>
+            <div class="export-options">
+                <div class="export-option" onclick="selectExportOption(this, 'pdf')">
+                    <strong>📄 PDF Report</strong>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">
+                        Comprehensive report with charts and insights
+                    </p>
+                </div>
+                <div class="export-option" onclick="selectExportOption(this, 'excel')">
+                    <strong>📊 Excel Workbook</strong>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">
+                        Raw data with pivot tables and analysis
+                    </p>
+                </div>
+                <div class="export-option" onclick="selectExportOption(this, 'powerbi')">
+                    <strong>📈 Power BI Dataset</strong>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">
+                        Connect directly to Power BI for custom dashboards
+                    </p>
+                </div>
+            </div>
+            <div class="export-actions">
+                <button class="btn" onclick="hideExportModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="exportReport()">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard
+        let selectedExportFormat = null;
+        let refreshInterval = null;
+
+        // Auto-refresh data every 30 seconds
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                refreshData(true);
+            }, 30000);
+        }
+
+        // Refresh data
+        function refreshData(silent = false) {
+            if (!silent) {
+                // Show loading indicator
+                document.querySelector('.live-indicator').innerHTML = `
+                    <span class="live-dot"></span>
+                    Updating...
+                `;
+            }
+
+            // Simulate data refresh
+            setTimeout(() => {
+                // Update KPIs with random variations
+                updateKPIs();
+                updateCharts();
+                
+                document.querySelector('.live-indicator').innerHTML = `
+                    <span class="live-dot"></span>
+                    Real-time monitoring
+                `;
+                
+                if (!silent) {
+                    showNotification('Data refreshed successfully');
+                }
+            }, 1000);
+        }
+
+        // Update KPI values
+        function updateKPIs() {
+            const kpiValues = document.querySelectorAll('.kpi-value');
+            kpiValues[0].textContent = Math.floor(240 + Math.random() * 20);
+            kpiValues[1].textContent = (98 + Math.random() * 2).toFixed(1) + '%';
+            kpiValues[2].textContent = '£' + Math.floor(2800 + Math.random() * 200).toLocaleString();
+            kpiValues[3].textContent = (1.1 + Math.random() * 0.3).toFixed(1) + 'M';
+            kpiValues[4].textContent = (7 + Math.random() * 3).toFixed(1) + 's';
+            kpiValues[5].textContent = Math.floor(130 + Math.random() * 30);
+        }
+
+        // Update charts
+        function updateCharts() {
+            const bars = document.querySelectorAll('.performance-bar');
+            bars.forEach(bar => {
+                const height = 40 + Math.random() * 50;
+                bar.style.height = height + '%';
+                const value = (4 + Math.random() * 8).toFixed(1);
+                bar.querySelector('.performance-value').textContent = value + 's';
+            });
+        }
+
+        // Export modal functions
+        function showExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function hideExportModal() {
+            document.getElementById('exportModal').classList.remove('active');
+            selectedExportFormat = null;
+            document.querySelectorAll('.export-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        }
+
+        function selectExportOption(element, format) {
+            document.querySelectorAll('.export-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedExportFormat = format;
+        }
+
+        function exportReport() {
+            if (!selectedExportFormat) {
+                alert('Please select an export format');
+                return;
+            }
+
+            const messages = {
+                pdf: 'Generating PDF report with 24 pages of insights...',
+                excel: 'Creating Excel workbook with 12 worksheets...',
+                powerbi: 'Preparing Power BI dataset connection...'
+            };
+
+            alert(messages[selectedExportFormat] + '\n\nYour report will be ready for download in a few seconds.');
+            hideExportModal();
+        }
+
+        // Show settings
+        function showSettings() {
+            alert('Settings panel would open here with options for:\n\n• Dashboard refresh rate\n• Alert thresholds\n• Email notifications\n• Data retention period\n• Custom metrics\n• API integration');
+        }
+
+        // Show notification
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--success);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 4px;
+                box-shadow: var(--shadow);
+                z-index: 1001;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = '✅ ' + message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Filter handlers
+        document.getElementById('timeRange').addEventListener('change', function() {
+            refreshData();
+        });
+
+        document.getElementById('environment').addEventListener('change', function() {
+            refreshData();
+        });
+
+        document.getElementById('flowType').addEventListener('change', function() {
+            refreshData();
+        });
+
+        // Chart control handlers
+        document.querySelectorAll('.chart-control').forEach(control => {
+            control.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.chart-control').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                updateCharts();
+            });
+        });
+
+        // Flow row click handler
+        document.querySelectorAll('.flow-table tbody tr').forEach(row => {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', function() {
+                const flowName = this.querySelector('.flow-name').textContent;
+                alert(`Opening detailed analytics for: ${flowName}\n\nThis would show:\n• Historical performance\n• Error analysis\n• Cost breakdown\n• Optimization suggestions`);
+            });
+        });
+
+        // Suggestion click handler
+        document.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const title = this.querySelector('.suggestion-title').textContent;
+                const impact = this.querySelector('.impact-value').textContent;
+                alert(`Optimization Details:\n\n${title}\n\nEstimated Impact: ${impact}\n\nClick "Apply" to automatically implement this optimization or "Learn More" for detailed instructions.`);
+            });
+        });
+
+        // Start auto-refresh
+        startAutoRefresh();
+
+        // Initial load animation
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.kpi-card, .chart-card, .suggestions-card, .flow-list-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

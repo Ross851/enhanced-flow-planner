@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Optimisation Suite | Professional Edition</title>
+    <style>
+        /* Microsoft Fluent Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Core Microsoft Azure/Office 365 Colours */
+            --primary: #0078d4;
+            --primary-hover: #106ebe;
+            --primary-active: #005a9e;
+            --secondary: #40e0d0;
+            --success: #107c10;
+            --warning: #ff8c00;
+            --danger: #d13438;
+            --info: #0078d4;
+            
+            /* Neutral Palette */
+            --surface: #ffffff;
+            --surface-secondary: #faf9f8;
+            --surface-tertiary: #f3f2f1;
+            --border: #e1dfdd;
+            --border-secondary: #edebe9;
+            --text-primary: #323130;
+            --text-secondary: #605e5c;
+            --text-tertiary: #a19f9d;
+            --text-disabled: #c8c6c4;
+            
+            /* Professional Shadows */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 2px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-xl: 0 8px 16px rgba(0,0,0,0.07), 0 3px 6px rgba(0,0,0,0.05);
+            
+            /* Typography */
+            --font-system: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Cascadia Code', 'Consolas', monospace;
+        }
+
+        body {
+            font-family: var(--font-system);
+            background: var(--surface-tertiary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Professional Header Bar */
+        .header-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-secondary);
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .app-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .header-nav {
+            margin-left: auto;
+            display: flex;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 0 20px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            border-radius: 0;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--surface-secondary);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Enhanced Sidebar with Categories */
+        .sidebar {
+            width: 320px;
+            background: var(--surface);
+            border-right: 1px solid var(--border-secondary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 32px 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            background: var(--surface);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        /* Connector Categories */
+        .connector-category {
+            margin-bottom: 16px;
+        }
+
+        .category-header {
+            padding: 8px 12px;
+            background: var(--surface-secondary);
+            border-radius: 4px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+        }
+
+        .category-header:hover {
+            background: var(--surface-tertiary);
+        }
+
+        .category-count {
+            font-size: 11px;
+            background: var(--border);
+            color: var(--text-tertiary);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .category-items {
+            padding: 4px 0;
+        }
+
+        .category-collapsed .category-items {
+            display: none;
+        }
+
+        /* Enhanced Action Items */
+        .action-item {
+            background: var(--surface);
+            border: 1px solid var(--border-secondary);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 4px;
+            cursor: move;
+            transition: all 0.15s;
+            position: relative;
+        }
+
+        .action-item:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-item:hover .action-info {
+            opacity: 1;
+        }
+
+        .action-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .action-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .action-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-secondary);
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .action-badges {
+            display: flex;
+            gap: 4px;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-standard {
+            background: #e3f2e3;
+            color: var(--success);
+        }
+
+        .badge-premium {
+            background: #fee0e0;
+            color: var(--danger);
+        }
+
+        .badge-api {
+            background: #e3f0ff;
+            color: var(--info);
+            font-size: 9px;
+        }
+
+        /* Action Info Tooltip */
+        .action-info {
+            position: absolute;
+            left: 100%;
+            top: 0;
+            margin-left: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 12px;
+            width: 250px;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .action-item:hover .action-info {
+            pointer-events: auto;
+        }
+
+        .info-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .info-section {
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .info-tips {
+            border-top: 1px solid var(--border-secondary);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .info-tip {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 2px 0;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .info-tip::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        /* Canvas Area */
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface-tertiary);
+        }
+
+        .canvas-toolbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-secondary);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 4px;
+            padding: 0 8px;
+            border-right: 1px solid var(--border-secondary);
+        }
+
+        .toolbar-group:last-child {
+            border-right: none;
+        }
+
+        .toolbar-button {
+            padding: 6px 10px;
+            background: var(--surface);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toolbar-button:hover {
+            background: var(--surface-secondary);
+            border-color: var(--border);
+        }
+
+        .toolbar-button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .flow-canvas {
+            flex: 1;
+            padding: 32px;
+            overflow: auto;
+            position: relative;
+            background-image: 
+                linear-gradient(var(--border-secondary) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-secondary) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Enhanced Flow Nodes */
+        .flow-node {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .flow-node:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .flow-node.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.2);
+        }
+
+        .node-header {
+            padding: 12px 16px;
+            background: var(--surface-secondary);
+            border-bottom: 1px solid var(--border-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .node-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .node-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .status-dot.warning {
+            background: var(--warning);
+        }
+
+        .status-dot.error {
+            background: var(--danger);
+        }
+
+        .node-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .node-action {
+            width: 28px;
+            height: 28px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            transition: all 0.15s;
+            font-size: 14px;
+        }
+
+        .node-action:hover {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .node-body {
+            padding: 16px;
+        }
+
+        .node-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .node-metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .node-metric-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .node-metric-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .node-tips {
+            background: var(--surface-secondary);
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 8px;
+        }
+
+        .node-tip {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 2px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .tip-icon {
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* Flow Connector */
+        .flow-connector {
+            width: 2px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .flow-connector::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 6px solid var(--border);
+        }
+
+        /* Enhanced Properties Panel */
+        .properties-panel {
+            width: 360px;
+            background: var(--surface);
+            border-left: 1px solid var(--border-secondary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .panel-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .panel-tab:hover {
+            color: var(--text-primary);
+            background: var(--surface-secondary);
+        }
+
+        .panel-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 4px;
+            padding: 12px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .metric-card.success .metric-value {
+            color: var(--success);
+        }
+
+        .metric-card.warning .metric-value {
+            color: var(--warning);
+        }
+
+        .metric-card.danger .metric-value {
+            color: var(--danger);
+        }
+
+        /* Best Practices Panel */
+        .best-practices-section {
+            margin-bottom: 20px;
+        }
+
+        .practice-category {
+            margin-bottom: 16px;
+        }
+
+        .practice-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .practice-list {
+            list-style: none;
+        }
+
+        .practice-item {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .practice-item::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .practice-item.warning::before {
+            content: '!';
+            color: var(--warning);
+        }
+
+        .practice-item.danger::before {
+            content: '✗';
+            color: var(--danger);
+        }
+
+        /* Information Cards */
+        .info-card {
+            background: var(--surface-secondary);
+            border-left: 3px solid var(--primary);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .info-card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .info-card-content {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Add Node Button */
+        .add-node-btn {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 24px;
+            padding: 20px;
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .add-node-btn:hover {
+            border-color: var(--primary);
+            background: var(--surface);
+            color: var(--primary);
+        }
+
+        .add-node-btn.drag-over {
+            border-color: var(--primary);
+            background: rgba(0, 120, 212, 0.05);
+            color: var(--primary);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--surface);
+            border-top: 1px solid var(--border-secondary);
+            height: 28px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 20px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Bar -->
+    <header class="header-bar">
+        <div class="app-title">
+            <div class="app-logo"></div>
+            <span>Power Automate Optimisation Suite</span>
+        </div>
+        <nav class="header-nav">
+            <button class="nav-tab active" onclick="switchView('builder')">Flow Builder</button>
+            <button class="nav-tab" onclick="switchView('analyzer')">Impact Analyser</button>
+            <button class="nav-tab" onclick="switchView('optimizer')">Cost Optimiser</button>
+            <button class="nav-tab" onclick="switchView('dashboard')">Analytics</button>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Enhanced Sidebar with All Connectors -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Connector Library</div>
+                <div class="search-box">
+                    <input type="search" class="search-input" placeholder="Search connectors..." id="connectorSearch">
+                </div>
+            </div>
+            <div class="sidebar-content" id="connectorLibrary">
+                <!-- Dynamically populated from comprehensive-connector-library.js -->
+            </div>
+        </aside>
+
+        <!-- Canvas Container -->
+        <div class="canvas-container">
+            <div class="canvas-toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-button" onclick="saveFlow()">Save</button>
+                    <button class="toolbar-button" onclick="loadFlow()">Load</button>
+                    <button class="toolbar-button" onclick="exportFlow()">Export</button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-button" onclick="undoAction()">Undo</button>
+                    <button class="toolbar-button" onclick="redoAction()">Redo</button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-button" onclick="testFlow()">Test</button>
+                    <button class="toolbar-button" onclick="validateFlow()">Validate</button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-button" onclick="optimiseFlow()">Optimise</button>
+                    <button class="toolbar-button" onclick="analyseFlow()">Analyse</button>
+                </div>
+            </div>
+            <div class="flow-canvas" id="flowCanvas">
+                <button class="add-node-btn" onclick="showActionPicker()">
+                    + Add a trigger to start your flow
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced Properties Panel -->
+        <aside class="properties-panel">
+            <div class="panel-tabs">
+                <button class="panel-tab active" onclick="switchPanel('metrics')">Metrics</button>
+                <button class="panel-tab" onclick="switchPanel('config')">Configuration</button>
+                <button class="panel-tab" onclick="switchPanel('tips')">Best Practices</button>
+            </div>
+            
+            <!-- Metrics Tab -->
+            <div class="panel-content" id="metricsPanel">
+                <div class="metrics-grid">
+                    <div class="metric-card" id="costMetric">
+                        <div class="metric-value">£0</div>
+                        <div class="metric-label">Monthly Cost</div>
+                    </div>
+                    <div class="metric-card" id="runtimeMetric">
+                        <div class="metric-value">0s</div>
+                        <div class="metric-label">Est. Runtime</div>
+                    </div>
+                    <div class="metric-card" id="pprMetric">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">PPR/Month</div>
+                    </div>
+                    <div class="metric-card" id="licenceMetric">
+                        <div class="metric-value">Standard</div>
+                        <div class="metric-label">Licence Required</div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card-title">API Throttling Risk</div>
+                    <div class="info-card-content" id="throttlingInfo">
+                        No connectors added yet. Add actions to see API limit analysis.
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card-title">Cost Breakdown</div>
+                    <div class="info-card-content" id="costBreakdown">
+                        <div>Base: £0</div>
+                        <div>Premium Connectors: £0</div>
+                        <div>AI Credits: £0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Tab -->
+            <div class="panel-content" id="configPanel" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">User Count</label>
+                    <input type="number" class="form-input" value="1" min="1" max="10000" id="userCount">
+                    <div class="form-help">Number of users running this flow</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Account Type</label>
+                    <select class="form-select" id="accountType">
+                        <option value="user">Individual Users</option>
+                        <option value="service">Service Account</option>
+                    </select>
+                    <div class="form-help">Service accounts concentrate all API calls through one account</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Environment</label>
+                    <select class="form-select" id="environment">
+                        <option value="production">Production</option>
+                        <option value="sandbox">Sandbox</option>
+                        <option value="trial">Trial (90 days)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Expected Daily Runs</label>
+                    <input type="number" class="form-input" value="10" min="1" id="dailyRuns">
+                    <div class="form-help">How many times per day will this flow execute?</div>
+                </div>
+            </div>
+
+            <!-- Best Practices Tab -->
+            <div class="panel-content" id="tipsPanel" style="display: none;">
+                <div class="best-practices-section">
+                    <div class="practice-category">
+                        <div class="practice-title">
+                            <span>Performance Optimisation</span>
+                        </div>
+                        <ul class="practice-list">
+                            <li class="practice-item">Always filter at source using OData/SQL WHERE</li>
+                            <li class="practice-item">Use Select before Apply to each loops</li>
+                            <li class="practice-item">Enable concurrency control (max 50)</li>
+                            <li class="practice-item">Cache frequently accessed data</li>
+                            <li class="practice-item">Use indexed columns for filtering</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-category">
+                        <div class="practice-title">
+                            <span>Cost Optimisation</span>
+                        </div>
+                        <ul class="practice-list">
+                            <li class="practice-item">Use Standard connectors when possible</li>
+                            <li class="practice-item">Consider per-flow licensing for >7 users</li>
+                            <li class="practice-item">Monitor AI token usage carefully</li>
+                            <li class="practice-item">Batch operations to reduce API calls</li>
+                            <li class="practice-item warning">Premium connectors require paid licensing</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-category">
+                        <div class="practice-title">
+                            <span>Reliability</span>
+                        </div>
+                        <ul class="practice-list">
+                            <li class="practice-item">Implement proper error handling with Scope</li>
+                            <li class="practice-item">Add retry logic for transient failures</li>
+                            <li class="practice-item">Use timeout settings appropriately</li>
+                            <li class="practice-item">Handle null values explicitly</li>
+                            <li class="practice-item danger">Never store credentials in flow</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="status-bar">
+        <div class="status-item">
+            <span class="status-indicator"></span>
+            <span>Ready</span>
+        </div>
+        <div class="status-item">
+            <span id="nodeCount">0 nodes</span>
+        </div>
+        <div class="status-item">
+            <span id="lastSaved">Not saved</span>
+        </div>
+        <div class="status-item">
+            <span id="apiStatus">API: Normal</span>
+        </div>
+    </footer>
+
+    <!-- Load Comprehensive Connector Library -->
+    <script src="comprehensive-connector-library.js"></script>
+    
+    <script>
+        // Initialise the application
+        let flowNodes = [];
+        let selectedNode = null;
+        let currentView = 'builder';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initialiseConnectorLibrary();
+            setupDragAndDrop();
+            setupEventListeners();
+            loadSavedFlow();
+        });
+
+        // Populate connector library from comprehensive data
+        function initialiseConnectorLibrary() {
+            const library = document.getElementById('connectorLibrary');
+            
+            // Group connectors by category
+            const categories = {};
+            
+            // Process triggers
+            Object.entries(PowerPlatformConnectors.triggers).forEach(([key, trigger]) => {
+                if (!categories[trigger.category]) {
+                    categories[trigger.category] = { triggers: [], actions: [] };
+                }
+                categories[trigger.category].triggers.push({ key, ...trigger });
+            });
+            
+            // Process actions
+            Object.entries(PowerPlatformConnectors.actions).forEach(([key, action]) => {
+                if (!categories[action.category]) {
+                    categories[action.category] = { triggers: [], actions: [] };
+                }
+                categories[action.category].actions.push({ key, ...action });
+            });
+            
+            // Render categories
+            Object.entries(categories).forEach(([categoryName, items]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'connector-category';
+                
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.innerHTML = `
+                    <span>${categoryName}</span>
+                    <span class="category-count">${items.triggers.length + items.actions.length}</span>
+                `;
+                header.onclick = () => categoryDiv.classList.toggle('category-collapsed');
+                
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = 'category-items';
+                
+                // Add triggers
+                items.triggers.forEach(trigger => {
+                    itemsDiv.appendChild(createActionItem(trigger, 'trigger'));
+                });
+                
+                // Add actions
+                items.actions.forEach(action => {
+                    itemsDiv.appendChild(createActionItem(action, 'action'));
+                });
+                
+                categoryDiv.appendChild(header);
+                categoryDiv.appendChild(itemsDiv);
+                library.appendChild(categoryDiv);
+            });
+        }
+
+        function createActionItem(item, type) {
+            const div = document.createElement('div');
+            div.className = 'action-item';
+            div.draggable = true;
+            div.dataset.key = item.key;
+            div.dataset.type = type;
+            
+            const licenceBadge = item.licence === 'Premium' ? 'badge-premium' : 'badge-standard';
+            const costText = item.cost > 0 ? `£${item.cost}/user` : 'Free';
+            
+            div.innerHTML = `
+                <div class="action-header">
+                    <div class="action-label">
+                        <span class="action-icon">${item.icon || '•'}</span>
+                        <span>${item.name}</span>
+                    </div>
+                    <div class="action-badges">
+                        <span class="badge ${licenceBadge}">${costText}</span>
+                        ${item.apiLimit ? `<span class="badge badge-api">${item.apiLimit}</span>` : ''}
+                    </div>
+                </div>
+                <div class="action-info">
+                    <div class="info-title">${item.name}</div>
+                    <div class="info-section">
+                        <div class="info-label">Description</div>
+                        <div class="info-value">${item.description}</div>
+                    </div>
+                    ${item.performanceImpact ? `
+                        <div class="info-section">
+                            <div class="info-label">Performance Impact</div>
+                            <div class="info-value">${item.performanceImpact}</div>
+                        </div>
+                    ` : ''}
+                    ${item.topTips && item.topTips.length > 0 ? `
+                        <div class="info-tips">
+                            <div class="info-label">Top Tips</div>
+                            ${item.topTips.slice(0, 3).map(tip => 
+                                `<div class="info-tip">${tip}</div>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function setupDragAndDrop() {
+            // Setup drag start
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('action-item')) {
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('key', e.target.dataset.key);
+                    e.dataTransfer.setData('type', e.target.dataset.type);
+                    e.target.style.opacity = '0.5';
+                }
+            });
+
+            document.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('action-item')) {
+                    e.target.style.opacity = '';
+                }
+            });
+
+            // Setup drop zones
+            document.addEventListener('dragover', (e) => {
+                const addBtn = e.target.closest('.add-node-btn');
+                if (addBtn) {
+                    e.preventDefault();
+                    addBtn.classList.add('drag-over');
+                }
+            });
+
+            document.addEventListener('dragleave', (e) => {
+                const addBtn = e.target.closest('.add-node-btn');
+                if (addBtn) {
+                    addBtn.classList.remove('drag-over');
+                }
+            });
+
+            document.addEventListener('drop', (e) => {
+                const addBtn = e.target.closest('.add-node-btn');
+                if (addBtn) {
+                    e.preventDefault();
+                    addBtn.classList.remove('drag-over');
+                    
+                    const key = e.dataTransfer.getData('key');
+                    const type = e.dataTransfer.getData('type');
+                    addFlowNode(key, type);
+                }
+            });
+        }
+
+        function addFlowNode(key, type) {
+            const data = type === 'trigger' 
+                ? PowerPlatformConnectors.triggers[key]
+                : PowerPlatformConnectors.actions[key];
+            
+            if (!data) return;
+            
+            const canvas = document.getElementById('flowCanvas');
+            const addBtn = canvas.querySelector('.add-node-btn');
+            
+            // Create connector
+            if (flowNodes.length > 0) {
+                const connector = document.createElement('div');
+                connector.className = 'flow-connector';
+                canvas.insertBefore(connector, addBtn);
+            }
+            
+            // Create node
+            const node = document.createElement('div');
+            node.className = 'flow-node';
+            node.dataset.key = key;
+            node.dataset.type = type;
+            
+            // Get top tips
+            const topTips = data.topTips ? data.topTips.slice(0, 2) : [];
+            
+            node.innerHTML = `
+                <div class="node-header">
+                    <div class="node-title">
+                        <span>${data.icon || '•'}</span>
+                        <span>${data.name}</span>
+                    </div>
+                    <div class="node-status">
+                        <span class="status-dot"></span>
+                        <div class="node-actions">
+                            <button class="node-action" onclick="configureNode(this)" title="Configure">⚙</button>
+                            <button class="node-action" onclick="deleteNode(this)" title="Delete">✕</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="node-body">
+                    <div class="node-info">
+                        <div class="node-metric">
+                            <span class="node-metric-label">Licence</span>
+                            <span class="node-metric-value">${data.licence}</span>
+                        </div>
+                        <div class="node-metric">
+                            <span class="node-metric-label">API Limit</span>
+                            <span class="node-metric-value">${data.apiLimit || 'N/A'}</span>
+                        </div>
+                    </div>
+                    ${topTips.length > 0 ? `
+                        <div class="node-tips">
+                            ${topTips.map(tip => `
+                                <div class="node-tip">
+                                    <span class="tip-icon">💡</span>
+                                    <span>${tip}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            canvas.insertBefore(node, addBtn);
+            
+            // Update add button text
+            addBtn.textContent = '+ Add an action';
+            
+            // Add to flowNodes
+            flowNodes.push({
+                id: Date.now(),
+                key: key,
+                type: type,
+                data: data,
+                element: node
+            });
+            
+            updateMetrics();
+            updateNodeCount();
+        }
+
+        function configureNode(btn) {
+            const node = btn.closest('.flow-node');
+            const key = node.dataset.key;
+            const type = node.dataset.type;
+            
+            const data = type === 'trigger' 
+                ? PowerPlatformConnectors.triggers[key]
+                : PowerPlatformConnectors.actions[key];
+            
+            // Show detailed configuration
+            alert(`Configure ${data.name}\n\nBest Practice: ${data.bestPractice}`);
+        }
+
+        function deleteNode(btn) {
+            if (confirm('Delete this action?')) {
+                const node = btn.closest('.flow-node');
+                const connector = node.previousElementSibling;
+                
+                if (connector && connector.classList.contains('flow-connector')) {
+                    connector.remove();
+                }
+                
+                node.remove();
+                
+                // Remove from flowNodes
+                flowNodes = flowNodes.filter(n => n.element !== node);
+                
+                updateMetrics();
+                updateNodeCount();
+            }
+        }
+
+        function updateMetrics() {
+            const userCount = parseInt(document.getElementById('userCount').value) || 1;
+            const accountType = document.getElementById('accountType').value;
+            const dailyRuns = parseInt(document.getElementById('dailyRuns').value) || 10;
+            
+            let monthlyCost = 0;
+            let requiresPremium = false;
+            let totalRuntime = 0;
+            let apiUsage = {};
+            
+            // Calculate metrics
+            flowNodes.forEach(node => {
+                const data = node.data;
+                
+                // Cost
+                if (data.licence === 'Premium') {
+                    requiresPremium = true;
+                }
+                
+                // Runtime (estimate)
+                totalRuntime += 2.5; // Average seconds per action
+                
+                // API usage
+                if (data.apiLimit) {
+                    const connector = data.category.toLowerCase();
+                    if (!apiUsage[connector]) {
+                        apiUsage[connector] = 0;
+                    }
+                    apiUsage[connector] += dailyRuns * userCount;
+                }
+            });
+            
+            // Calculate cost
+            if (requiresPremium) {
+                if (accountType === 'service' || userCount > 7) {
+                    monthlyCost = 81.90; // Per-flow
+                    document.getElementById('licenceMetric').querySelector('.metric-value').textContent = 'Process';
+                } else {
+                    monthlyCost = 12.20 * userCount; // Per-user
+                    document.getElementById('licenceMetric').querySelector('.metric-value').textContent = 'Premium';
+                }
+            } else {
+                document.getElementById('licenceMetric').querySelector('.metric-value').textContent = 'Standard';
+            }
+            
+            // Update display
+            document.getElementById('costMetric').querySelector('.metric-value').textContent = `£${monthlyCost.toFixed(2)}`;
+            document.getElementById('runtimeMetric').querySelector('.metric-value').textContent = `${totalRuntime.toFixed(1)}s`;
+            document.getElementById('pprMetric').querySelector('.metric-value').textContent = 
+                `${(dailyRuns * flowNodes.length * 30).toLocaleString()}`;
+            
+            // Update cost breakdown
+            document.getElementById('costBreakdown').innerHTML = `
+                <div>Base: £0</div>
+                <div>Premium Connectors: £${requiresPremium ? monthlyCost.toFixed(2) : '0'}</div>
+                <div>AI Credits: £0</div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-secondary);">
+                    <strong>Total: £${monthlyCost.toFixed(2)}/month</strong>
+                </div>
+            `;
+            
+            // Update throttling info
+            updateThrottlingInfo(apiUsage);
+        }
+
+        function updateThrottlingInfo(apiUsage) {
+            const limits = PowerPlatformConnectors.apiLimits;
+            let warnings = [];
+            
+            Object.entries(apiUsage).forEach(([connector, usage]) => {
+                if (limits[connector]) {
+                    const limit = limits[connector].perUser;
+                    const percentage = (usage / limit) * 100;
+                    
+                    if (percentage > 80) {
+                        warnings.push(`${connector}: ${percentage.toFixed(0)}% of limit`);
+                    }
+                }
+            });
+            
+            const throttlingInfo = document.getElementById('throttlingInfo');
+            if (warnings.length > 0) {
+                throttlingInfo.innerHTML = `
+                    <div style="color: var(--warning);">⚠ High API usage detected:</div>
+                    ${warnings.map(w => `<div>• ${w}</div>`).join('')}
+                `;
+            } else {
+                throttlingInfo.textContent = 'API usage within safe limits for all connectors.';
+            }
+        }
+
+        function updateNodeCount() {
+            document.getElementById('nodeCount').textContent = `${flowNodes.length} nodes`;
+        }
+
+        function setupEventListeners() {
+            // Configuration changes
+            ['userCount', 'accountType', 'dailyRuns'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updateMetrics);
+            });
+            
+            // Search functionality
+            document.getElementById('connectorSearch').addEventListener('input', (e) => {
+                const search = e.target.value.toLowerCase();
+                document.querySelectorAll('.action-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(search) ? '' : 'none';
+                });
+            });
+        }
+
+        function switchPanel(panel) {
+            // Update tabs
+            document.querySelectorAll('.panel-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.panel-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(panel + 'Panel').style.display = 'block';
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            currentView = view;
+            
+            // Here you would switch the main content based on view
+            console.log('Switching to view:', view);
+        }
+
+        function saveFlow() {
+            const flowData = {
+                nodes: flowNodes.map(n => ({
+                    key: n.key,
+                    type: n.type
+                })),
+                config: {
+                    userCount: document.getElementById('userCount').value,
+                    accountType: document.getElementById('accountType').value,
+                    dailyRuns: document.getElementById('dailyRuns').value
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('powerAutomateFlow', JSON.stringify(flowData));
+            document.getElementById('lastSaved').textContent = `Saved at ${new Date().toLocaleTimeString()}`;
+        }
+
+        function loadSavedFlow() {
+            const saved = localStorage.getItem('powerAutomateFlow');
+            if (saved) {
+                const data = JSON.parse(saved);
+                // Restore configuration
+                if (data.config) {
+                    document.getElementById('userCount').value = data.config.userCount;
+                    document.getElementById('accountType').value = data.config.accountType;
+                    document.getElementById('dailyRuns').value = data.config.dailyRuns;
+                }
+                // Note: Would need to restore nodes here
+            }
+        }
+
+        function loadFlow() {
+            loadSavedFlow();
+        }
+
+        function exportFlow() {
+            const flowData = {
+                nodes: flowNodes.map(n => ({
+                    key: n.key,
+                    type: n.type,
+                    name: n.data.name
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(flowData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'power-automate-flow.json';
+            a.click();
+        }
+
+        function testFlow() {
+            console.log('Testing flow with', flowNodes.length, 'nodes');
+        }
+
+        function validateFlow() {
+            let issues = [];
+            
+            if (flowNodes.length === 0) {
+                issues.push('Flow has no trigger');
+            }
+            
+            // Check for premium without licence
+            const hasPremium = flowNodes.some(n => n.data.licence === 'Premium');
+            if (hasPremium) {
+                issues.push('Flow uses premium connectors - ensure proper licensing');
+            }
+            
+            if (issues.length > 0) {
+                alert('Validation Issues:\n' + issues.join('\n'));
+            } else {
+                alert('Flow validation passed!');
+            }
+        }
+
+        function optimiseFlow() {
+            let suggestions = [];
+            
+            // Check for Get Items without filter
+            flowNodes.forEach(node => {
+                if (node.key === 'sharepoint-get-items') {
+                    suggestions.push('Add Filter Query to Get Items for 90% performance improvement');
+                }
+            });
+            
+            if (suggestions.length > 0) {
+                alert('Optimisation Suggestions:\n' + suggestions.join('\n'));
+            } else {
+                alert('Flow is optimised!');
+            }
+        }
+
+        function analyseFlow() {
+            updateMetrics();
+            switchPanel('metrics');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        saveFlow();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        undoAction();
+                        break;
+                }
+            }
+        });
+
+        function undoAction() { console.log('Undo'); }
+        function redoAction() { console.log('Redo'); }
+        function showActionPicker() { console.log('Show picker'); }
+    </script>
+</body>
+</html>

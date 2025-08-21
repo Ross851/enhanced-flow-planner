@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Power Automate Community Flow Builder - Build It Right First Time!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* Community Header */
+        .community-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .community-header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .community-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
+        /* Universal Connector Search */
+        .search-section {
+            background: white;
+            margin: 20px auto;
+            max-width: 1400px;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            font-size: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .filter-chip:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .filter-chip.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Connector Results Grid */
+        .connectors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .connector-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .connector-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .connector-card.selected {
+            border-color: #4caf50;
+            background: #f0fff4;
+        }
+
+        .connector-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .connector-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .connector-info {
+            flex: 1;
+        }
+
+        .connector-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .connector-type {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .connector-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge.premium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .badge.standard {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge.trigger {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge.action {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .badge.new {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .connector-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Advanced Options Panel */
+        .advanced-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .advanced-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .advanced-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .advanced-option {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .option-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .option-value {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Flow Builder Section */
+        .builder-section {
+            background: white;
+            margin: 20px auto;
+            max-width: 1400px;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .flow-canvas {
+            min-height: 400px;
+            background: #fafafa;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .flow-step {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .flow-step::after {
+            content: '↓';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        /* Trigger Types */
+        .trigger-section {
+            background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .trigger-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .trigger-card {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .trigger-card:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .trigger-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .trigger-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Community Features */
+        .community-section {
+            background: white;
+            margin: 20px auto;
+            max-width: 1400px;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .community-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .community-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .community-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .community-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .community-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .community-button {
+            padding: 8px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .community-button:hover {
+            background: #5569d7;
+            transform: translateY(-1px);
+        }
+
+        /* Smart Recommendations */
+        .recommendations {
+            background: linear-gradient(135deg, #81c784 0%, #4caf50 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .recommendation-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .recommendation-item {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recommendation-icon {
+            font-size: 24px;
+        }
+
+        .recommendation-text {
+            flex: 1;
+        }
+
+        .recommendation-action {
+            padding: 6px 12px;
+            background: white;
+            color: #4caf50;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Popular Combinations */
+        .combinations-scroll {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 16px 0;
+        }
+
+        .combination-card {
+            min-width: 300px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .combination-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .combination-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .combination-connectors {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mini-connector {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: #f0f0f0;
+        }
+
+        .combination-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Cost Calculator */
+        .cost-display {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 250px;
+            z-index: 100;
+        }
+
+        .cost-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .cost-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 12px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .cost-savings {
+            background: #e8f5e9;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 12px;
+            text-align: center;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Community Header -->
+    <div class="community-header">
+        <h1>🌍 Power Automate Community Flow Builder</h1>
+        <p>Build It Right The First Time - Powered by Community Best Practices</p>
+        <div class="community-stats">
+            <div class="stat">
+                <div class="stat-value">523</div>
+                <div class="stat-label">Connectors</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">12,847</div>
+                <div class="stat-label">Community Flows</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">£2.4M</div>
+                <div class="stat-label">Saved Monthly</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">98.7%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Universal Connector Search -->
+    <div class="search-section">
+        <h2>🔍 Search All 523 Connectors - Including Canvas Apps & Dataverse</h2>
+        
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search connectors... (e.g., 'Canvas App', 'Dataverse table', 'SharePoint', 'When a row is added')" oninput="searchConnectors(this.value)">
+        </div>
+
+        <div class="search-filters">
+            <button class="filter-chip active" onclick="filterBy('all')">All (523)</button>
+            <button class="filter-chip" onclick="filterBy('triggers')">🎯 Triggers (189)</button>
+            <button class="filter-chip" onclick="filterBy('actions')">⚡ Actions (334)</button>
+            <button class="filter-chip" onclick="filterBy('canvas')">📱 Canvas Apps (47)</button>
+            <button class="filter-chip" onclick="filterBy('dataverse')">💎 Dataverse (82)</button>
+            <button class="filter-chip" onclick="filterBy('standard')">✅ Standard (412)</button>
+            <button class="filter-chip" onclick="filterBy('premium')">💰 Premium (111)</button>
+            <button class="filter-chip" onclick="filterBy('new')">🆕 New (23)</button>
+            <button class="filter-chip" onclick="filterBy('popular')">🔥 Popular (45)</button>
+            <button class="filter-chip" onclick="filterBy('custom')">🔧 Custom (67)</button>
+        </div>
+
+        <div class="connectors-grid" id="connectorsGrid">
+            <!-- Canvas App Triggers -->
+            <div class="connector-card" onclick="selectConnector(this, 'canvas-trigger')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #e91e63, #f06292);">📱</div>
+                    <div class="connector-info">
+                        <div class="connector-name">PowerApps (V2)</div>
+                        <div class="connector-type">Trigger from Canvas App</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge standard">STANDARD</span>
+                    <span class="badge trigger">TRIGGER</span>
+                    <span class="badge new">NEW V2</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 8,234 flows</span>
+                    <span>99.2% success</span>
+                </div>
+            </div>
+
+            <!-- Dataverse Triggers -->
+            <div class="connector-card" onclick="selectConnector(this, 'dataverse-trigger')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #00bcd4, #00acc1);">💎</div>
+                    <div class="connector-info">
+                        <div class="connector-name">Dataverse</div>
+                        <div class="connector-type">When a row is added, modified or deleted</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge standard">STANDARD</span>
+                    <span class="badge trigger">TRIGGER</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 12,456 flows</span>
+                    <span>99.8% success</span>
+                </div>
+            </div>
+
+            <!-- Model-driven App Trigger -->
+            <div class="connector-card" onclick="selectConnector(this, 'model-trigger')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #9c27b0, #ba68c8);">🎯</div>
+                    <div class="connector-info">
+                        <div class="connector-name">When record is selected</div>
+                        <div class="connector-type">Model-driven app button</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge standard">STANDARD</span>
+                    <span class="badge trigger">TRIGGER</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 3,456 flows</span>
+                    <span>98.5% success</span>
+                </div>
+            </div>
+
+            <!-- SharePoint -->
+            <div class="connector-card" onclick="selectConnector(this, 'sharepoint')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #036c70, #048a81);">📁</div>
+                    <div class="connector-info">
+                        <div class="connector-name">SharePoint</div>
+                        <div class="connector-type">When an item is created or modified</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge standard">STANDARD</span>
+                    <span class="badge trigger">TRIGGER</span>
+                    <span class="badge action">ACTION</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 45,678 flows</span>
+                    <span>99.5% success</span>
+                </div>
+            </div>
+
+            <!-- SQL Server -->
+            <div class="connector-card" onclick="selectConnector(this, 'sql')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #ff5722, #ff7043);">🗄️</div>
+                    <div class="connector-info">
+                        <div class="connector-name">SQL Server</div>
+                        <div class="connector-type">When an item is created</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge premium">PREMIUM</span>
+                    <span class="badge trigger">TRIGGER</span>
+                    <span class="badge action">ACTION</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 6,789 flows</span>
+                    <span>97.8% success</span>
+                </div>
+            </div>
+
+            <!-- Teams -->
+            <div class="connector-card" onclick="selectConnector(this, 'teams')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #5558af, #7b83eb);">💬</div>
+                    <div class="connector-info">
+                        <div class="connector-name">Microsoft Teams</div>
+                        <div class="connector-type">When a new message is posted</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge standard">STANDARD</span>
+                    <span class="badge trigger">TRIGGER</span>
+                    <span class="badge action">ACTION</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 23,456 flows</span>
+                    <span>98.9% success</span>
+                </div>
+            </div>
+
+            <!-- Custom Connector -->
+            <div class="connector-card" onclick="selectConnector(this, 'custom')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #ff9800, #ffb74d);">🔧</div>
+                    <div class="connector-info">
+                        <div class="connector-name">Custom Connector</div>
+                        <div class="connector-type">Your API endpoints</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge premium">PREMIUM</span>
+                    <span class="badge trigger">TRIGGER</span>
+                    <span class="badge action">ACTION</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 1,234 flows</span>
+                    <span>Variable success</span>
+                </div>
+            </div>
+
+            <!-- Power BI -->
+            <div class="connector-card" onclick="selectConnector(this, 'powerbi')">
+                <div class="connector-header">
+                    <div class="connector-icon" style="background: linear-gradient(135deg, #ffc107, #ffca28);">📊</div>
+                    <div class="connector-info">
+                        <div class="connector-name">Power BI</div>
+                        <div class="connector-type">Data alerts & refresh</div>
+                    </div>
+                </div>
+                <div class="connector-badges">
+                    <span class="badge standard">STANDARD</span>
+                    <span class="badge trigger">TRIGGER</span>
+                    <span class="badge action">ACTION</span>
+                    <span class="badge new">ENHANCED</span>
+                </div>
+                <div class="connector-stats">
+                    <span>Used by 4,567 flows</span>
+                    <span>96.5% success</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="advanced-panel">
+            <div class="advanced-header">
+                <h3>⚙️ Advanced Options</h3>
+                <button class="community-button">Show All Options</button>
+            </div>
+            <div class="advanced-grid">
+                <div class="advanced-option">
+                    <div class="option-label">Trigger Type</div>
+                    <select class="option-value" style="width: 100%; padding: 4px;">
+                        <option>Instant (Button/Canvas App)</option>
+                        <option>Automated (When something happens)</option>
+                        <option>Scheduled (Recurrence)</option>
+                        <option>Business Process Flow</option>
+                        <option>Desktop Flow</option>
+                    </select>
+                </div>
+                <div class="advanced-option">
+                    <div class="option-label">Run Context</div>
+                    <select class="option-value" style="width: 100%; padding: 4px;">
+                        <option>User Context</option>
+                        <option>System/Service Account</option>
+                        <option>Connection Reference</option>
+                        <option>Embedded in App</option>
+                    </select>
+                </div>
+                <div class="advanced-option">
+                    <div class="option-label">Environment Type</div>
+                    <select class="option-value" style="width: 100%; padding: 4px;">
+                        <option>Production</option>
+                        <option>Sandbox</option>
+                        <option>Developer</option>
+                        <option>Default</option>
+                    </select>
+                </div>
+                <div class="advanced-option">
+                    <div class="option-label">Solution Aware</div>
+                    <select class="option-value" style="width: 100%; padding: 4px;">
+                        <option>Yes - In Solution</option>
+                        <option>No - Personal Flow</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Combinations -->
+    <div class="search-section">
+        <h2>🔥 Popular Community Combinations</h2>
+        <div class="combinations-scroll">
+            <div class="combination-card" onclick="loadCombination('canvas-sharepoint')">
+                <div class="combination-header">
+                    <span>📱</span> Canvas App → SharePoint
+                </div>
+                <div class="combination-connectors">
+                    <div class="mini-connector">📱</div>
+                    <div class="mini-connector">→</div>
+                    <div class="mini-connector">📁</div>
+                    <div class="mini-connector">→</div>
+                    <div class="mini-connector">📧</div>
+                </div>
+                <div class="combination-stats">
+                    <span>Used 12,456 times</span>
+                    <span>£0/month</span>
+                    <span>99.8% success</span>
+                </div>
+            </div>
+
+            <div class="combination-card" onclick="loadCombination('dataverse-teams')">
+                <div class="combination-header">
+                    <span>💎</span> Dataverse → Teams
+                </div>
+                <div class="combination-connectors">
+                    <div class="mini-connector">💎</div>
+                    <div class="mini-connector">→</div>
+                    <div class="mini-connector">🔍</div>
+                    <div class="mini-connector">→</div>
+                    <div class="mini-connector">💬</div>
+                </div>
+                <div class="combination-stats">
+                    <span>Used 8,234 times</span>
+                    <span>£0/month</span>
+                    <span>98.5% success</span>
+                </div>
+            </div>
+
+            <div class="combination-card" onclick="loadCombination('forms-approval')">
+                <div class="combination-header">
+                    <span>📝</span> Forms → Approvals
+                </div>
+                <div class="combination-connectors">
+                    <div class="mini-connector">📝</div>
+                    <div class="mini-connector">→</div>
+                    <div class="mini-connector">✅</div>
+                    <div class="mini-connector">→</div>
+                    <div class="mini-connector">📧</div>
+                </div>
+                <div class="combination-stats">
+                    <span>Used 6,789 times</span>
+                    <span>£0/month</span>
+                    <span>97.2% success</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smart Recommendations -->
+    <div class="builder-section">
+        <div class="recommendations">
+            <h3>💡 Smart Recommendations Based on Your Selection</h3>
+            <div class="recommendation-list">
+                <div class="recommendation-item">
+                    <span class="recommendation-icon">⚠️</span>
+                    <span class="recommendation-text">Canvas App triggers don't need Premium - you can pass complex data for free!</span>
+                    <button class="recommendation-action">Learn How</button>
+                </div>
+                <div class="recommendation-item">
+                    <span class="recommendation-icon">🚀</span>
+                    <span class="recommendation-text">Use Dataverse instead of SQL to avoid Premium licensing (save £300/month)</span>
+                    <button class="recommendation-action">Switch Now</button>
+                </div>
+                <div class="recommendation-item">
+                    <span class="recommendation-icon">💡</span>
+                    <span class="recommendation-text">Add OData $filter to reduce API calls by 90%</span>
+                    <button class="recommendation-action">Add Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Features -->
+    <div class="community-section">
+        <h2>🤝 Community Resources</h2>
+        <div class="community-grid">
+            <div class="community-card">
+                <div class="community-icon">📚</div>
+                <div class="community-title">Template Library</div>
+                <div class="community-description">12,847 tested flows from the community</div>
+                <button class="community-button">Browse Templates</button>
+            </div>
+            <div class="community-card">
+                <div class="community-icon">💬</div>
+                <div class="community-title">Ask Community</div>
+                <div class="community-description">Get help from 45,678 Power Platform experts</div>
+                <button class="community-button">Ask Question</button>
+            </div>
+            <div class="community-card">
+                <div class="community-icon">🏆</div>
+                <div class="community-title">MVP Patterns</div>
+                <div class="community-description">Curated patterns from Microsoft MVPs</div>
+                <button class="community-button">View Patterns</button>
+            </div>
+            <div class="community-card">
+                <div class="community-icon">📊</div>
+                <div class="community-title">Success Metrics</div>
+                <div class="community-description">See what works for 98.7% of flows</div>
+                <button class="community-button">View Metrics</button>
+            </div>
+            <div class="community-card">
+                <div class="community-icon">🎓</div>
+                <div class="community-title">Learning Paths</div>
+                <div class="community-description">Step-by-step guides for beginners</div>
+                <button class="community-button">Start Learning</button>
+            </div>
+            <div class="community-card">
+                <div class="community-icon">🔄</div>
+                <div class="community-title">Share Your Flow</div>
+                <div class="community-description">Help others by sharing your solutions</div>
+                <button class="community-button">Share Flow</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cost Display -->
+    <div class="cost-display">
+        <div class="cost-title">
+            <span>💰</span> Live Cost Calculator
+        </div>
+        <div class="cost-item">
+            <span>Canvas App Trigger</span>
+            <span>£0</span>
+        </div>
+        <div class="cost-item">
+            <span>SharePoint Actions</span>
+            <span>£0</span>
+        </div>
+        <div class="cost-item">
+            <span>Premium Connectors</span>
+            <span>£0</span>
+        </div>
+        <div class="cost-total">
+            <span>Total Monthly</span>
+            <span>£0</span>
+        </div>
+        <div class="cost-savings">
+            🎉 Using Standard Connectors - Saving £300/month!
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        function searchConnectors(query) {
+            console.log('Searching for:', query);
+            // Filter connectors based on query
+            // Update the grid with filtered results
+        }
+
+        // Filter by type
+        function filterBy(type) {
+            // Remove active class from all chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            // Add active class to clicked chip
+            event.target.classList.add('active');
+            
+            // Filter connectors based on type
+            console.log('Filtering by:', type);
+        }
+
+        // Select connector
+        function selectConnector(element, type) {
+            element.classList.toggle('selected');
+            
+            // Update cost calculator
+            updateCostCalculator(type);
+            
+            // Show relevant recommendations
+            showRecommendations(type);
+        }
+
+        // Update cost calculator
+        function updateCostCalculator(type) {
+            // Calculate costs based on selected connectors
+            console.log('Updating costs for:', type);
+        }
+
+        // Show recommendations
+        function showRecommendations(type) {
+            // Display smart recommendations based on selection
+            console.log('Showing recommendations for:', type);
+        }
+
+        // Load combination
+        function loadCombination(combo) {
+            alert(`Loading popular combination: ${combo}`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load all connectors
+            console.log('Loading 523 connectors...');
+            
+            // Set up real-time updates
+            setInterval(() => {
+                // Update community stats
+                const stats = document.querySelectorAll('.stat-value');
+                stats[1].textContent = (parseInt(stats[1].textContent) + Math.floor(Math.random() * 5)).toLocaleString();
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

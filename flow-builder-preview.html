@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Power Automate Visual Flow Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 2px solid #e4e6eb;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1c1e21;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: #0078d4;
+            color: white;
+            border-color: #0078d4;
+        }
+
+        .btn-primary:hover {
+            background: #106ebe;
+        }
+
+        .btn-success {
+            background: #107c10;
+            color: white;
+            border-color: #107c10;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e4e6eb;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #65676b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-item {
+            background: #f8f9fa;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: move;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-item:hover {
+            background: #e3f2fd;
+            border-color: #0078d4;
+            transform: translateX(4px);
+        }
+
+        .action-item.dragging {
+            opacity: 0.5;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .trigger-icon { background: #e7f6e7; }
+        .action-icon-blue { background: #e3f2fd; }
+        .condition-icon { background: #fff4e6; }
+        .loop-icon { background: #fde7e9; }
+
+        .action-details {
+            flex: 1;
+        }
+
+        .action-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1c1e21;
+        }
+
+        .action-desc {
+            font-size: 12px;
+            color: #65676b;
+        }
+
+        /* Canvas */
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .canvas-header {
+            background: white;
+            border-bottom: 1px solid #e4e6eb;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flow-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1c1e21;
+        }
+
+        .canvas {
+            flex: 1;
+            padding: 32px;
+            overflow: auto;
+            position: relative;
+        }
+
+        .flow-container {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .flow-step {
+            background: white;
+            border: 2px solid #e4e6eb;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            width: 400px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .flow-step:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .flow-step.trigger {
+            border-color: #107c10;
+            background: linear-gradient(135deg, #e7f6e7 0%, white 100%);
+        }
+
+        .flow-step.condition {
+            border-color: #ffb900;
+            background: linear-gradient(135deg, #fff4e6 0%, white 100%);
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .step-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid #e4e6eb;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .step-action-btn:hover {
+            background: #f8f9fa;
+            border-color: #0078d4;
+        }
+
+        .step-content {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            color: #65676b;
+        }
+
+        .connector-line {
+            width: 2px;
+            height: 20px;
+            background: #0078d4;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .connector-line::after {
+            content: '▼';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #0078d4;
+            font-size: 12px;
+        }
+
+        .add-step-btn {
+            width: 400px;
+            padding: 16px;
+            border: 2px dashed #0078d4;
+            border-radius: 12px;
+            background: #e3f2fd;
+            color: #0078d4;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-step-btn:hover {
+            background: #0078d4;
+            color: white;
+            border-style: solid;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 320px;
+            background: white;
+            border-left: 1px solid #e4e6eb;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .metrics-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #65676b;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .metric-value.success { color: #107c10; }
+        .metric-value.warning { color: #ffb900; }
+        .metric-value.danger { color: #d13438; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1c1e21;
+        }
+
+        .empty-desc {
+            color: #65676b;
+            margin-bottom: 24px;
+        }
+
+        /* Configuration Panel */
+        .config-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .config-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: #65676b;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e4e6eb;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.1);
+        }
+
+        /* Drag Over Effect */
+        .drag-over {
+            background: #e3f2fd !important;
+            border-color: #0078d4 !important;
+            border-style: dashed !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            🔧 Power Automate Visual Flow Builder
+        </div>
+        <div class="header-actions">
+            <button class="btn" onclick="testFlow()">🧪 Test</button>
+            <button class="btn" onclick="validateFlow()">✅ Validate</button>
+            <button class="btn btn-success" onclick="saveFlow()">💾 Save</button>
+            <button class="btn btn-primary" onclick="exportFlow()">📤 Export to Power Automate</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar - Action Library -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-title">
+                    ⚡ TRIGGERS
+                </div>
+                <div class="action-item" draggable="true" data-action="sharepoint-created">
+                    <div class="action-icon trigger-icon">📄</div>
+                    <div class="action-details">
+                        <div class="action-name">When item is created</div>
+                        <div class="action-desc">SharePoint</div>
+                    </div>
+                </div>
+                <div class="action-item" draggable="true" data-action="email-received">
+                    <div class="action-icon trigger-icon">📧</div>
+                    <div class="action-details">
+                        <div class="action-name">When email arrives</div>
+                        <div class="action-desc">Outlook</div>
+                    </div>
+                </div>
+                <div class="action-item" draggable="true" data-action="forms-submitted">
+                    <div class="action-icon trigger-icon">📝</div>
+                    <div class="action-details">
+                        <div class="action-name">When response submitted</div>
+                        <div class="action-desc">Microsoft Forms</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">
+                    🎯 ACTIONS
+                </div>
+                <div class="action-item" draggable="true" data-action="send-email">
+                    <div class="action-icon action-icon-blue">✉️</div>
+                    <div class="action-details">
+                        <div class="action-name">Send an email</div>
+                        <div class="action-desc">Outlook</div>
+                    </div>
+                </div>
+                <div class="action-item" draggable="true" data-action="create-item">
+                    <div class="action-icon action-icon-blue">➕</div>
+                    <div class="action-details">
+                        <div class="action-name">Create item</div>
+                        <div class="action-desc">SharePoint</div>
+                    </div>
+                </div>
+                <div class="action-item" draggable="true" data-action="update-item">
+                    <div class="action-icon action-icon-blue">✏️</div>
+                    <div class="action-details">
+                        <div class="action-name">Update item</div>
+                        <div class="action-desc">SharePoint</div>
+                    </div>
+                </div>
+                <div class="action-item" draggable="true" data-action="get-items">
+                    <div class="action-icon action-icon-blue">📋</div>
+                    <div class="action-details">
+                        <div class="action-name">Get items</div>
+                        <div class="action-desc">SharePoint</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">
+                    🔀 CONTROL
+                </div>
+                <div class="action-item" draggable="true" data-action="condition">
+                    <div class="action-icon condition-icon">❓</div>
+                    <div class="action-details">
+                        <div class="action-name">Condition</div>
+                        <div class="action-desc">If/else logic</div>
+                    </div>
+                </div>
+                <div class="action-item" draggable="true" data-action="apply-each">
+                    <div class="action-icon loop-icon">🔄</div>
+                    <div class="action-details">
+                        <div class="action-name">Apply to each</div>
+                        <div class="action-desc">Loop through items</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <div class="canvas-header">
+                <div class="flow-name">📊 New Invoice Processing Flow</div>
+                <div>
+                    <span style="color: #65676b; font-size: 14px;">Auto-saved 2 minutes ago</span>
+                </div>
+            </div>
+            
+            <div class="canvas">
+                <div class="flow-container" id="flowContainer">
+                    <!-- Trigger -->
+                    <div class="flow-step trigger">
+                        <div class="step-header">
+                            <div class="step-title">
+                                <span>📄</span>
+                                When a file is created
+                            </div>
+                            <div class="step-actions">
+                                <button class="step-action-btn">⚙️</button>
+                                <button class="step-action-btn">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            Site: Finance Documents<br>
+                            Library: Invoices<br>
+                            Folder: /2024/Pending
+                        </div>
+                    </div>
+                    
+                    <div class="connector-line"></div>
+                    
+                    <!-- Action 1 -->
+                    <div class="flow-step">
+                        <div class="step-header">
+                            <div class="step-title">
+                                <span>📋</span>
+                                Get file properties
+                            </div>
+                            <div class="step-actions">
+                                <button class="step-action-btn">⚙️</button>
+                                <button class="step-action-btn">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            Extract metadata from file<br>
+                            Include: Name, Size, Created By
+                        </div>
+                    </div>
+                    
+                    <div class="connector-line"></div>
+                    
+                    <!-- Condition -->
+                    <div class="flow-step condition">
+                        <div class="step-header">
+                            <div class="step-title">
+                                <span>❓</span>
+                                Check invoice amount
+                            </div>
+                            <div class="step-actions">
+                                <button class="step-action-btn">⚙️</button>
+                                <button class="step-action-btn">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            If Amount > £1000<br>
+                            Then: Send for approval<br>
+                            Else: Auto-approve
+                        </div>
+                    </div>
+                    
+                    <div class="connector-line"></div>
+                    
+                    <!-- Add Step Button -->
+                    <button class="add-step-btn" onclick="addNewStep()">
+                        <span style="font-size: 20px;">+</span>
+                        Add an action
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Properties & Metrics -->
+        <div class="right-panel">
+            <h3 style="margin-bottom: 16px;">📊 Flow Metrics</h3>
+            
+            <div class="metrics-card">
+                <div class="metric-row">
+                    <span class="metric-label">Estimated Runtime</span>
+                    <span class="metric-value success">8.3 sec</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Monthly Cost</span>
+                    <span class="metric-value success">£0</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">PPR Usage</span>
+                    <span class="metric-value warning">12K/day</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">License Required</span>
+                    <span class="metric-value success">Standard</span>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 16px;">🎯 Optimization Tips</h3>
+            
+            <div class="metrics-card" style="background: #e7f6e7;">
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <span>✅</span>
+                    <div>
+                        <strong>Good choice!</strong><br>
+                        <span style="font-size: 13px; color: #65676b;">
+                            Using SharePoint instead of SQL saves £300/month
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-card" style="background: #fff4e6;">
+                <div style="display: flex; gap: 8px;">
+                    <span>💡</span>
+                    <div>
+                        <strong>Add OData filter</strong><br>
+                        <span style="font-size: 13px; color: #65676b;">
+                            Filter at source for 10x performance gain
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin: 16px 0;">⚙️ Selected Action</h3>
+            
+            <div class="config-panel">
+                <div class="config-title">Get file properties</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Site Address</label>
+                    <input type="text" class="form-input" value="https://contoso.sharepoint.com/finance">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Library Name</label>
+                    <select class="form-select">
+                        <option>Invoices</option>
+                        <option>Receipts</option>
+                        <option>Contracts</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">File Identifier</label>
+                    <input type="text" class="form-input" placeholder="@{triggerOutputs()?['ID']}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drag and Drop functionality
+        let draggedElement = null;
+
+        // Add drag listeners to action items
+        document.querySelectorAll('.action-item').forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                draggedElement = e.target;
+                e.target.classList.add('dragging');
+            });
+
+            item.addEventListener('dragend', (e) => {
+                e.target.classList.remove('dragging');
+            });
+        });
+
+        // Add drop zone to canvas
+        const flowContainer = document.getElementById('flowContainer');
+        const addButton = document.querySelector('.add-step-btn');
+
+        flowContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const draggingOver = e.target.closest('.add-step-btn');
+            if (draggingOver) {
+                draggingOver.classList.add('drag-over');
+            }
+        });
+
+        flowContainer.addEventListener('dragleave', (e) => {
+            const leavingElement = e.target.closest('.add-step-btn');
+            if (leavingElement) {
+                leavingElement.classList.remove('drag-over');
+            }
+        });
+
+        flowContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const dropTarget = e.target.closest('.add-step-btn');
+            if (dropTarget && draggedElement) {
+                dropTarget.classList.remove('drag-over');
+                const actionType = draggedElement.dataset.action;
+                const actionName = draggedElement.querySelector('.action-name').textContent;
+                const actionIcon = draggedElement.querySelector('.action-icon').textContent;
+                
+                addStepToFlow(actionName, actionIcon, dropTarget);
+            }
+        });
+
+        function addStepToFlow(name, icon, insertBefore) {
+            const connector = document.createElement('div');
+            connector.className = 'connector-line';
+            
+            const newStep = document.createElement('div');
+            newStep.className = 'flow-step';
+            newStep.innerHTML = `
+                <div class="step-header">
+                    <div class="step-title">
+                        <span>${icon}</span>
+                        ${name}
+                    </div>
+                    <div class="step-actions">
+                        <button class="step-action-btn">⚙️</button>
+                        <button class="step-action-btn">🗑️</button>
+                    </div>
+                </div>
+                <div class="step-content">
+                    Configure this action...
+                </div>
+            `;
+            
+            insertBefore.parentNode.insertBefore(connector, insertBefore);
+            insertBefore.parentNode.insertBefore(newStep, insertBefore);
+            
+            // Update metrics
+            updateMetrics();
+        }
+
+        function addNewStep() {
+            alert('Drag an action from the left sidebar here to add it to your flow!');
+        }
+
+        function updateMetrics() {
+            // Simulate metric updates
+            const steps = document.querySelectorAll('.flow-step').length;
+            const runtime = (steps * 2.1).toFixed(1);
+            document.querySelector('.metric-value').textContent = runtime + ' sec';
+        }
+
+        function testFlow() {
+            alert('🧪 Testing flow...\n\n✅ Trigger: Connection successful\n✅ Get properties: Test passed\n✅ Condition: Logic validated\n\nFlow is ready to deploy!');
+        }
+
+        function validateFlow() {
+            alert('✅ Flow Validation\n\n• All connections configured\n• No infinite loops detected\n• Permissions verified\n• Performance optimized\n\nYour flow is valid!');
+        }
+
+        function saveFlow() {
+            alert('💾 Flow saved successfully!\n\nName: New Invoice Processing Flow\nVersion: 1.0.0\nLast modified: Just now');
+        }
+
+        function exportFlow() {
+            alert('📤 Exporting to Power Automate...\n\nYour flow JSON has been generated and copied to clipboard.\n\n1. Open Power Automate\n2. Click "Import"\n3. Paste the JSON\n4. Configure connections\n5. Save and activate!');
+        }
+
+        // Initialize tooltips and interactions
+        document.querySelectorAll('.step-action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (this.textContent === '⚙️') {
+                    alert('Configuration panel would open for this action');
+                } else if (this.textContent === '🗑️') {
+                    if (confirm('Delete this action?')) {
+                        this.closest('.flow-step').remove();
+                        updateMetrics();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

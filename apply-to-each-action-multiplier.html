@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply to Each Action Multiplier - SEE THE REAL IMPACT</title>
+    <style>
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #004578;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-red-dark: #a80000;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-90: #605e5c;
+            --ms-gray-130: #323130;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header with Critical Warning */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .critical-banner {
+            background: var(--ms-red);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: pulse-critical 2s infinite;
+        }
+
+        @keyframes pulse-critical {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .critical-text {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loop Builder Section */
+        .loop-builder {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--ms-gray-130);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Loop Level Container */
+        .loop-level {
+            border: 3px solid;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .loop-level-1 {
+            border-color: var(--ms-orange);
+            background: rgba(255, 140, 0, 0.05);
+        }
+
+        .loop-level-2 {
+            border-color: var(--ms-red);
+            background: rgba(209, 52, 56, 0.05);
+            margin-left: 30px;
+        }
+
+        .loop-level-3 {
+            border-color: var(--ms-red-dark);
+            background: rgba(168, 0, 0, 0.1);
+            margin-left: 30px;
+        }
+
+        .loop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .loop-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .loop-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .badge-warning { background: var(--ms-orange); }
+        .badge-critical { background: var(--ms-red); }
+        .badge-disaster { background: var(--ms-red-dark); }
+
+        /* Loop Configuration */
+        .loop-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .config-label {
+            font-size: 13px;
+            color: var(--ms-gray-90);
+            margin-bottom: 5px;
+        }
+
+        .config-input {
+            padding: 8px;
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+        }
+
+        /* Actions Inside Loop */
+        .actions-container {
+            background: white;
+            border: 2px dashed var(--ms-gray-30);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .actions-header {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ms-gray-90);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-action-btn {
+            background: var(--ms-blue);
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-action-btn:hover {
+            background: var(--ms-blue-dark);
+        }
+
+        .action-item {
+            background: var(--ms-gray-10);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .action-item:hover {
+            background: var(--ms-gray-20);
+            transform: translateX(5px);
+        }
+
+        .action-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--ms-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .action-details {
+            flex: 1;
+        }
+
+        .action-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .action-connector {
+            font-size: 12px;
+            color: var(--ms-gray-90);
+        }
+
+        .action-api-count {
+            background: var(--ms-red);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .remove-action {
+            background: none;
+            border: none;
+            color: var(--ms-red);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Impact Visualization */
+        .impact-visualization {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .total-impact {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .impact-number {
+            font-size: 72px;
+            font-weight: 900;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: number-pulse 2s infinite;
+        }
+
+        @keyframes number-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .impact-label {
+            font-size: 20px;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+
+        /* Breakdown Table */
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .breakdown-table th {
+            background: var(--ms-gray-20);
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 14px;
+            border-bottom: 2px solid var(--ms-gray-30);
+        }
+
+        .breakdown-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--ms-gray-30);
+            font-size: 14px;
+        }
+
+        .breakdown-table tr:hover {
+            background: var(--ms-gray-10);
+        }
+
+        .multiplier-effect {
+            font-weight: 700;
+            color: var(--ms-red);
+            font-size: 16px;
+        }
+
+        /* Visual Flow Diagram */
+        .flow-diagram {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--ms-gray-10);
+            border-radius: 8px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .step-normal { border-color: var(--ms-green); }
+        .step-loop { border-color: var(--ms-orange); }
+        .step-nested { border-color: var(--ms-red); }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--ms-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .step-detail {
+            font-size: 13px;
+            color: var(--ms-gray-90);
+        }
+
+        .step-api {
+            margin-left: auto;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ms-red);
+        }
+
+        /* Throttling Alert */
+        .throttling-alert {
+            background: var(--ms-red);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .throttling-alert.active {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .throttle-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .throttle-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .throttle-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-calculate {
+            background: var(--ms-red);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            background: var(--ms-red-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: white;
+            color: var(--ms-gray-130);
+            border: 2px solid var(--ms-gray-30);
+        }
+
+        /* Optimization Tips */
+        .optimization-tips {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .tips-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .tip-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="critical-banner">
+                <div class="critical-text">
+                    ⚠️ EVERY ACTION INSIDE Apply to Each MULTIPLIES YOUR API CALLS!
+                </div>
+                <div style="text-align: center; margin-top: 10px; font-size: 16px;">
+                    100 items × 5 actions = 500 API calls | Nested: 100 × 50 × 5 = 25,000 API calls!
+                </div>
+            </div>
+            <h1 style="color: var(--ms-blue-dark); font-size: 36px; margin-bottom: 10px;">
+                Apply to Each Action Multiplier Visualiser
+            </h1>
+            <p style="font-size: 18px; color: var(--ms-gray-90);">
+                Build your loops, add actions inside them, and watch the API calls EXPLODE
+            </p>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Loop Builder -->
+            <div class="loop-builder">
+                <h2 class="section-title">
+                    <span>🔨</span>
+                    <span>Build Your Loop Structure</span>
+                </h2>
+
+                <!-- Level 1 Loop -->
+                <div class="loop-level loop-level-1">
+                    <div class="loop-header">
+                        <span class="loop-title">Level 1: Outer Apply to Each</span>
+                        <span class="loop-badge badge-warning">WARNING</span>
+                    </div>
+                    
+                    <div class="loop-config">
+                        <div class="config-item">
+                            <label class="config-label">Number of items:</label>
+                            <input type="number" class="config-input" id="loop1Items" value="100" min="1" max="10000" onchange="calculateImpact()">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">Data source:</label>
+                            <select class="config-input" id="loop1Source" onchange="calculateImpact()">
+                                <option value="sharepoint">SharePoint List</option>
+                                <option value="sql">SQL Database</option>
+                                <option value="dataverse">Dataverse</option>
+                                <option value="api">API Response</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="actions-container">
+                        <div class="actions-header">
+                            <span>Actions Inside This Loop:</span>
+                            <button class="add-action-btn" onclick="addAction(1)">+ Add Action</button>
+                        </div>
+                        <div id="loop1Actions">
+                            <!-- Actions will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Level 2 Nested Loop -->
+                    <div class="loop-level loop-level-2">
+                        <div class="loop-header">
+                            <span class="loop-title">Level 2: Nested Apply to Each</span>
+                            <span class="loop-badge badge-critical">CRITICAL</span>
+                        </div>
+                        
+                        <div class="loop-config">
+                            <div class="config-item">
+                                <label class="config-label">Items per parent:</label>
+                                <input type="number" class="config-input" id="loop2Items" value="50" min="0" max="1000" onchange="calculateImpact()">
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">Enable nested loop:</label>
+                                <select class="config-input" id="loop2Enabled" onchange="toggleLoop2()">
+                                    <option value="yes">Yes - DANGER!</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="actions-container" id="loop2Container">
+                            <div class="actions-header">
+                                <span>Actions Inside Nested Loop:</span>
+                                <button class="add-action-btn" onclick="addAction(2)">+ Add Action</button>
+                            </div>
+                            <div id="loop2Actions">
+                                <!-- Actions will be added here -->
+                            </div>
+                        </div>
+
+                        <!-- Level 3 Double Nested -->
+                        <div class="loop-level loop-level-3">
+                            <div class="loop-header">
+                                <span class="loop-title">Level 3: Double Nested</span>
+                                <span class="loop-badge badge-disaster">DISASTER!</span>
+                            </div>
+                            
+                            <div class="loop-config">
+                                <div class="config-item">
+                                    <label class="config-label">Items per parent:</label>
+                                    <input type="number" class="config-input" id="loop3Items" value="0" min="0" max="100" onchange="calculateImpact()">
+                                </div>
+                                <div class="config-item">
+                                    <label class="config-label">Enable double nested:</label>
+                                    <select class="config-input" id="loop3Enabled" onchange="toggleLoop3()">
+                                        <option value="no">No - Good choice!</option>
+                                        <option value="yes">Yes - ARE YOU SURE?!</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="actions-container" id="loop3Container" style="display: none;">
+                                <div class="actions-header">
+                                    <span>Actions Inside Double Nested:</span>
+                                    <button class="add-action-btn" onclick="addAction(3)">+ Add Action</button>
+                                </div>
+                                <div id="loop3Actions">
+                                    <!-- Actions will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impact Visualization -->
+            <div class="impact-visualization">
+                <h2 class="section-title">
+                    <span>💥</span>
+                    <span>Real-Time API Impact</span>
+                </h2>
+
+                <div class="total-impact">
+                    <div class="impact-label">TOTAL API CALLS PER EXECUTION</div>
+                    <div class="impact-number" id="totalAPICalls">0</div>
+                    <div class="impact-label" id="impactWarning">Configure your loops to see impact</div>
+                </div>
+
+                <!-- Breakdown Table -->
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Loop Level</th>
+                            <th>Items</th>
+                            <th>Actions Inside</th>
+                            <th>Multiplication</th>
+                            <th>Total API Calls</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdownBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--ms-gray-90);">
+                                Add actions to loops to see breakdown
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Visual Flow Diagram -->
+                <div class="flow-diagram">
+                    <h3 style="margin-bottom: 15px;">Execution Flow Visualization:</h3>
+                    <div id="flowSteps">
+                        <!-- Flow steps will be added here -->
+                    </div>
+                </div>
+
+                <!-- Throttling Alert -->
+                <div class="throttling-alert" id="throttlingAlert">
+                    <div class="throttle-header">🚨 API THROTTLING IMMINENT!</div>
+                    <p>Your flow WILL be throttled and fail with these settings!</p>
+                    <div class="throttle-details" id="throttleDetails">
+                        <!-- Details will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-calculate" onclick="calculateImpact()">
+                Calculate Full Impact
+            </button>
+            <button class="btn btn-reset" onclick="resetAll()">
+                Reset Everything
+            </button>
+        </div>
+
+        <!-- Optimization Tips -->
+        <div class="optimization-tips">
+            <h2 class="tips-title">🚀 How to Fix This Multiplication Disaster</h2>
+            
+            <div class="tip-item">
+                <strong>Batch Operations:</strong> Instead of 5 separate actions inside a loop, combine into one batch operation. SharePoint and Graph API support batching!
+            </div>
+            <div class="tip-item">
+                <strong>Filter at Source:</strong> Don't get 1000 items then filter in the loop. Use OData $filter to get only what you need.
+            </div>
+            <div class="tip-item">
+                <strong>Parallel Branches:</strong> Move independent actions outside the loop into parallel branches.
+            </div>
+            <div class="tip-item">
+                <strong>Select and Expand:</strong> Get related data in one call using $expand instead of nested loops for lookups.
+            </div>
+            <div class="tip-item">
+                <strong>Cache Results:</strong> Store frequently accessed data in variables outside the loop.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Action templates
+        const actionTemplates = {
+            sharepoint: [
+                { name: 'Get item', connector: 'SharePoint', apiCalls: 1, icon: '📄' },
+                { name: 'Update item', connector: 'SharePoint', apiCalls: 1, icon: '✏️' },
+                { name: 'Create item', connector: 'SharePoint', apiCalls: 1, icon: '➕' },
+                { name: 'Get file content', connector: 'SharePoint', apiCalls: 1, icon: '📁' },
+                { name: 'Send HTTP request', connector: 'SharePoint', apiCalls: 1, icon: '🌐' }
+            ],
+            sql: [
+                { name: 'Get row', connector: 'SQL', apiCalls: 1, icon: '🗃️' },
+                { name: 'Update row', connector: 'SQL', apiCalls: 1, icon: '✏️' },
+                { name: 'Insert row', connector: 'SQL', apiCalls: 1, icon: '➕' },
+                { name: 'Execute stored procedure', connector: 'SQL', apiCalls: 1, icon: '⚙️' }
+            ],
+            teams: [
+                { name: 'Post message', connector: 'Teams', apiCalls: 1, icon: '💬' },
+                { name: 'Create channel', connector: 'Teams', apiCalls: 1, icon: '📢' },
+                { name: 'Add member', connector: 'Teams', apiCalls: 1, icon: '👤' }
+            ],
+            email: [
+                { name: 'Send email', connector: 'Outlook', apiCalls: 1, icon: '📧' },
+                { name: 'Get emails', connector: 'Outlook', apiCalls: 1, icon: '📬' },
+                { name: 'Create event', connector: 'Outlook', apiCalls: 1, icon: '📅' }
+            ],
+            http: [
+                { name: 'HTTP GET', connector: 'HTTP', apiCalls: 1, icon: '🔽' },
+                { name: 'HTTP POST', connector: 'HTTP', apiCalls: 1, icon: '🔼' },
+                { name: 'Parse JSON', connector: 'Data Operations', apiCalls: 0, icon: '📊' }
+            ]
+        };
+
+        // Store actions for each loop
+        let loopActions = {
+            1: [],
+            2: [],
+            3: []
+        };
+
+        // API Limits
+        const apiLimits = {
+            sharepoint: 600,
+            sql: 300,
+            dataverse: 6000,
+            teams: 1800,
+            outlook: 300,
+            http: 100
+        };
+
+        // Initialize with some default actions
+        function initializeDefaultActions() {
+            // Add default actions to Level 1
+            loopActions[1] = [
+                { name: 'Get item details', connector: 'SharePoint', apiCalls: 1, icon: '📄' },
+                { name: 'Get user profile', connector: 'Office 365 Users', apiCalls: 1, icon: '👤' },
+                { name: 'Update item status', connector: 'SharePoint', apiCalls: 1, icon: '✏️' }
+            ];
+            
+            // Add default actions to Level 2
+            loopActions[2] = [
+                { name: 'Get related records', connector: 'SharePoint', apiCalls: 1, icon: '🔗' },
+                { name: 'Send notification', connector: 'Teams', apiCalls: 1, icon: '💬' }
+            ];
+            
+            renderActions();
+            calculateImpact();
+        }
+
+        // Add action to loop
+        function addAction(loopLevel) {
+            // Get random action template
+            const allActions = [
+                ...actionTemplates.sharepoint,
+                ...actionTemplates.sql,
+                ...actionTemplates.teams,
+                ...actionTemplates.email,
+                ...actionTemplates.http
+            ];
+            
+            const randomAction = allActions[Math.floor(Math.random() * allActions.length)];
+            loopActions[loopLevel].push({...randomAction});
+            
+            renderActions();
+            calculateImpact();
+        }
+
+        // Remove action
+        function removeAction(loopLevel, index) {
+            loopActions[loopLevel].splice(index, 1);
+            renderActions();
+            calculateImpact();
+        }
+
+        // Render actions in UI
+        function renderActions() {
+            // Render Loop 1 actions
+            const loop1Container = document.getElementById('loop1Actions');
+            loop1Container.innerHTML = '';
+            loopActions[1].forEach((action, index) => {
+                loop1Container.innerHTML += createActionHTML(action, 1, index);
+            });
+            
+            // Render Loop 2 actions
+            const loop2Container = document.getElementById('loop2Actions');
+            loop2Container.innerHTML = '';
+            loopActions[2].forEach((action, index) => {
+                loop2Container.innerHTML += createActionHTML(action, 2, index);
+            });
+            
+            // Render Loop 3 actions
+            const loop3Container = document.getElementById('loop3Actions');
+            loop3Container.innerHTML = '';
+            loopActions[3].forEach((action, index) => {
+                loop3Container.innerHTML += createActionHTML(action, 3, index);
+            });
+        }
+
+        // Create action HTML
+        function createActionHTML(action, loopLevel, index) {
+            return `
+                <div class="action-item">
+                    <div class="action-icon">${action.icon}</div>
+                    <div class="action-details">
+                        <div class="action-name">${action.name}</div>
+                        <div class="action-connector">${action.connector}</div>
+                    </div>
+                    <span class="action-api-count">${action.apiCalls} API</span>
+                    <button class="remove-action" onclick="removeAction(${loopLevel}, ${index})">×</button>
+                </div>
+            `;
+        }
+
+        // Toggle Loop 2
+        function toggleLoop2() {
+            const enabled = document.getElementById('loop2Enabled').value === 'yes';
+            document.getElementById('loop2Container').style.display = enabled ? 'block' : 'none';
+            if (!enabled) {
+                document.getElementById('loop3Container').style.display = 'none';
+                document.getElementById('loop3Enabled').value = 'no';
+            }
+            calculateImpact();
+        }
+
+        // Toggle Loop 3
+        function toggleLoop3() {
+            const enabled = document.getElementById('loop3Enabled').value === 'yes';
+            document.getElementById('loop3Container').style.display = enabled ? 'block' : 'none';
+            calculateImpact();
+        }
+
+        // Calculate total impact
+        function calculateImpact() {
+            // Get loop configurations
+            const loop1Items = parseInt(document.getElementById('loop1Items').value) || 0;
+            const loop2Items = parseInt(document.getElementById('loop2Items').value) || 0;
+            const loop3Items = parseInt(document.getElementById('loop3Items').value) || 0;
+            
+            const loop2Enabled = document.getElementById('loop2Enabled').value === 'yes';
+            const loop3Enabled = document.getElementById('loop3Enabled').value === 'yes';
+            
+            // Calculate API calls for each level
+            let level1APICalls = 0;
+            let level2APICalls = 0;
+            let level3APICalls = 0;
+            
+            // Level 1 calculations
+            const loop1ActionCount = loopActions[1].reduce((sum, action) => sum + action.apiCalls, 0);
+            level1APICalls = loop1Items * loop1ActionCount;
+            
+            // Level 2 calculations (if enabled)
+            if (loop2Enabled && loop2Items > 0) {
+                const loop2ActionCount = loopActions[2].reduce((sum, action) => sum + action.apiCalls, 0);
+                level2APICalls = loop1Items * loop2Items * loop2ActionCount;
+            }
+            
+            // Level 3 calculations (if enabled)
+            if (loop3Enabled && loop3Items > 0 && loop2Enabled) {
+                const loop3ActionCount = loopActions[3].reduce((sum, action) => sum + action.apiCalls, 0);
+                level3APICalls = loop1Items * loop2Items * loop3Items * loop3ActionCount;
+            }
+            
+            // Total API calls
+            const totalAPICalls = level1APICalls + level2APICalls + level3APICalls;
+            
+            // Update display
+            document.getElementById('totalAPICalls').textContent = totalAPICalls.toLocaleString();
+            
+            // Update warning message
+            const warningElement = document.getElementById('impactWarning');
+            if (totalAPICalls > 10000) {
+                warningElement.textContent = '🚨 DISASTER! This will definitely fail!';
+                warningElement.style.color = 'white';
+            } else if (totalAPICalls > 5000) {
+                warningElement.textContent = '⚠️ CRITICAL! High risk of throttling!';
+                warningElement.style.color = 'yellow';
+            } else if (totalAPICalls > 1000) {
+                warningElement.textContent = '⚠️ WARNING! Optimization needed!';
+                warningElement.style.color = 'orange';
+            } else {
+                warningElement.textContent = 'Manageable but can be optimized';
+                warningElement.style.color = 'white';
+            }
+            
+            // Update breakdown table
+            updateBreakdownTable(loop1Items, loop1ActionCount, level1APICalls,
+                              loop2Items, loop2ActionCount, level2APICalls,
+                              loop3Items, loopActions[3].reduce((sum, a) => sum + a.apiCalls, 0), level3APICalls,
+                              loop2Enabled, loop3Enabled);
+            
+            // Update flow visualization
+            updateFlowVisualization(totalAPICalls);
+            
+            // Check throttling
+            checkThrottling(totalAPICalls);
+        }
+
+        // Update breakdown table
+        function updateBreakdownTable(l1Items, l1Actions, l1Calls, l2Items, l2Actions, l2Calls, l3Items, l3Actions, l3Calls, l2Enabled, l3Enabled) {
+            const tbody = document.getElementById('breakdownBody');
+            let html = '';
+            
+            // Level 1
+            if (l1Actions > 0) {
+                html += `
+                    <tr>
+                        <td><strong>Level 1 (Outer)</strong></td>
+                        <td>${l1Items.toLocaleString()}</td>
+                        <td>${l1Actions} actions</td>
+                        <td class="multiplier-effect">${l1Items} × ${l1Actions}</td>
+                        <td class="multiplier-effect">${l1Calls.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+            
+            // Level 2
+            if (l2Enabled && l2Actions > 0) {
+                html += `
+                    <tr style="background: rgba(209, 52, 56, 0.05);">
+                        <td><strong>Level 2 (Nested)</strong></td>
+                        <td>${(l1Items * l2Items).toLocaleString()}</td>
+                        <td>${l2Actions} actions</td>
+                        <td class="multiplier-effect">${l1Items} × ${l2Items} × ${l2Actions}</td>
+                        <td class="multiplier-effect">${l2Calls.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+            
+            // Level 3
+            if (l3Enabled && l3Actions > 0) {
+                html += `
+                    <tr style="background: rgba(209, 52, 56, 0.1);">
+                        <td><strong>Level 3 (Double Nested)</strong></td>
+                        <td>${(l1Items * l2Items * l3Items).toLocaleString()}</td>
+                        <td>${l3Actions} actions</td>
+                        <td class="multiplier-effect">${l1Items} × ${l2Items} × ${l3Items} × ${l3Actions}</td>
+                        <td class="multiplier-effect">${l3Calls.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+            
+            // Total
+            const total = l1Calls + l2Calls + l3Calls;
+            if (total > 0) {
+                html += `
+                    <tr style="background: var(--ms-gray-20); font-weight: 700;">
+                        <td>TOTAL IMPACT</td>
+                        <td>-</td>
+                        <td>${l1Actions + l2Actions + l3Actions} total</td>
+                        <td>-</td>
+                        <td class="multiplier-effect" style="font-size: 20px;">${total.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html || '<tr><td colspan="5" style="text-align: center;">Add actions to see breakdown</td></tr>';
+        }
+
+        // Update flow visualization
+        function updateFlowVisualization(totalAPICalls) {
+            const container = document.getElementById('flowSteps');
+            const loop1Items = parseInt(document.getElementById('loop1Items').value) || 0;
+            
+            let html = '';
+            
+            // Show first few iterations
+            for (let i = 1; i <= Math.min(3, loop1Items); i++) {
+                html += `
+                    <div class="flow-step step-loop">
+                        <div class="step-number">${i}</div>
+                        <div class="step-content">
+                            <div class="step-title">Item ${i} of ${loop1Items}</div>
+                            <div class="step-detail">${loopActions[1].length} actions executed</div>
+                        </div>
+                        <div class="step-api">${loopActions[1].length} calls</div>
+                    </div>
+                `;
+            }
+            
+            if (loop1Items > 3) {
+                html += `
+                    <div style="text-align: center; padding: 20px; font-size: 24px; color: var(--ms-red);">
+                        ... repeats ${loop1Items - 3} more times ...
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Check throttling
+        function checkThrottling(totalAPICalls) {
+            const source = document.getElementById('loop1Source').value;
+            const limit = apiLimits[source] || 600;
+            
+            // Assuming execution in 1 minute
+            if (totalAPICalls > limit) {
+                const alert = document.getElementById('throttlingAlert');
+                alert.classList.add('active');
+                
+                document.getElementById('throttleDetails').innerHTML = `
+                    <div class="throttle-item">
+                        <div>API Limit</div>
+                        <div>${limit}/min</div>
+                    </div>
+                    <div class="throttle-item">
+                        <div>Your Usage</div>
+                        <div>${totalAPICalls}/min</div>
+                    </div>
+                    <div class="throttle-item">
+                        <div>Over Limit</div>
+                        <div>${((totalAPICalls / limit) * 100).toFixed(0)}%</div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('throttlingAlert').classList.remove('active');
+            }
+        }
+
+        // Reset everything
+        function resetAll() {
+            loopActions = { 1: [], 2: [], 3: [] };
+            document.getElementById('loop1Items').value = 100;
+            document.getElementById('loop2Items').value = 50;
+            document.getElementById('loop3Items').value = 0;
+            document.getElementById('loop2Enabled').value = 'no';
+            document.getElementById('loop3Enabled').value = 'no';
+            toggleLoop2();
+            toggleLoop3();
+            renderActions();
+            calculateImpact();
+        }
+
+        // Initialize on load
+        initializeDefaultActions();
+    </script>
+</body>
+</html>

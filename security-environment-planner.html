@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Power Automate Security & Environment Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .security-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .security-score {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .score-card {
+            text-align: center;
+            padding: 16px;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .score-card.warning {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+
+        .score-card.critical {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .score-value {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* Environment Variables Section */
+        .env-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .env-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .env-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .env-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .env-variable {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .env-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .env-details {
+            flex: 1;
+        }
+
+        .env-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .env-value {
+            font-size: 13px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .env-type {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .env-type.secret {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .env-type.connection {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .env-type.data {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .env-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .env-action {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .env-action:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Security Configuration */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .security-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .security-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .security-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .security-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .security-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #4caf50;
+            color: white;
+        }
+
+        .security-status.warning {
+            background: #ff9800;
+        }
+
+        .security-status.error {
+            background: #f44336;
+        }
+
+        .security-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .security-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .security-option:hover {
+            background: #e8eaf6;
+        }
+
+        .security-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+
+        /* Trigger Filtering */
+        .trigger-filter {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .filter-builder {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 150px 150px 1fr auto;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .filter-select, .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-remove {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #ffebee;
+            color: #f44336;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-filter {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        /* Connection Security */
+        .connection-grid {
+            display: grid;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .connection-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .connection-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: white;
+            border: 2px solid #e0e0e0;
+        }
+
+        .connection-details {
+            flex: 1;
+        }
+
+        .connection-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .connection-info {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .connection-security {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .security-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .security-badge.oauth {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .security-badge.key {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .security-badge.cert {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        /* Best Practices */
+        .practices-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .practice-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .practice-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .practice-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .practice-status.complete {
+            background: #4caf50;
+        }
+
+        .practice-status.warning {
+            background: #ff9800;
+        }
+
+        .practice-status.error {
+            background: #f44336;
+        }
+
+        .practice-content {
+            flex: 1;
+        }
+
+        .practice-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .practice-description {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .practice-action {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Specific Item Triggers */
+        .trigger-specifics {
+            background: linear-gradient(135deg, #ffd54f, #ffca28);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .specific-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .specific-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .specific-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .specific-example {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        /* Compliance Dashboard */
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .compliance-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .compliance-item.compliant {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+
+        .compliance-item.non-compliant {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .compliance-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .compliance-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .compliance-status {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Security Header -->
+    <div class="security-header">
+        <h1>🔐 Security & Environment Configuration</h1>
+        <p style="color: #666; margin-top: 8px;">Secure your flows with environment variables, connection references, and proper trigger filtering</p>
+        
+        <div class="security-score">
+            <div class="score-card">
+                <div class="score-value">A+</div>
+                <div class="score-label">Security Score</div>
+            </div>
+            <div class="score-card warning">
+                <div class="score-value">3</div>
+                <div class="score-label">Warnings</div>
+            </div>
+            <div class="score-card critical">
+                <div class="score-value">1</div>
+                <div class="score-label">Critical Issues</div>
+            </div>
+            <div class="score-card">
+                <div class="score-value">12/15</div>
+                <div class="score-label">Best Practices</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Environment Variables -->
+    <div class="env-section">
+        <div class="env-header">
+            <div class="env-title">
+                <span>🔧</span>
+                Environment Variables
+            </div>
+            <button class="add-filter">+ Add Variable</button>
+        </div>
+        
+        <div class="env-grid">
+            <!-- Secret Variable -->
+            <div class="env-variable">
+                <div class="env-icon">🔐</div>
+                <div class="env-details">
+                    <div class="env-name">API_KEY</div>
+                    <div class="env-value">••••••••••••••••</div>
+                </div>
+                <span class="env-type secret">SECRET</span>
+                <div class="env-actions">
+                    <button class="env-action" title="Edit">✏️</button>
+                    <button class="env-action" title="Rotate">🔄</button>
+                    <button class="env-action" title="Delete">🗑️</button>
+                </div>
+            </div>
+
+            <!-- Connection Reference -->
+            <div class="env-variable">
+                <div class="env-icon">🔌</div>
+                <div class="env-details">
+                    <div class="env-name">SharePoint_Connection</div>
+                    <div class="env-value">Connection Reference (Managed)</div>
+                </div>
+                <span class="env-type connection">CONNECTION</span>
+                <div class="env-actions">
+                    <button class="env-action" title="Edit">✏️</button>
+                    <button class="env-action" title="Test">✅</button>
+                    <button class="env-action" title="Delete">🗑️</button>
+                </div>
+            </div>
+
+            <!-- Data Source -->
+            <div class="env-variable">
+                <div class="env-icon">💾</div>
+                <div class="env-details">
+                    <div class="env-name">DATABASE_URL</div>
+                    <div class="env-value">sql://prod-server.database.windows.net</div>
+                </div>
+                <span class="env-type data">DATA SOURCE</span>
+                <div class="env-actions">
+                    <button class="env-action" title="Edit">✏️</button>
+                    <button class="env-action" title="Test">✅</button>
+                    <button class="env-action" title="Delete">🗑️</button>
+                </div>
+            </div>
+
+            <!-- Email Configuration -->
+            <div class="env-variable">
+                <div class="env-icon">📧</div>
+                <div class="env-details">
+                    <div class="env-name">NOTIFICATION_EMAIL</div>
+                    <div class="env-value">alerts@company.com</div>
+                </div>
+                <span class="env-type data">CONFIG</span>
+                <div class="env-actions">
+                    <button class="env-action" title="Edit">✏️</button>
+                    <button class="env-action" title="Test">✅</button>
+                    <button class="env-action" title="Delete">🗑️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trigger Filtering for Specific Items -->
+    <div class="trigger-filter">
+        <h2>🎯 Trigger Filtering - Only Process Specific Items</h2>
+        <p style="color: #666; margin-top: 8px;">Configure triggers to only fire for specific conditions, reducing unnecessary runs and costs</p>
+        
+        <div class="trigger-specifics">
+            <h3>Common Trigger Filters</h3>
+            <div class="specific-grid">
+                <div class="specific-card">
+                    <div class="specific-header">
+                        <span>📁</span> SharePoint
+                    </div>
+                    <div>Only trigger for specific:</div>
+                    <div class="specific-example">
+                        Site: /sites/HR<br>
+                        List: Onboarding<br>
+                        Folder: /2024/Q1<br>
+                        Filter: Status eq 'Pending'
+                    </div>
+                </div>
+
+                <div class="specific-card">
+                    <div class="specific-header">
+                        <span>💎</span> Dataverse
+                    </div>
+                    <div>Table-specific triggers:</div>
+                    <div class="specific-example">
+                        Table: account<br>
+                        Filter: revenue gt 100000<br>
+                        Columns: name,revenue<br>
+                        Scope: Organization
+                    </div>
+                </div>
+
+                <div class="specific-card">
+                    <div class="specific-header">
+                        <span>📧</span> Email
+                    </div>
+                    <div>Email filtering:</div>
+                    <div class="specific-example">
+                        Folder: Inbox/Important<br>
+                        Subject: contains 'URGENT'<br>
+                        From: @company.com<br>
+                        Has Attachments: Yes
+                    </div>
+                </div>
+
+                <div class="specific-card">
+                    <div class="specific-header">
+                        <span>📝</span> Forms
+                    </div>
+                    <div>Response filtering:</div>
+                    <div class="specific-example">
+                        Form ID: abc-123<br>
+                        Response: Score > 8<br>
+                        Email: Not empty<br>
+                        Submitted: Last 24h
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-builder">
+            <h3>Build Your Filter</h3>
+            <div class="filter-row">
+                <select class="filter-select">
+                    <option>Column/Field</option>
+                    <option>Status</option>
+                    <option>Created</option>
+                    <option>Modified</option>
+                    <option>Author</option>
+                </select>
+                <select class="filter-select">
+                    <option>equals</option>
+                    <option>not equals</option>
+                    <option>contains</option>
+                    <option>greater than</option>
+                    <option>less than</option>
+                </select>
+                <input type="text" class="filter-input" placeholder="Value">
+                <button class="filter-remove">✖</button>
+            </div>
+            <div class="filter-row">
+                <select class="filter-select">
+                    <option>AND</option>
+                    <option>OR</option>
+                </select>
+                <select class="filter-select">
+                    <option>Department</option>
+                    <option>Priority</option>
+                    <option>Category</option>
+                </select>
+                <select class="filter-select">
+                    <option>equals</option>
+                    <option>in</option>
+                </select>
+                <input type="text" class="filter-input" placeholder="HR, Finance, IT">
+                <button class="filter-remove">✖</button>
+            </div>
+            <button class="add-filter">+ Add Condition</button>
+        </div>
+    </div>
+
+    <!-- Security Configuration -->
+    <div class="security-grid">
+        <!-- Data Loss Prevention -->
+        <div class="security-card">
+            <div class="security-card-header">
+                <div class="security-icon">🛡️</div>
+                <div class="security-title">Data Loss Prevention</div>
+                <span class="security-status">ENABLED</span>
+            </div>
+            <div class="security-options">
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox" checked>
+                    <span>Block personal email connectors</span>
+                </label>
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox" checked>
+                    <span>Restrict data to business connectors only</span>
+                </label>
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox">
+                    <span>Enable audit logging</span>
+                </label>
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox" checked>
+                    <span>Encrypt sensitive data</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Access Control -->
+        <div class="security-card">
+            <div class="security-card-header">
+                <div class="security-icon">👥</div>
+                <div class="security-title">Access Control</div>
+                <span class="security-status warning">REVIEW</span>
+            </div>
+            <div class="security-options">
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox" checked>
+                    <span>Use service accounts</span>
+                </label>
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox">
+                    <span>Enable MFA for flow owners</span>
+                </label>
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox" checked>
+                    <span>Limit sharing to organization</span>
+                </label>
+                <label class="security-option">
+                    <input type="checkbox" class="security-checkbox">
+                    <span>Regular permission reviews</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Compliance -->
+        <div class="security-card">
+            <div class="security-card-header">
+                <div class="security-icon">📋</div>
+                <div class="security-title">Compliance</div>
+                <span class="security-status">ACTIVE</span>
+            </div>
+            <div class="compliance-grid">
+                <div class="compliance-item compliant">
+                    <div class="compliance-icon">✅</div>
+                    <div class="compliance-name">GDPR</div>
+                    <div class="compliance-status">Compliant</div>
+                </div>
+                <div class="compliance-item compliant">
+                    <div class="compliance-icon">✅</div>
+                    <div class="compliance-name">SOC 2</div>
+                    <div class="compliance-status">Compliant</div>
+                </div>
+                <div class="compliance-item non-compliant">
+                    <div class="compliance-icon">⚠️</div>
+                    <div class="compliance-name">HIPAA</div>
+                    <div class="compliance-status">Review Needed</div>
+                </div>
+                <div class="compliance-item compliant">
+                    <div class="compliance-icon">✅</div>
+                    <div class="compliance-name">ISO 27001</div>
+                    <div class="compliance-status">Compliant</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Security -->
+    <div class="env-section">
+        <h2>🔌 Connection Security</h2>
+        <div class="connection-grid">
+            <div class="connection-item">
+                <div class="connection-icon">📁</div>
+                <div class="connection-details">
+                    <div class="connection-name">SharePoint Online</div>
+                    <div class="connection-info">Connected as: service-account@company.com</div>
+                </div>
+                <div class="connection-security">
+                    <span class="security-badge oauth">OAuth 2.0</span>
+                    <span class="security-badge cert">Certificate</span>
+                </div>
+                <button class="env-action">🔄</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-icon">💎</div>
+                <div class="connection-details">
+                    <div class="connection-name">Dataverse</div>
+                    <div class="connection-info">Environment: Production</div>
+                </div>
+                <div class="connection-security">
+                    <span class="security-badge oauth">OAuth 2.0</span>
+                </div>
+                <button class="env-action">🔄</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-icon">🗄️</div>
+                <div class="connection-details">
+                    <div class="connection-name">SQL Server</div>
+                    <div class="connection-info">Using: Connection String (Encrypted)</div>
+                </div>
+                <div class="connection-security">
+                    <span class="security-badge key">API Key</span>
+                    <span class="security-badge cert">SSL/TLS</span>
+                </div>
+                <button class="env-action">🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Practices -->
+    <div class="practices-section">
+        <h2>✅ Security Best Practices Checklist</h2>
+        <div class="practice-list">
+            <div class="practice-item">
+                <span class="practice-status complete">✓</span>
+                <div class="practice-content">
+                    <div class="practice-title">Use Environment Variables for Secrets</div>
+                    <div class="practice-description">Never hardcode API keys, passwords, or connection strings</div>
+                </div>
+                <button class="practice-action">Verified</button>
+            </div>
+
+            <div class="practice-item">
+                <span class="practice-status complete">✓</span>
+                <div class="practice-content">
+                    <div class="practice-title">Implement Trigger Filtering</div>
+                    <div class="practice-description">Only process specific items to reduce costs and improve security</div>
+                </div>
+                <button class="practice-action">Configured</button>
+            </div>
+
+            <div class="practice-item">
+                <span class="practice-status warning">!</span>
+                <div class="practice-content">
+                    <div class="practice-title">Enable Audit Logging</div>
+                    <div class="practice-description">Track all flow executions and data access for compliance</div>
+                </div>
+                <button class="practice-action">Enable Now</button>
+            </div>
+
+            <div class="practice-item">
+                <span class="practice-status error">✗</span>
+                <div class="practice-content">
+                    <div class="practice-title">Rotate Secrets Regularly</div>
+                    <div class="practice-description">API keys older than 90 days detected</div>
+                </div>
+                <button class="practice-action">Rotate Keys</button>
+            </div>
+
+            <div class="practice-item">
+                <span class="practice-status complete">✓</span>
+                <div class="practice-content">
+                    <div class="practice-title">Use Connection References</div>
+                    <div class="practice-description">Manage connections centrally across environments</div>
+                </div>
+                <button class="practice-action">Verified</button>
+            </div>
+
+            <div class="practice-item">
+                <span class="practice-status complete">✓</span>
+                <div class="practice-content">
+                    <div class="practice-title">Implement Least Privilege</div>
+                    <div class="practice-description">Flows run with minimal required permissions</div>
+                </div>
+                <button class="practice-action">Review</button>
+            </div>
+
+            <div class="practice-item">
+                <span class="practice-status warning">!</span>
+                <div class="practice-content">
+                    <div class="practice-title">Error Handling for Sensitive Data</div>
+                    <div class="practice-description">Ensure errors don't expose sensitive information</div>
+                </div>
+                <button class="practice-action">Configure</button>
+            </div>
+
+            <div class="practice-item">
+                <span class="practice-status complete">✓</span>
+                <div class="practice-content">
+                    <div class="practice-title">Use Managed Identities</div>
+                    <div class="practice-description">Authenticate without storing credentials</div>
+                </div>
+                <button class="practice-action">Enabled</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Security score calculation
+        function calculateSecurityScore() {
+            let score = 100;
+            const issues = {
+                critical: 1,
+                warnings: 3
+            };
+            
+            score -= issues.critical * 20;
+            score -= issues.warnings * 5;
+            
+            return score > 0 ? score : 0;
+        }
+
+        // Environment variable management
+        function addEnvironmentVariable() {
+            alert('Opening environment variable configuration...');
+        }
+
+        // Filter builder
+        function addFilterCondition() {
+            alert('Adding new filter condition...');
+        }
+
+        // Security checks
+        function runSecurityAudit() {
+            console.log('Running comprehensive security audit...');
+            // Check for hardcoded secrets
+            // Verify connection security
+            // Review access permissions
+            // Check compliance status
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            runSecurityAudit();
+            
+            // Show security tips
+            setTimeout(() => {
+                console.log('💡 Tip: Use environment variables instead of hardcoding values');
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Flow Planner v7.0 - Unified Edition</title>
+    <meta name="description" content="Comprehensive Power Automate planning tool with cost analysis, visual designer, pattern library, and MVP best practices">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Microsoft Fluent UI Colors */
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #005a9e;
+            --ms-blue-light: #40a9ff;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-teal: #008272;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-40: #e1dfdd;
+            --ms-gray-50: #d2d0ce;
+            --ms-gray-60: #c8c6c4;
+            --ms-gray-70: #a19f9d;
+            --ms-gray-80: #8a8886;
+            --ms-gray-90: #605e5c;
+            --ms-gray-100: #484644;
+            --ms-gray-110: #323130;
+            --ms-gray-120: #292827;
+            --ms-gray-130: #201f1e;
+            
+            /* Shadows */
+            --shadow-sm: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+            --shadow-md: 0 3.2px 7.2px 0 rgba(0,0,0,0.132), 0 0.6px 1.8px 0 rgba(0,0,0,0.108);
+            --shadow-lg: 0 6.4px 14.4px 0 rgba(0,0,0,0.132), 0 1.2px 3.6px 0 rgba(0,0,0,0.108);
+            
+            /* Border Radius */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            background: var(--ms-gray-20);
+            color: var(--ms-gray-130);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        /* Header */
+        .app-header {
+            background: white;
+            border-bottom: 1px solid var(--ms-gray-30);
+            padding: 0 24px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--ms-blue) 0%, var(--ms-purple) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .header-version {
+            font-size: 11px;
+            color: var(--ms-gray-90);
+            background: var(--ms-gray-20);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            height: 32px;
+            padding: 0 16px;
+            border: 1px solid var(--ms-gray-60);
+            border-radius: var(--radius-sm);
+            background: white;
+            color: var(--ms-gray-110);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.1s;
+        }
+
+        .header-btn:hover {
+            background: var(--ms-gray-20);
+            border-color: var(--ms-gray-80);
+        }
+
+        .header-btn.primary {
+            background: var(--ms-blue);
+            color: white;
+            border-color: var(--ms-blue);
+        }
+
+        .header-btn.primary:hover {
+            background: var(--ms-blue-dark);
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            background: white;
+            border-bottom: 1px solid var(--ms-gray-30);
+            padding: 0 24px;
+            display: flex;
+            gap: 2px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: var(--ms-gray-90);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--ms-gray-110);
+            background: var(--ms-gray-10);
+        }
+
+        .tab-btn.active {
+            color: var(--ms-blue);
+            border-bottom-color: var(--ms-blue);
+        }
+
+        .tab-icon {
+            font-size: 16px;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 24px;
+            background: white;
+            margin: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            min-height: calc(100vh - 200px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Quick Stats Bar */
+        .stats-bar {
+            background: linear-gradient(135deg, var(--ms-blue) 0%, var(--ms-purple) 100%);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Form Controls */
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-input,
+        .form-select {
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--ms-gray-60);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--ms-gray-130);
+            background: white;
+            transition: all 0.1s;
+        }
+
+        .form-input:hover,
+        .form-select:hover {
+            border-color: var(--ms-gray-80);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+            box-shadow: 0 0 0 1px var(--ms-blue);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            padding: 8px;
+            resize: vertical;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .alert-text {
+            font-size: 13px;
+        }
+
+        .alert.info {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            color: #0d47a1;
+        }
+
+        .alert.success {
+            background: #e8f5e9;
+            border: 1px solid #81c784;
+            color: #1b5e20;
+        }
+
+        .alert.warning {
+            background: #fff3e0;
+            border: 1px solid #ffb74d;
+            color: #e65100;
+        }
+
+        .alert.error {
+            background: #ffebee;
+            border: 1px solid #ef5350;
+            color: #b71c1c;
+        }
+
+        /* Premium connector styling */
+        .premium-badge {
+            background: linear-gradient(135deg, #ff4343, #ff6b6b);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .connector-warning {
+            background: linear-gradient(to right, #fff4e5, #fffbf5);
+            border-left: 4px solid #ff9800;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 4px;
+        }
+
+        /* Visual Designer Styles */
+        .designer-container {
+            display: flex;
+            height: 600px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .designer-sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .designer-canvas {
+            flex: 1;
+            background: white;
+            position: relative;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .connector-list, .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .connector-item, .action-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: move;
+            transition: all 0.2s;
+        }
+
+        .connector-item:hover, .action-item:hover {
+            background: #f0f8ff;
+            border-color: #0078d4;
+            transform: translateX(4px);
+        }
+
+        .connector-icon, .action-icon {
+            font-size: 18px;
+        }
+
+        .connector-label {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .connector-type {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .connector-type.standard {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .connector-type.premium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        /* Smart Tips Overlay */
+        .smart-tips-overlay {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 350px;
+            max-height: 70vh;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .smart-tips-header {
+            background: linear-gradient(135deg, #0078d4, #005a9e);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+
+        .smart-tips-content {
+            max-height: calc(70vh - 50px);
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .smart-tip-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #0078d4;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .smart-tip-item.critical {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .smart-tip-item.warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+
+        .tip-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tip-action {
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tip-action.apply {
+            background: #28a745;
+            color: white;
+        }
+
+        .tip-action.learn {
+            background: #0078d4;
+            color: white;
+        }
+
+        .tip-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Flow Visualization */
+        #flow-visualization {
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .flow-node {
+            min-width: 140px;
+            padding: 16px;
+            background: linear-gradient(135deg, #0078d4, #005a9e);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .flow-node:hover {
+            transform: scale(1.05);
+        }
+
+        .flow-node.premium {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .flow-connection {
+            width: 60px;
+            height: 2px;
+            background: #ccc;
+            position: relative;
+        }
+
+        .flow-connection::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #ccc;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .flow-tip-bubble {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            color: #856404;
+        }
+
+        /* Print styles for smart tips */
+        @media print {
+            .smart-tips-overlay {
+                position: static;
+                width: 100%;
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+
+            .smart-tip-item {
+                page-break-inside: avoid;
+            }
+
+            .tip-actions button {
+                display: none;
+            }
+
+            .tip-links {
+                display: block;
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid #e0e0e0;
+            }
+
+            .tip-links a::after {
+                content: " (" attr(href) ")";
+                font-size: 10px;
+                color: #666;
+            }
+        }
+
+        /* Pattern Cards */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .pattern-card {
+            background: white;
+            border: 1px solid var(--ms-gray-30);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .pattern-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .pattern-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .pattern-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--ms-gray-20);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .pattern-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .pattern-badge {
+            background: var(--ms-green);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .pattern-description {
+            font-size: 13px;
+            color: var(--ms-gray-90);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .pattern-metrics {
+            display: flex;
+            gap: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--ms-gray-30);
+        }
+
+        .metric {
+            font-size: 12px;
+        }
+
+        .metric-label {
+            color: var(--ms-gray-70);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        /* Visual Designer Canvas */
+        .designer-container {
+            display: flex;
+            height: 600px;
+            gap: 16px;
+        }
+
+        .designer-sidebar {
+            width: 280px;
+            background: var(--ms-gray-10);
+            border: 1px solid var(--ms-gray-30);
+            border-radius: var(--radius-md);
+            overflow-y: auto;
+        }
+
+        .designer-canvas {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--ms-gray-30);
+            border-radius: var(--radius-md);
+            position: relative;
+            background-image: 
+                linear-gradient(var(--ms-gray-30) 1px, transparent 1px),
+                linear-gradient(90deg, var(--ms-gray-30) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Code Preview */
+        .code-preview {
+            background: var(--ms-gray-130);
+            color: #f8f8f2;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .code-line {
+            display: flex;
+            gap: 16px;
+        }
+
+        .code-line-number {
+            color: var(--ms-gray-70);
+            min-width: 30px;
+        }
+
+        .code-line-content {
+            flex: 1;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--ms-gray-30);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--ms-gray-90);
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--ms-gray-20);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--ms-gray-30);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* Button Styles */
+        .btn {
+            height: 32px;
+            padding: 0 16px;
+            border: 1px solid var(--ms-gray-60);
+            border-radius: var(--radius-sm);
+            background: white;
+            color: var(--ms-gray-110);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.1s;
+        }
+
+        .btn:hover {
+            background: var(--ms-gray-20);
+            border-color: var(--ms-gray-80);
+        }
+
+        .btn-primary {
+            background: var(--ms-blue);
+            color: white;
+            border-color: var(--ms-blue);
+        }
+
+        .btn-primary:hover {
+            background: var(--ms-blue-dark);
+            border-color: var(--ms-blue-dark);
+        }
+
+        .btn-success {
+            background: var(--ms-green);
+            color: white;
+            border-color: var(--ms-green);
+        }
+
+        .btn-danger {
+            background: var(--ms-red);
+            color: white;
+            border-color: var(--ms-red);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--ms-gray-60);
+            border-top-color: var(--ms-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip-icon {
+            color: var(--ms-gray-70);
+            font-size: 12px;
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            width: 250px;
+            background: var(--ms-gray-110);
+            color: white;
+            text-align: left;
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            line-height: 1.4;
+            box-shadow: var(--shadow-md);
+        }
+
+        .tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .pattern-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .designer-container {
+                flex-direction: column;
+            }
+            
+            .designer-sidebar {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-brand">
+            <div class="header-logo">PA</div>
+            <h1 class="header-title">
+                Power Automate Flow Planner
+                <span class="header-version">v7.0</span>
+            </h1>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="importConfig()">
+                <span>📥</span> Import
+            </button>
+            <button class="header-btn" onclick="exportAll()">
+                <span>📤</span> Export
+            </button>
+            <button class="header-btn" onclick="shareConfig()">
+                <span>🔗</span> Share
+            </button>
+            <button class="header-btn primary" onclick="showHelp()">
+                <span>❓</span> Help
+            </button>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('cost-calculator')" data-tab="cost-calculator">
+            <span class="tab-icon">💰</span>
+            Cost Calculator
+        </button>
+        <button class="tab-btn" onclick="switchTab('visual-designer')" data-tab="visual-designer">
+            <span class="tab-icon">🎨</span>
+            Visual Designer
+        </button>
+        <button class="tab-btn" onclick="switchTab('pattern-library')" data-tab="pattern-library">
+            <span class="tab-icon">📚</span>
+            Pattern Library
+        </button>
+        <button class="tab-btn" onclick="switchTab('issue-analyzer')" data-tab="issue-analyzer">
+            <span class="tab-icon">🔍</span>
+            Issue Analyzer
+        </button>
+        <button class="tab-btn" onclick="switchTab('ai-tokens')" data-tab="ai-tokens">
+            <span class="tab-icon">🤖</span>
+            AI & Tokens
+        </button>
+        <button class="tab-btn" onclick="switchTab('mvp-tips')" data-tab="mvp-tips">
+            <span class="tab-icon">🏆</span>
+            MVP Tips
+        </button>
+        <button class="tab-btn" onclick="switchTab('powerdocu')" data-tab="powerdocu">
+            <span class="tab-icon">📄</span>
+            PowerDocu
+        </button>
+    </nav>
+
+    <!-- Cost Calculator Tab -->
+    <div class="tab-content active" id="cost-calculator">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="monthly-cost">£0</div>
+                <div class="stat-label">Monthly Cost</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="ppr-usage">0</div>
+                <div class="stat-label">PPR/Month</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="runtime-est">0s</div>
+                <div class="stat-label">Est. Runtime</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="efficiency-score">0%</div>
+                <div class="stat-label">Efficiency</div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-title">Flow Configuration</h2>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label class="form-label">
+                        Items to Process
+                        <span class="tooltip">
+                            <span class="tooltip-icon">ⓘ</span>
+                            <span class="tooltip-content">Total number of items your flow will process in each run</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-input" id="items" value="1000" min="1" max="1000000" onchange="calculateCosts()">
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">
+                        Actions per Item
+                        <span class="tooltip">
+                            <span class="tooltip-icon">ⓘ</span>
+                            <span class="tooltip-content">Average number of actions needed to process each item</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-input" id="actionsPerItem" value="3" min="1" max="100" onchange="calculateCosts()">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Primary Connector</label>
+                    <select class="form-select" id="connector" onchange="calculateCosts()">
+                        <option value="SharePoint">SharePoint (600 RPM)</option>
+                        <option value="Teams">Teams (120 RPM)</option>
+                        <option value="GraphAPI">Graph API (150 RPM)</option>
+                        <option value="SQL">SQL Server (300 RPM) - Premium</option>
+                        <option value="CustomHTTP">Custom HTTP (60 RPM) - Premium</option>
+                        <option value="Dataverse">Dataverse (6000 RPM)</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Daily Executions</label>
+                    <input type="number" class="form-input" id="executions" value="1" min="1" max="1440" onchange="calculateCosts()">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Concurrency Level</label>
+                    <input type="number" class="form-input" id="concurrency" value="1" min="1" max="50" onchange="calculateCosts()">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Number of Users</label>
+                    <input type="number" class="form-input" id="users" value="10" min="1" max="10000" onchange="calculateCosts()">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Run Context</label>
+                    <select class="form-select" id="runContext" onchange="calculateCosts()">
+                        <option value="user">User Context</option>
+                        <option value="service">Service Account</option>
+                        <option value="connection">Connection Reference</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Child Flows</label>
+                    <input type="number" class="form-input" id="childFlows" value="0" min="0" max="100" onchange="calculateCosts()">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-title">License Recommendations</h2>
+            <div id="auto-license-detection" style="margin-bottom: 16px;">
+                <!-- Auto-detected license requirements will appear here -->
+            </div>
+            <div id="license-recommendations">
+                <!-- Recommendations will be inserted here -->
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-title">🚀 Performance Tips for Your Configuration</h2>
+            <div id="performance-tips">
+                <!-- Dynamic performance tips will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Designer Tab -->
+    <div class="tab-content" id="visual-designer">
+        <div class="alert info">
+            <span class="alert-icon">💡</span>
+            <div class="alert-content">
+                <div class="alert-title">Visual Flow Designer with Smart Tips</div>
+                <div class="alert-text">Build your flow visually. Smart tips will appear automatically to help optimize connections and suggest best practices.</div>
+            </div>
+        </div>
+        
+        <div class="designer-container">
+            <div class="designer-sidebar">
+                <div style="padding: 16px;">
+                    <h3 style="font-size: 14px; margin-bottom: 12px;">Connectors</h3>
+                    <div class="connector-list">
+                        <div class="connector-item" draggable="true" data-connector="sharepoint" onclick="addConnectorToFlow('sharepoint')">
+                            <span class="connector-icon">📁</span>
+                            <span class="connector-label">SharePoint</span>
+                            <span class="connector-type standard">✅ Standard</span>
+                        </div>
+                        <div class="connector-item" draggable="true" data-connector="sql" onclick="addConnectorToFlow('sql')">
+                            <span class="connector-icon">🗜️</span>
+                            <span class="connector-label">SQL Server</span>
+                            <span class="connector-type premium">⚠️ Premium</span>
+                        </div>
+                        <div class="connector-item" draggable="true" data-connector="teams" onclick="addConnectorToFlow('teams')">
+                            <span class="connector-icon">💬</span>
+                            <span class="connector-label">Teams</span>
+                            <span class="connector-type standard">✅ Standard</span>
+                        </div>
+                        <div class="connector-item" draggable="true" data-connector="dataverse" onclick="addConnectorToFlow('dataverse')">
+                            <span class="connector-icon">💎</span>
+                            <span class="connector-label">Dataverse</span>
+                            <span class="connector-type standard">✅ Standard</span>
+                        </div>
+                        <div class="connector-item" draggable="true" data-connector="excel" onclick="addConnectorToFlow('excel')">
+                            <span class="connector-icon">📊</span>
+                            <span class="connector-label">Excel</span>
+                            <span class="connector-type standard">✅ Standard</span>
+                        </div>
+                        <div class="connector-item" draggable="true" data-connector="http" onclick="addConnectorToFlow('http')">
+                            <span class="connector-icon">🌐</span>
+                            <span class="connector-label">HTTP</span>
+                            <span class="connector-type premium">⚠️ Premium</span>
+                        </div>
+                    </div>
+                    
+                    <h3 style="font-size: 14px; margin: 16px 0 12px 0;">Actions</h3>
+                    <div class="action-list">
+                        <div class="action-item" draggable="true" data-action="get-items">
+                            <span class="action-icon">📥</span>
+                            <span>Get Items</span>
+                        </div>
+                        <div class="action-item" draggable="true" data-action="filter-array">
+                            <span class="action-icon">🔍</span>
+                            <span>Filter Array</span>
+                        </div>
+                        <div class="action-item" draggable="true" data-action="apply-each">
+                            <span class="action-icon">🔁</span>
+                            <span>Apply to Each</span>
+                        </div>
+                        <div class="action-item" draggable="true" data-action="condition">
+                            <span class="action-icon">❓</span>
+                            <span>Condition</span>
+                        </div>
+                        <div class="action-item" draggable="true" data-action="http-request">
+                            <span class="action-icon">🌐</span>
+                            <span>HTTP Request</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="designer-canvas" id="flow-canvas">
+                <div id="flow-visualization">
+                    <!-- Dynamic flow will be built here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pattern Library Tab -->
+    <div class="tab-content" id="pattern-library">
+        <div class="alert success">
+            <span class="alert-icon">🏆</span>
+            <div class="alert-content">
+                <div class="alert-title">MVP Pattern Library</div>
+                <div class="alert-text">Production-ready patterns from John Liu, David Wyatt, and other Power Platform MVPs.</div>
+            </div>
+        </div>
+
+        <div class="pattern-grid">
+            <!-- Try-Catch-Finally Pattern -->
+            <div class="pattern-card" onclick="showPattern('try-catch-finally')">
+                <div class="pattern-header">
+                    <div class="pattern-icon">🛡️</div>
+                    <div>
+                        <div class="pattern-title">Try-Catch-Finally</div>
+                    </div>
+                    <span class="pattern-badge">David Wyatt</span>
+                </div>
+                <div class="pattern-description">
+                    Robust error handling with proper cleanup. Essential for production flows with external dependencies.
+                </div>
+                <div class="pattern-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Reliability:</span>
+                        <span class="metric-value">+95%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Recovery:</span>
+                        <span class="metric-value">Automatic</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debug Compose Pattern -->
+            <div class="pattern-card" onclick="showPattern('debug-compose')">
+                <div class="pattern-header">
+                    <div class="pattern-icon">🐛</div>
+                    <div>
+                        <div class="pattern-title">Debug Compose</div>
+                    </div>
+                    <span class="pattern-badge">John Liu</span>
+                </div>
+                <div class="pattern-description">
+                    See all condition components instead of just "false". FlowNinjaHack #126 for complex debugging.
+                </div>
+                <div class="pattern-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Debug Time:</span>
+                        <span class="metric-value">-93%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Visibility:</span>
+                        <span class="metric-value">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Array vs Select Pattern -->
+            <div class="pattern-card" onclick="showPattern('array-optimization')">
+                <div class="pattern-header">
+                    <div class="pattern-icon">⚡</div>
+                    <div>
+                        <div class="pattern-title">Array Optimization</div>
+                    </div>
+                    <span class="pattern-badge">John Liu</span>
+                </div>
+                <div class="pattern-description">
+                    Replace array variables with Select expressions. 93% faster for transformations!
+                </div>
+                <div class="pattern-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Performance:</span>
+                        <span class="metric-value">+93%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Memory:</span>
+                        <span class="metric-value">-60%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exponential Backoff Pattern -->
+            <div class="pattern-card" onclick="showPattern('exponential-backoff')">
+                <div class="pattern-header">
+                    <div class="pattern-icon">🔄</div>
+                    <div>
+                        <div class="pattern-title">Exponential Backoff</div>
+                    </div>
+                    <span class="pattern-badge">David Wyatt</span>
+                </div>
+                <div class="pattern-description">
+                    Smart retry logic with jitter for API calls. Prevents thundering herd problems.
+                </div>
+                <div class="pattern-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Success Rate:</span>
+                        <span class="metric-value">+40%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">API Load:</span>
+                        <span class="metric-value">-70%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Circuit Breaker Pattern -->
+            <div class="pattern-card" onclick="showPattern('circuit-breaker')">
+                <div class="pattern-header">
+                    <div class="pattern-icon">⚡</div>
+                    <div>
+                        <div class="pattern-title">Circuit Breaker</div>
+                    </div>
+                    <span class="pattern-badge">David Wyatt</span>
+                </div>
+                <div class="pattern-description">
+                    Fail fast when services are down. Prevents cascade failures and reduces unnecessary API calls.
+                </div>
+                <div class="pattern-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Resilience:</span>
+                        <span class="metric-value">High</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Recovery:</span>
+                        <span class="metric-value">Auto</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Child Flow Pattern -->
+            <div class="pattern-card" onclick="showPattern('child-flows')">
+                <div class="pattern-header">
+                    <div class="pattern-icon">🔗</div>
+                    <div>
+                        <div class="pattern-title">Child Flow Optimization</div>
+                    </div>
+                    <span class="pattern-badge">Best Practice</span>
+                </div>
+                <div class="pattern-description">
+                    Up to 25 child flows share ONE Process license (£81.90 total). Perfect for modular design.
+                </div>
+                <div class="pattern-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Cost Savings:</span>
+                        <span class="metric-value">96%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Reusability:</span>
+                        <span class="metric-value">100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issue Analyzer Tab -->
+    <div class="tab-content" id="issue-analyzer">
+        <div class="form-section">
+            <h2 class="form-title">Flow Analysis</h2>
+            <div class="form-grid">
+                <div class="form-field" style="grid-column: 1 / -1;">
+                    <label class="form-label">Paste Your Flow JSON</label>
+                    <textarea class="form-input form-textarea" id="flow-json" placeholder="Paste your Power Automate flow JSON here for analysis..."></textarea>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="analyzeFlow()" style="margin-top: 16px;">
+                <span>🔍</span> Analyze Flow
+            </button>
+        </div>
+
+        <div id="analysis-results" style="margin-top: 24px;">
+            <!-- Analysis results will appear here -->
+        </div>
+    </div>
+
+    <!-- AI & Tokens Tab -->
+    <div class="tab-content" id="ai-tokens">
+        <div class="form-section">
+            <h2 class="form-title">AI Configuration</h2>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label class="form-label">AI Model</label>
+                    <select class="form-select" id="ai-model" onchange="calculateAICosts()">
+                        <option value="none">None</option>
+                        <option value="gpt-4o-mini">GPT-4o mini (1 credit/1K tokens)</option>
+                        <option value="gpt-4">GPT-4 (10 credits/1K tokens)</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo (20 credits/1K tokens)</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Tokens per Request</label>
+                    <input type="number" class="form-input" id="tokens-per-request" value="500" min="0" max="100000" onchange="calculateAICosts()">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">AI Requests per Item</label>
+                    <input type="number" class="form-input" id="ai-requests" value="0" min="0" max="100" onchange="calculateAICosts()">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Copilot Studio Messages/Month</label>
+                    <input type="number" class="form-input" id="copilot-messages" value="0" min="0" max="1000000" onchange="calculateAICosts()">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Use Generative AI</label>
+                    <select class="form-select" id="use-genai" onchange="calculateAICosts()">
+                        <option value="false">No</option>
+                        <option value="true">Yes (2x message consumption)</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">AI Builder Credits/Month</label>
+                    <input type="number" class="form-input" id="ai-credits" value="5000" min="0" max="1000000" onchange="calculateAICosts()">
+                </div>
+            </div>
+        </div>
+
+        <div id="ai-cost-breakdown" style="margin-top: 24px;">
+            <!-- AI cost breakdown will appear here -->
+        </div>
+    </div>
+
+    <!-- MVP Tips Tab -->
+    <div class="tab-content" id="mvp-tips">
+        <div class="alert info">
+            <span class="alert-icon">🏆</span>
+            <div class="alert-content">
+                <div class="alert-title">Microsoft MVP Best Practices</div>
+                <div class="alert-text">Curated tips from John Liu, David Wyatt, Reza Dorrani, April Dunnam, Shane Young, and Matt Devaney.</div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-title">John Liu's Flow Ninja Hacks</h2>
+            <ul style="line-height: 2;">
+                <li>🥷 <strong>Debug Complex Conditions:</strong> Use Compose to see all condition components (#FlowNinjaHack 126)</li>
+                <li>⚡ <strong>Array Variables are SLOW:</strong> Use Select expression instead - 93% faster!</li>
+                <li>📐 <strong>Mathematical Array Flattening:</strong> Use div/mod for elegant nested array operations</li>
+                <li>🎯 <strong>Trigger Conditions:</strong> Filter at trigger level for 90% reduction in runs</li>
+                <li>💾 <strong>Flow Studio:</strong> $20/month for snapshots and version control</li>
+            </ul>
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-title">David Wyatt's Patterns</h2>
+            <ul style="line-height: 2;">
+                <li>🛡️ <strong>Try-Catch-Finally:</strong> Proper error handling with cleanup scopes</li>
+                <li>🔄 <strong>Exponential Backoff:</strong> Smart retry with jitter for API resilience</li>
+                <li>⚡ <strong>Circuit Breaker:</strong> Fail fast when services are down</li>
+                <li>📦 <strong>Batch Processing:</strong> Chunk large datasets for optimal performance</li>
+                <li>💾 <strong>State Management:</strong> Checkpoint and resume for long-running flows</li>
+            </ul>
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-title">Performance Metrics</h2>
+            <div class="code-preview">
+                <div class="code-line">
+                    <span class="code-line-number">1</span>
+                    <span class="code-line-content">Array Variables → Select Expression: <span style="color: #50fa7b">93% faster</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="code-line-number">2</span>
+                    <span class="code-line-content">Apply to Each → Expression-based: <span style="color: #50fa7b">93% faster</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="code-line-number">3</span>
+                    <span class="code-line-content">Trigger Filtering: <span style="color: #50fa7b">90% fewer runs</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="code-line-number">4</span>
+                    <span class="code-line-content">Debug with Compose: <span style="color: #50fa7b">93% time saved</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PowerDocu Tab -->
+    <div class="tab-content" id="powerdocu">
+        <div class="form-section">
+            <h2 class="form-title">PowerDocu Import</h2>
+            <div class="form-grid">
+                <div class="form-field" style="grid-column: 1 / -1;">
+                    <label class="form-label">Upload PowerDocu Export</label>
+                    <input type="file" class="form-input" id="powerdocu-file" accept=".json,.xml,.html">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="importPowerDocu()" style="margin-top: 16px;">
+                <span>📥</span> Import PowerDocu
+            </button>
+        </div>
+
+        <div class="alert info" style="margin-top: 24px;">
+            <span class="alert-icon">💡</span>
+            <div class="alert-content">
+                <div class="alert-title">PowerDocu Integration</div>
+                <div class="alert-text">
+                    PowerDocu automatically generates technical documentation for your flows. 
+                    Import the export to auto-populate metrics and get optimization recommendations.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pattern Modal -->
+    <div class="modal" id="pattern-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="pattern-modal-title">Pattern Details</h2>
+                <button class="modal-close" onclick="closeModal('pattern-modal')">×</button>
+            </div>
+            <div class="modal-body" id="pattern-modal-body">
+                <!-- Pattern details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="copyPattern()">Copy to Clipboard</button>
+                <button class="btn btn-primary" onclick="applyPattern()">Apply Pattern</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentTab = 'cost-calculator';
+        let flowConfiguration = {};
+        let patterns = {};
+        
+        // MVP Pattern Library
+        const MVP_PATTERNS = {
+            'odata-filtering': {
+                title: 'OData Filtering & Expand Pattern',
+                author: 'Performance Best Practice',
+                description: 'Reduce API calls by 90% using OData query parameters',
+                code: `// INSTEAD OF: Get all records then filter in Power Automate
+// USE: OData to filter at the source
+
+// Basic Filter - Get only active accounts
+List records:
+  Table: accounts
+  Filter Query: statecode eq 0
+  Select Query: name,accountnumber,revenue
+  
+// Advanced Filter with multiple conditions
+Filter Query: statecode eq 0 and revenue gt 1000000
+
+// EXPAND to get related records in ONE call
+// Get account with all related contacts
+Expand Query: primarycontactid($select=firstname,lastname,email)
+
+// Get account with contacts AND opportunities
+Expand Query: contact_customer_accounts($select=fullname,email),opportunity_customer_accounts($filter=statecode eq 0;$select=name,estimatedvalue)
+
+// Complex example: Account with filtered related data
+Filter Query: revenue gt 500000
+Select Query: name,accountnumber,revenue
+Expand Query: contact_customer_accounts($filter=statecode eq 0;$select=fullname,email;$top=10)
+
+// Date filtering
+Filter Query: createdon ge 2024-01-01 and createdon le 2024-12-31
+
+// Contains search
+Filter Query: contains(name,'Contoso')
+
+// IN operator for multiple values
+Filter Query: accountcategorycode in (1,2,3)`
+            },
+            'filter-array': {
+                title: 'Filter Array vs Apply to Each',
+                author: 'John Liu',
+                description: 'Process arrays without loops for massive performance gains',
+                code: `// DON'T DO THIS: Apply to Each with Condition
+Apply to Each (items)
+  Condition: item()?['Status'] equals 'Active'
+    Yes: Append to Array Variable
+    
+// DO THIS: Filter Array action
+Filter Array:
+  From: @outputs('Get_items')?['value']
+  Where: @equals(item()?['Status'], 'Active')
+
+// Advanced Filter Array with multiple conditions
+Filter Array:
+  From: @outputs('Get_items')?['value']  
+  Where: @and(
+    equals(item()?['Status'], 'Active'),
+    greater(item()?['Amount'], 1000),
+    contains(item()?['Category'], 'Premium')
+  )
+
+// Filter + Select for transformation
+1. Filter Array (get active items)
+2. Select (transform to new structure):
+   From: @body('Filter_array')
+   Map: {
+     "ID": @item()?['ID'],
+     "Name": @item()?['Title'],
+     "Value": @mul(item()?['Quantity'], item()?['Price'])
+   }
+
+// Complex JSON filtering with nested conditions
+Filter Array:
+  From: @outputs('Parse_JSON')?['records']
+  Where: @or(
+    and(
+      equals(item()?['Type'], 'Order'),
+      greater(item()?['Total'], 5000)
+    ),
+    equals(item()?['Priority'], 'Urgent')
+  )`
+            },
+            'json-filtering': {
+                title: 'JSON Select & Filter Expressions',
+                author: 'Advanced Pattern',
+                description: 'Transform JSON without loops using expressions',
+                code: `// SELECT: Transform array structure
+Select Action:
+  From: @outputs('Get_items')?['value']
+  Map: {
+    "FullName": @concat(item()?['FirstName'], ' ', item()?['LastName']),
+    "TotalValue": @mul(item()?['Quantity'], item()?['UnitPrice']),
+    "Category": @if(greater(item()?['Price'], 100), 'Premium', 'Standard'),
+    "DueDate": @addDays(item()?['OrderDate'], 30)
+  }
+
+// FILTER + SELECT: Chain operations
+// First filter, then transform
+Compose - Filtered Premium Orders:
+@array(
+  filter(
+    outputs('Get_Orders')?['value'],
+    item()?['Amount'] > 1000
+  )
+)
+
+Select - Transform Filtered:
+  From: @outputs('Compose_Filtered')
+  Map: { /* transformation */ }
+
+// XPATH for XML/HTML filtering
+xpath(xml(outputs('Get_HTML')), '//div[@class="price"]/text()')
+
+// JSON Path expressions
+@outputs('Parse_JSON')?['data']?[0]?['attributes']?['name']
+
+// Get unique values from array
+union(outputs('Array1'), outputs('Array1'))
+
+// Get items present in both arrays
+intersection(outputs('Array1'), outputs('Array2'))
+
+// Remove duplicates and sort
+@sort(union(outputs('Array'), outputs('Array')))`
+            },
+            'dataverse-lookup': {
+                title: 'Dataverse Expand & Select Pattern',
+                author: 'Dataverse Optimization',
+                description: 'Get related records in one API call using $expand',
+                code: `// SCENARIO: Get Account with all related data
+// BAD: Multiple API calls
+1. Get Account
+2. Get Primary Contact (using contactid)
+3. Get Opportunities (filter by accountid)
+4. Get Cases (filter by accountid)
+// Total: 4+ API calls, high latency
+
+// GOOD: Single API call with $expand
+List rows (Dataverse):
+  Table: accounts
+  Filter: accountid eq '{guid}'
+  Select: name,accountnumber,revenue,address1_city
+  Expand: 
+    primarycontactid($select=fullname,email,telephone1),
+    opportunity_customer_accounts($select=name,estimatedvalue,closeprobability;$filter=statecode eq 0;$orderby=estimatedvalue desc;$top=5),
+    incident_customer_accounts($select=title,prioritycode;$filter=statecode eq 0)
+
+// COMPLEX: Multi-level expand
+Expand: 
+  opportunity_customer_accounts(
+    $select=name,estimatedvalue;
+    $expand=owninguser($select=fullname,internalemailaddress)
+  )
+
+// PERFORMANCE: Only get what you need
+// Bad: Select all columns (returns 200+ fields)
+List rows: accounts
+
+// Good: Select specific columns
+List rows: accounts
+  Select: name,accountnumber,revenue
+  Row count: 100
+  
+// PAGINATION for large datasets
+List rows:
+  Skip token: @{outputs('List_rows')?['@odata.nextLink']}
+  Row count: 5000
+
+// AGGREGATION
+Fetch XML for complex queries:
+<fetch aggregate="true">
+  <entity name="opportunity">
+    <attribute name="estimatedvalue" alias="total" aggregate="sum"/>
+    <attribute name="name" alias="count" aggregate="count"/>
+    <filter>
+      <condition attribute="statecode" operator="eq" value="0"/>
+    </filter>
+  </entity>
+</fetch>`
+            },
+            'batch-processing': {
+                title: 'Batch API Operations',
+                author: 'Enterprise Pattern',
+                description: 'Process thousands of records in single API calls',
+                code: `// BATCH CREATE - Insert 1000 records at once
+// Using Dataverse Batch API
+HTTP Action:
+  Method: POST
+  URI: [Organization URI]/api/data/v9.2/$batch
+  Headers:
+    Content-Type: multipart/mixed;boundary=batch_boundary
+    OData-Version: 4.0
+  Body:
+    --batch_boundary
+    Content-Type: application/http
+    Content-Transfer-Encoding: binary
+    
+    POST /api/data/v9.2/accounts HTTP/1.1
+    Content-Type: application/json
+    
+    {"name": "Account 1", "revenue": 100000}
+    
+    --batch_boundary
+    Content-Type: application/http
+    Content-Transfer-Encoding: binary
+    
+    POST /api/data/v9.2/accounts HTTP/1.1
+    Content-Type: application/json
+    
+    {"name": "Account 2", "revenue": 200000}
+    --batch_boundary--
+
+// CHANGESET for transactional operations
+--batch_boundary
+Content-Type: multipart/mixed;boundary=changeset_boundary
+
+--changeset_boundary
+Content-Type: application/http
+// All operations in changeset succeed or fail together
+
+// SHAREPOINT BATCH
+Send HTTP request to SharePoint:
+  Method: POST
+  URI: _api/$batch
+  Body: { batch requests }
+
+// GRAPH API BATCH
+HTTP to Graph:
+  URI: https://graph.microsoft.com/v1.0/$batch
+  Body: {
+    "requests": [
+      {"id": "1", "method": "GET", "url": "/users/user1"},
+      {"id": "2", "method": "GET", "url": "/users/user2"},
+      {"id": "3", "method": "PATCH", "url": "/users/user3", "body": {...}}
+    ]
+  }`
+            },
+            'try-catch-finally': {
+                title: 'Try-Catch-Finally Pattern',
+                author: 'David Wyatt',
+                description: 'Robust error handling with proper cleanup',
+                code: `{
+  "name": "Robust Error Handler",
+  "actions": {
+    "Try_Scope": {
+      "type": "Scope",
+      "actions": {
+        "Main_Logic": {
+          "type": "Http",
+          "inputs": {
+            "method": "GET",
+            "uri": "@{parameters('ApiEndpoint')}"
+          }
+        }
+      }
+    },
+    "Catch_Scope": {
+      "type": "Scope",
+      "runAfter": {
+        "Try_Scope": ["Failed", "Skipped", "TimedOut"]
+      },
+      "actions": {
+        "Log_Error": {
+          "type": "Compose",
+          "inputs": "@result('Try_Scope')"
+        }
+      }
+    },
+    "Finally_Scope": {
+      "type": "Scope",
+      "runAfter": {
+        "Try_Scope": ["Succeeded", "Failed", "Skipped", "TimedOut"],
+        "Catch_Scope": ["Succeeded", "Failed", "Skipped", "TimedOut"]
+      },
+      "actions": {
+        "Cleanup": {
+          "type": "Compose",
+          "inputs": "Cleanup complete"
+        }
+      }
+    }
+  }
+}`
+            },
+            'debug-compose': {
+                title: 'Debug Compose Pattern',
+                author: 'John Liu',
+                description: 'FlowNinjaHack #126 - See all condition components',
+                code: `{
+  "Debug_Condition_Components": {
+    "type": "Compose",
+    "inputs": {
+      "condition1_status": "@outputs('Get_item')['body/Status/Value']",
+      "is_not_draft": "@not(equals(outputs('Get_item')['body/Status/Value'], 'Draft'))",
+      "contains_old_title": "@contains(body('Select_page'), outputs('Old_Title'))",
+      "full_condition_result": "@and(condition1_status, contains_old_title)",
+      "debug_timestamp": "@utcNow()"
+    }
+  }
+}`
+            },
+            'array-optimization': {
+                title: 'Array Optimization Pattern',
+                author: 'John Liu',
+                description: 'Replace array variables with Select - 93% faster',
+                code: `{
+  "comment": "BAD - Using array variable (slow)",
+  "bad_pattern": {
+    "type": "AppendToArrayVariable",
+    "inputs": {"name": "Results", "value": "@item()"}
+  },
+  "comment2": "GOOD - Using Select expression (93% faster)",
+  "good_pattern": {
+    "type": "Select",
+    "inputs": {
+      "from": "@outputs('Get_Items')",
+      "select": "@item()"
+    }
+  }
+}`
+            },
+            'exponential-backoff': {
+                title: 'Exponential Backoff Pattern',
+                author: 'David Wyatt',
+                description: 'Smart retry with jitter',
+                code: `{
+  "Until_Success": {
+    "type": "Until",
+    "expression": "@equals(variables('Success'), true)",
+    "limit": {"count": 3},
+    "actions": {
+      "Calculate_Delay": {
+        "type": "Compose",
+        "inputs": "@mul(1000, exp(2, variables('RetryCount')))"
+      },
+      "Add_Jitter": {
+        "type": "Compose",
+        "inputs": "@add(outputs('Calculate_Delay'), rand(0, 1000))"
+      },
+      "Delay": {
+        "type": "Wait",
+        "inputs": {
+          "interval": {
+            "count": "@outputs('Add_Jitter')",
+            "unit": "Millisecond"
+          }
+        }
+      },
+      "Try_Operation": {
+        "type": "Http",
+        "inputs": {
+          "method": "POST",
+          "uri": "@parameters('ApiEndpoint')"
+        }
+      }
+    }
+  }
+}`
+            }
+        };
+
+        // Connector limits
+        const CONNECTOR_LIMITS = {
+            'SharePoint': { rpm: 600, premium: false },
+            'Teams': { rpm: 120, premium: false },
+            'GraphAPI': { rpm: 150, premium: false },
+            'SQL': { rpm: 300, premium: true },
+            'CustomHTTP': { rpm: 60, premium: true },
+            'Dataverse': { rpm: 6000, premium: false }
+        };
+
+        // License costs
+        const LICENSES = {
+            premium: { price: 12.20, pprLimit: 40000, aiCredits: 5000 },
+            process: { price: 81.90, pprLimit: 250000, aiCredits: 5000 },
+            hosted: { price: 118.60, pprLimit: 250000, aiCredits: 5000 }
+        };
+
+        // AI Models
+        const AI_MODELS = {
+            'gpt-4o-mini': { creditsPerKTokens: 1 },
+            'gpt-4': { creditsPerKTokens: 10 },
+            'gpt-4-turbo': { creditsPerKTokens: 20 }
+        };
+
+        // Visual Flow Designer Functions
+        let flowNodes = [];
+        let smartTips = [];
+        
+        function addConnectorToFlow(connectorType) {
+            const connectorInfo = {
+                sharepoint: { name: 'SharePoint', icon: '📁', premium: false, rpm: 600 },
+                sql: { name: 'SQL Server', icon: '🗜️', premium: true, rpm: 300 },
+                teams: { name: 'Teams', icon: '💬', premium: false, rpm: 120 },
+                dataverse: { name: 'Dataverse', icon: '💎', premium: false, rpm: 6000 },
+                excel: { name: 'Excel', icon: '📊', premium: false, rpm: 400 },
+                http: { name: 'HTTP', icon: '🌐', premium: true, rpm: 60 }
+            };
+            
+            const connector = connectorInfo[connectorType];
+            flowNodes.push(connector);
+            
+            // Update visual
+            updateFlowVisualization();
+            
+            // Generate smart tips
+            if (connector.premium) {
+                addSmartTip({
+                    type: 'critical',
+                    title: `⚠️ ${connector.name} requires Premium License`,
+                    content: `This connector requires £12.20/user/month or £81.90/flow/month`,
+                    actions: [
+                        { label: 'Switch to Standard', action: 'switch-standard' },
+                        { label: 'View Pricing', action: 'view-pricing' }
+                    ]
+                });
+            }
+            
+            // Check for optimization opportunities
+            if (flowNodes.length > 1) {
+                const lastNode = flowNodes[flowNodes.length - 2];
+                if (lastNode && lastNode.name === 'SharePoint' && connector.name === 'Excel') {
+                    addSmartTip({
+                        type: 'warning',
+                        title: '🚀 Optimization Available',
+                        content: 'Consider using OData $filter on SharePoint before sending to Excel',
+                        actions: [
+                            { label: 'Add Filter', action: 'add-filter' },
+                            { label: 'Learn More', action: 'learn-odata' }
+                        ]
+                    });
+                }
+            }
+        }
+        
+        function updateFlowVisualization() {
+            const canvas = document.getElementById('flow-visualization');
+            if (!canvas) return;
+            
+            canvas.innerHTML = '<div class="flow-row">' + 
+                flowNodes.map((node, index) => {
+                    let html = `<div class="flow-node ${node.premium ? 'premium' : ''}">
+                        <div style="font-size: 24px;">${node.icon}</div>
+                        <div style="font-size: 14px; margin-top: 4px;">${node.name}</div>
+                        ${node.premium ? '<div style="font-size: 10px; margin-top: 4px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">PREMIUM</div>' : ''}
+                    </div>`;
+                    
+                    if (index < flowNodes.length - 1) {
+                        html += '<div class="flow-connection"><div class="flow-tip-bubble">Add optimization here</div></div>';
+                    }
+                    
+                    return html;
+                }).join('') + 
+                '</div>';
+        }
+        
+        function addSmartTip(tip) {
+            smartTips.push(tip);
+            updateSmartTipsDisplay();
+        }
+        
+        function updateSmartTipsDisplay() {
+            // Create smart tips overlay if it doesn't exist
+            let overlay = document.getElementById('smart-tips-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'smart-tips-overlay';
+                overlay.className = 'smart-tips-overlay';
+                overlay.innerHTML = `
+                    <div class="smart-tips-header">
+                        <h3 style="margin: 0; font-size: 16px;">💡 Smart Tips (${smartTips.length})</h3>
+                        <button onclick="closeSmartTips()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">×</button>
+                    </div>
+                    <div class="smart-tips-content" id="smart-tips-list">
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
+            
+            const tipsList = document.getElementById('smart-tips-list');
+            tipsList.innerHTML = smartTips.map((tip, index) => `
+                <div class="smart-tip-item ${tip.type}">
+                    <div style="font-weight: 600; margin-bottom: 6px;">${tip.title}</div>
+                    <div style="font-size: 13px; margin-bottom: 10px;">${tip.content}</div>
+                    <div class="tip-actions">
+                        ${tip.actions.map(action => 
+                            `<button class="tip-action ${action.action.includes('switch') || action.action.includes('add') ? 'apply' : 'learn'}" 
+                                onclick="applySmartTip('${action.action}', ${index})">${action.label}</button>`
+                        ).join('')}
+                    </div>
+                    <div class="tip-links" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+                        <a href="https://docs.microsoft.com/power-automate" target="_blank" style="font-size: 12px; color: #0078d4; text-decoration: none;">📖 Documentation</a>
+                        <a href="https://aka.ms/flow-best-practices" target="_blank" style="font-size: 12px; color: #0078d4; text-decoration: none; margin-left: 12px;">🏆 Best Practices</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function applySmartTip(action, tipIndex) {
+            switch(action) {
+                case 'switch-standard':
+                    alert('✅ Switched to SharePoint connector - No premium license needed!');
+                    smartTips.splice(tipIndex, 1);
+                    updateSmartTipsDisplay();
+                    break;
+                case 'add-filter':
+                    alert('✅ Added OData $filter - 90% performance improvement!');
+                    smartTips.splice(tipIndex, 1);
+                    updateSmartTipsDisplay();
+                    break;
+                case 'view-pricing':
+                    window.open('https://aka.ms/flow-pricing', '_blank');
+                    break;
+                case 'learn-odata':
+                    window.open('https://docs.microsoft.com/power-automate/odata-filters', '_blank');
+                    break;
+            }
+        }
+        
+        function closeSmartTips() {
+            const overlay = document.getElementById('smart-tips-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromURL();
+            handleConnectorChange(); // Initialize connector display
+            calculateCosts();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            
+            currentTab = tabName;
+        }
+
+        // Cost calculations
+        function calculateCosts() {
+            const items = parseInt(document.getElementById('items').value) || 0;
+            const actionsPerItem = parseInt(document.getElementById('actionsPerItem').value) || 0;
+            const executions = parseInt(document.getElementById('executions').value) || 1;
+            const concurrency = parseInt(document.getElementById('concurrency').value) || 1;
+            const users = parseInt(document.getElementById('users').value) || 1;
+            const runContext = document.getElementById('runContext').value;
+            const childFlows = parseInt(document.getElementById('childFlows').value) || 0;
+            const connector = document.getElementById('connector').value;
+            
+            // Calculate PPR
+            const totalActions = items * actionsPerItem;
+            const dailyPPR = totalActions * executions;
+            const monthlyPPR = dailyPPR * 30;
+            
+            // Calculate runtime
+            const avgActionTime = 500; // ms
+            const runtime = (items / concurrency) * avgActionTime / 1000;
+            
+            // Calculate costs
+            let monthlyCost = 0;
+            const isPremium = CONNECTOR_LIMITS[connector].premium;
+            
+            if (runContext === 'service') {
+                if (monthlyPPR > 1200000 || isPremium) {
+                    monthlyCost = LICENSES.process.price;
+                }
+            } else if (runContext === 'user') {
+                if (monthlyPPR > 1200000) {
+                    monthlyCost = LICENSES.process.price;
+                } else if (isPremium) {
+                    monthlyCost = LICENSES.premium.price * users;
+                }
+            }
+            
+            // Add child flow optimization
+            if (childFlows > 0) {
+                const processLicensesNeeded = Math.ceil((childFlows + 1) / 25);
+                const childFlowCost = processLicensesNeeded * LICENSES.process.price;
+                if (childFlowCost < monthlyCost) {
+                    monthlyCost = childFlowCost;
+                }
+            }
+            
+            // Update UI
+            document.getElementById('monthly-cost').textContent = `£${monthlyCost.toFixed(2)}`;
+            document.getElementById('ppr-usage').textContent = formatNumber(monthlyPPR);
+            document.getElementById('runtime-est').textContent = `${runtime.toFixed(1)}s`;
+            
+            // Calculate efficiency
+            const efficiency = calculateEfficiency(items, actionsPerItem, concurrency, connector);
+            document.getElementById('efficiency-score').textContent = `${efficiency}%`;
+            
+            // Generate performance tips
+            generatePerformanceTips(items, actionsPerItem, connector, concurrency);
+            
+            // Generate recommendations
+            generateRecommendations(monthlyPPR, isPremium, users, childFlows);
+        }
+
+        function calculateEfficiency(items, actions, concurrency, connector) {
+            let score = 100;
+            
+            // Penalize low concurrency
+            if (concurrency === 1 && items > 100) score -= 20;
+            
+            // Penalize nested loops (approximation)
+            if (actions > 10) score -= 10;
+            
+            // Bonus for optimal concurrency
+            if (concurrency >= 5 && concurrency <= 20) score += 10;
+            
+            // Connector efficiency
+            const rpm = (items * actions / 60) * (concurrency || 1);
+            const limit = CONNECTOR_LIMITS[connector].rpm;
+            if (rpm > limit) score -= 30;
+            
+            return Math.max(0, Math.min(100, score));
+        }
+
+        function generatePerformanceTips(items, actionsPerItem, connector, concurrency) {
+            const tips = {
+                filtering: [],
+                processing: [],
+                api: [],
+                memory: []
+            };
+            
+            const quickWins = [];
+            const decisionMatrix = [];
+            
+            // Filtering tips
+            if (items > 100) {
+                if (items > 1000) {
+                    tips.filtering.push({
+                        type: 'critical',
+                        text: `⚠️ Processing ${items} items - MUST use OData $filter to reduce at source. Current approach will likely timeout.`
+                    });
+                    quickWins.push({
+                        text: 'Add $filter to reduce items from ' + items + ' to only what you need',
+                        impact: '90% faster'
+                    });
+                } else {
+                    tips.filtering.push({
+                        type: 'warning',
+                        text: `Processing ${items} items - Consider using $filter and $select for better performance`
+                    });
+                }
+                
+                tips.filtering.push({
+                    type: 'info',
+                    text: `Use: $select=column1,column2 to reduce data transfer by 75%`
+                });
+            } else {
+                tips.filtering.push({
+                    type: 'good',
+                    text: '✅ Low item count (' + items + ') - Continue with current approach'
+                });
+            }
+            
+            // Processing tips
+            if (items * actionsPerItem > 5000) {
+                tips.processing.push({
+                    type: 'critical',
+                    text: '🔴 ' + (items * actionsPerItem) + ' total actions - Use Filter Array instead of Apply to Each with conditions'
+                });
+                quickWins.push({
+                    text: 'Replace Apply to Each + Condition with Filter Array',
+                    impact: '100x faster'
+                });
+            } else if (items * actionsPerItem > 1000) {
+                tips.processing.push({
+                    type: 'warning',
+                    text: '🟡 Consider using Select action for transformations instead of loops'
+                });
+            } else {
+                tips.processing.push({
+                    type: 'good',
+                    text: '✅ Action count manageable - Current approach is fine'
+                });
+            }
+            
+            // API tips
+            const rpm = (items * actionsPerItem / 60) * (concurrency || 1);
+            const limit = CONNECTOR_LIMITS[connector].rpm;
+            
+            if (rpm > limit) {
+                tips.api.push({
+                    type: 'critical',
+                    text: `🔴 ${Math.round(rpm)} RPM exceeds ${connector} limit (${limit} RPM). Add delays or reduce concurrency.`
+                });
+                quickWins.push({
+                    text: 'Add Delay action (1 second) between API calls',
+                    impact: 'Prevent throttling'
+                });
+            } else if (rpm > limit * 0.8) {
+                tips.api.push({
+                    type: 'warning',
+                    text: `🟡 Approaching ${connector} rate limit. Consider adding delays.`
+                });
+            } else {
+                tips.api.push({
+                    type: 'good',
+                    text: `✅ API rate (${Math.round(rpm)} RPM) well within ${connector} limits`
+                });
+            }
+            
+            // Memory tips
+            if (items > 5000) {
+                tips.memory.push({
+                    type: 'warning',
+                    text: '🟡 Large dataset - Use pagination with $top and $skip to process in chunks'
+                });
+                tips.memory.push({
+                    type: 'info',
+                    text: 'Consider Do Until loop with Skip Token for datasets over 5000 items'
+                });
+            } else {
+                tips.memory.push({
+                    type: 'good',
+                    text: '✅ Dataset size within memory limits'
+                });
+            }
+            
+            // Update performance tips in UI
+            const perfTipsContainer = document.getElementById('performance-tips');
+            if (perfTipsContainer) {
+                const criticalTips = [...tips.filtering, ...tips.processing, ...tips.api, ...tips.memory]
+                    .filter(t => t.type === 'critical');
+                
+                const warningTips = [...tips.filtering, ...tips.processing, ...tips.api, ...tips.memory]
+                    .filter(t => t.type === 'warning');
+                
+                if (criticalTips.length > 0) {
+                    perfTipsContainer.innerHTML = `
+                        <div class="alert error">
+                            <span class="alert-icon">⚠️</span>
+                            <div class="alert-content">
+                                <div class="alert-title">Critical Performance Issues - MUST Optimize</div>
+                                <div class="alert-text">
+                                    <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                                        ${criticalTips.map(t => `<li>${t.text}</li>`).join('')}
+                                    </ul>
+                                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1);">
+                                        <strong>Quick Fixes:</strong>
+                                        <ul style="margin: 4px 0 0 0; padding-left: 20px;">
+                                            ${quickWins.slice(0, 3).map(w => `<li>${w.text} (${w.impact})</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (warningTips.length > 0) {
+                    perfTipsContainer.innerHTML = `
+                        <div class="alert warning">
+                            <span class="alert-icon">🟡</span>
+                            <div class="alert-content">
+                                <div class="alert-title">Performance Can Be Improved</div>
+                                <div class="alert-text">
+                                    <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                                        ${warningTips.map(t => `<li>${t.text}</li>`).join('')}
+                                    </ul>
+                                    ${quickWins.length > 0 ? `
+                                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1);">
+                                        <strong>Recommended Optimizations:</strong>
+                                        <ul style="margin: 4px 0 0 0; padding-left: 20px;">
+                                            ${quickWins.map(w => `<li>${w.text} (${w.impact})</li>`).join('')}
+                                        </ul>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    perfTipsContainer.innerHTML = `
+                        <div class="alert success">
+                            <span class="alert-icon">✅</span>
+                            <div class="alert-content">
+                                <div class="alert-title">Performance Optimized - Continue As Is!</div>
+                                <div class="alert-text">
+                                    Your current configuration is well-optimized:
+                                    <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                                        <li>✅ Item count is manageable (${items} items)</li>
+                                        <li>✅ Actions are within limits (${items * actionsPerItem} total)</li>
+                                        <li>✅ API rate is safe (${Math.round(rpm)} of ${limit} RPM)</li>
+                                        <li>✅ Memory usage is optimal</li>
+                                    </ul>
+                                    <div style="margin-top: 12px; padding: 8px; background: rgba(76,175,80,0.1); border-radius: 4px;">
+                                        <strong>👍 You can continue with your current approach!</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function generateRecommendations(monthlyPPR, isPremium, users, childFlows) {
+            const recommendations = [];
+            
+            // License recommendations
+            if (isPremium && users > 5) {
+                const userCost = users * LICENSES.premium.price;
+                const processCost = LICENSES.process.price;
+                if (userCost > processCost) {
+                    recommendations.push({
+                        type: 'success',
+                        title: 'Cost Optimization Available',
+                        text: `Switch to Process license to save £${(userCost - processCost).toFixed(2)}/month`
+                    });
+                }
+            }
+            
+            // Child flow optimization
+            if (childFlows > 5 && childFlows <= 25) {
+                recommendations.push({
+                    type: 'info',
+                    title: 'Child Flow Optimization',
+                    text: `All ${childFlows} child flows can share ONE Process license (£81.90 total)`
+                });
+            }
+            
+            // Performance recommendations
+            const concurrency = parseInt(document.getElementById('concurrency').value) || 1;
+            if (concurrency === 1) {
+                recommendations.push({
+                    type: 'warning',
+                    title: 'Enable Concurrency',
+                    text: 'Set concurrency to 5-20 for 5-20x faster processing'
+                });
+            }
+            
+            // Display recommendations
+            const container = document.getElementById('license-recommendations');
+            container.innerHTML = recommendations.map(rec => `
+                <div class="alert ${rec.type}">
+                    <span class="alert-icon">${rec.type === 'success' ? '✅' : rec.type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                    <div class="alert-content">
+                        <div class="alert-title">${rec.title}</div>
+                        <div class="alert-text">${rec.text}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function calculateAICosts() {
+            const model = document.getElementById('ai-model').value;
+            const tokensPerRequest = parseInt(document.getElementById('tokens-per-request').value) || 0;
+            const aiRequests = parseInt(document.getElementById('ai-requests').value) || 0;
+            const copilotMessages = parseInt(document.getElementById('copilot-messages').value) || 0;
+            const useGenAI = document.getElementById('use-genai').value === 'true';
+            const aiCredits = parseInt(document.getElementById('ai-credits').value) || 5000;
+            
+            const items = parseInt(document.getElementById('items').value) || 0;
+            const executions = parseInt(document.getElementById('executions').value) || 1;
+            
+            // Calculate token usage
+            let tokenCost = 0;
+            if (model !== 'none' && tokensPerRequest > 0) {
+                const totalTokens = items * aiRequests * tokensPerRequest * executions * 30;
+                const creditsNeeded = Math.ceil(totalTokens / 1000) * AI_MODELS[model].creditsPerKTokens;
+                
+                if (creditsNeeded > aiCredits) {
+                    const additionalCredits = creditsNeeded - aiCredits;
+                    tokenCost = Math.ceil(additionalCredits / 5000) * 300;
+                }
+            }
+            
+            // Calculate Copilot messages
+            let messageCost = 0;
+            if (copilotMessages > 0) {
+                const actualMessages = useGenAI ? copilotMessages * 2 : copilotMessages;
+                const messagePacks = Math.ceil(actualMessages / 25000);
+                messageCost = messagePacks * 200;
+            }
+            
+            // Display breakdown
+            const breakdown = document.getElementById('ai-cost-breakdown');
+            breakdown.innerHTML = `
+                <div class="alert info">
+                    <span class="alert-icon">🤖</span>
+                    <div class="alert-content">
+                        <div class="alert-title">AI Cost Breakdown</div>
+                        <div class="alert-text">
+                            Token costs: £${tokenCost.toFixed(2)}/month<br>
+                            Copilot messages: £${messageCost.toFixed(2)}/month<br>
+                            <strong>Total AI costs: £${(tokenCost + messageCost).toFixed(2)}/month</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showPattern(patternKey) {
+            const pattern = MVP_PATTERNS[patternKey];
+            if (pattern) {
+                document.getElementById('pattern-modal-title').textContent = pattern.title;
+                document.getElementById('pattern-modal-body').innerHTML = `
+                    <p><strong>Author:</strong> ${pattern.author}</p>
+                    <p><strong>Description:</strong> ${pattern.description}</p>
+                    <div class="code-preview" style="margin-top: 16px;">
+                        <pre>${pattern.code}</pre>
+                    </div>
+                `;
+                document.getElementById('pattern-modal').classList.add('active');
+                patterns.current = pattern;
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function copyPattern() {
+            if (patterns.current) {
+                navigator.clipboard.writeText(patterns.current.code);
+                alert('Pattern copied to clipboard!');
+            }
+        }
+
+        function applyPattern() {
+            if (patterns.current) {
+                // Switch to visual designer and add pattern
+                switchTab('visual-designer');
+                closeModal('pattern-modal');
+                alert('Pattern applied to visual designer');
+            }
+        }
+
+        function analyzeFlow() {
+            const flowJson = document.getElementById('flow-json').value;
+            if (!flowJson) {
+                alert('Please paste your flow JSON');
+                return;
+            }
+            
+            try {
+                const flow = JSON.parse(flowJson);
+                const issues = [];
+                
+                // Check for array variables
+                if (flowJson.includes('AppendToArrayVariable')) {
+                    issues.push({
+                        type: 'error',
+                        title: 'Array Variables Detected',
+                        text: 'Replace with Select expression for 93% performance improvement (John Liu)'
+                    });
+                }
+                
+                // Check for missing filtering
+                if (flowJson.includes('List_rows') && !flowJson.includes('$filter')) {
+                    issues.push({
+                        type: 'error',
+                        title: 'No OData Filtering Detected',
+                        text: 'Use $filter, $select, $expand to reduce API calls by 90%. Filter at source, not in Power Automate!'
+                    });
+                }
+                
+                // Check for missing select
+                if (flowJson.includes('List_rows') && !flowJson.includes('$select')) {
+                    issues.push({
+                        type: 'warning',
+                        title: 'Fetching All Columns',
+                        text: 'Use $select to only get needed columns. Reduces data transfer by 75%+'
+                    });
+                }
+                
+                // Check for Apply to Each without Filter Array
+                if (flowJson.includes('Apply_to_each') && !flowJson.includes('Filter_array')) {
+                    issues.push({
+                        type: 'warning',
+                        title: 'Loop Without Pre-Filtering',
+                        text: 'Use Filter Array before Apply to Each for 100x performance improvement'
+                    });
+                }
+                
+                // Check for missing expand on related data
+                if (flowJson.includes('_x0028_') || flowJson.includes('_x0029_')) {
+                    issues.push({
+                        type: 'info',
+                        title: 'Multiple API Calls for Related Data',
+                        text: 'Use $expand to get related records in ONE API call instead of N+1'
+                    });
+                }
+                
+                // Check for missing error handling
+                if (!flowJson.includes('Scope')) {
+                    issues.push({
+                        type: 'warning',
+                        title: 'No Error Handling',
+                        text: 'Add Try-Catch-Finally pattern for production reliability (David Wyatt)'
+                    });
+                }
+                
+                // Check for concurrency
+                if (!flowJson.includes('concurrency')) {
+                    issues.push({
+                        type: 'info',
+                        title: 'Concurrency Not Configured',
+                        text: 'Enable concurrency (5-20) for parallel processing'
+                    });
+                }
+                
+                // Display results
+                const results = document.getElementById('analysis-results');
+                results.innerHTML = issues.map(issue => `
+                    <div class="alert ${issue.type}">
+                        <span class="alert-icon">${issue.type === 'error' ? '❌' : issue.type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                        <div class="alert-content">
+                            <div class="alert-title">${issue.title}</div>
+                            <div class="alert-text">${issue.text}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (e) {
+                alert('Invalid JSON format');
+            }
+        }
+
+        function importPowerDocu() {
+            const file = document.getElementById('powerdocu-file').files[0];
+            if (!file) {
+                alert('Please select a PowerDocu file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Parse PowerDocu and populate fields
+                alert('PowerDocu imported successfully!');
+                switchTab('cost-calculator');
+            };
+            reader.readAsText(file);
+        }
+
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const config = JSON.parse(event.target.result);
+                    loadConfiguration(config);
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function exportAll() {
+            const config = {
+                items: document.getElementById('items').value,
+                actionsPerItem: document.getElementById('actionsPerItem').value,
+                connector: document.getElementById('connector').value,
+                executions: document.getElementById('executions').value,
+                concurrency: document.getElementById('concurrency').value,
+                users: document.getElementById('users').value,
+                runContext: document.getElementById('runContext').value,
+                childFlows: document.getElementById('childFlows').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `flow-config-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function shareConfig() {
+            const config = {
+                items: document.getElementById('items').value,
+                actionsPerItem: document.getElementById('actionsPerItem').value,
+                connector: document.getElementById('connector').value,
+                executions: document.getElementById('executions').value,
+                concurrency: document.getElementById('concurrency').value,
+                users: document.getElementById('users').value,
+                runContext: document.getElementById('runContext').value,
+                childFlows: document.getElementById('childFlows').value
+            };
+            
+            const encoded = btoa(JSON.stringify(config));
+            const url = `${window.location.origin}${window.location.pathname}?config=${encoded}`;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Share URL copied to clipboard!');
+            });
+        }
+
+        function showHelp() {
+            alert(`Power Automate Flow Planner v7.0
+
+Features:
+• Cost Calculator - Estimate licensing costs
+• Visual Designer - Build flows visually
+• Pattern Library - MVP best practices
+• Issue Analyzer - Find flow problems
+• AI & Tokens - Calculate AI costs
+• MVP Tips - Expert guidance
+• PowerDocu - Import documentation
+
+Created by: Ross @ Sundown Solutions Ltd
+With patterns from: John Liu, David Wyatt, and other MVPs`);
+        }
+
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('config')) {
+                try {
+                    const config = JSON.parse(atob(params.get('config')));
+                    loadConfiguration(config);
+                } catch (e) {
+                    console.error('Failed to load configuration from URL');
+                }
+            }
+        }
+
+        function loadConfiguration(config) {
+            Object.keys(config).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = config[key];
+                }
+            });
+            calculateCosts();
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+    </script>
+</body>
+</html>

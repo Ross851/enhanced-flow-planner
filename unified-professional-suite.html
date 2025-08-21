@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Optimisation Suite | Professional Edition</title>
+    <style>
+        /* Microsoft Fluent Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Core Microsoft Azure/Office 365 Colours */
+            --primary: #0078d4;
+            --primary-hover: #106ebe;
+            --primary-active: #005a9e;
+            --secondary: #40e0d0;
+            --success: #107c10;
+            --warning: #ff8c00;
+            --danger: #d13438;
+            --info: #0078d4;
+            
+            /* Neutral Palette */
+            --surface: #ffffff;
+            --surface-secondary: #faf9f8;
+            --surface-tertiary: #f3f2f1;
+            --border: #e1dfdd;
+            --border-secondary: #edebe9;
+            --text-primary: #323130;
+            --text-secondary: #605e5c;
+            --text-tertiary: #a19f9d;
+            --text-disabled: #c8c6c4;
+            
+            /* Professional Shadows */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 2px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-xl: 0 8px 16px rgba(0,0,0,0.07), 0 3px 6px rgba(0,0,0,0.05);
+            
+            /* Typography */
+            --font-system: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Cascadia Code', 'Consolas', monospace;
+        }
+
+        body {
+            font-family: var(--font-system);
+            background: var(--surface-tertiary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Professional Header Bar */
+        .header-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-secondary);
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .app-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-logo {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .header-nav {
+            margin-left: auto;
+            display: flex;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 0 20px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            border-radius: 0;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--surface-secondary);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border-secondary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* Action Categories */
+        .action-category {
+            margin-bottom: 24px;
+        }
+
+        .category-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding: 4px 0;
+        }
+
+        .action-item {
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 6px;
+            cursor: move;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .action-item:hover {
+            background: var(--surface);
+            border-color: var(--primary);
+            transform: translateX(2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-item.dragging {
+            opacity: 0.5;
+        }
+
+        .action-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+        }
+
+        .license-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .license-standard {
+            background: var(--surface-tertiary);
+            color: var(--text-tertiary);
+        }
+
+        .license-premium {
+            background: #fee0e0;
+            color: var(--danger);
+        }
+
+        /* Canvas Area */
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface-tertiary);
+        }
+
+        .canvas-toolbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-secondary);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .toolbar-button {
+            padding: 6px 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toolbar-button:hover {
+            background: var(--surface-secondary);
+            border-color: var(--primary);
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: var(--border-secondary);
+        }
+
+        .flow-canvas {
+            flex: 1;
+            padding: 32px;
+            overflow: auto;
+            position: relative;
+        }
+
+        /* Flow Nodes */
+        .flow-node {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .flow-node:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .flow-node.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.2);
+        }
+
+        .node-header {
+            padding: 12px 16px;
+            background: var(--surface-secondary);
+            border-bottom: 1px solid var(--border-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .node-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .node-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .node-action {
+            width: 28px;
+            height: 28px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            transition: all 0.15s;
+        }
+
+        .node-action:hover {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .node-body {
+            padding: 16px;
+        }
+
+        .node-config {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .config-label {
+            font-weight: 600;
+            margin-right: 8px;
+            min-width: 80px;
+        }
+
+        .config-value {
+            color: var(--text-primary);
+        }
+
+        /* Flow Connector */
+        .flow-connector {
+            width: 2px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .flow-connector::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 6px solid var(--border);
+        }
+
+        /* Properties Panel */
+        .properties-panel {
+            width: 320px;
+            background: var(--surface);
+            border-left: 1px solid var(--border-secondary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* Metrics Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 4px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .metric-card.success .metric-value {
+            color: var(--success);
+        }
+
+        .metric-card.warning .metric-value {
+            color: var(--warning);
+        }
+
+        .metric-card.danger .metric-value {
+            color: var(--danger);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: var(--font-system);
+            background: var(--surface);
+            color: var(--text-primary);
+            transition: all 0.15s;
+        }
+
+        .form-input:hover,
+        .form-select:hover {
+            border-color: var(--text-tertiary);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-system);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-primary:active {
+            background: var(--primary-active);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-secondary);
+            border-color: var(--primary);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--surface);
+            border-top: 1px solid var(--border-secondary);
+            height: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 24px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .status-indicator.warning {
+            background: var(--warning);
+        }
+
+        .status-indicator.error {
+            background: var(--danger);
+        }
+
+        /* Add Node Button */
+        .add-node-btn {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 24px;
+            padding: 24px;
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+
+        .add-node-btn:hover {
+            border-color: var(--primary);
+            background: var(--surface);
+            color: var(--primary);
+        }
+
+        .add-node-btn.drag-over {
+            border-color: var(--primary);
+            background: rgba(0, 120, 212, 0.05);
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: var(--shadow-xl);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .modal-close:hover {
+            background: var(--surface-secondary);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-secondary);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-secondary);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Best Practices List */
+        .best-practices {
+            list-style: none;
+        }
+
+        .practice-item {
+            padding: 12px;
+            background: var(--surface-secondary);
+            border-left: 3px solid var(--primary);
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .practice-item strong {
+            color: var(--text-primary);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--surface);
+            border-radius: 4px;
+            box-shadow: var(--shadow-xl);
+            padding: 16px;
+            min-width: 300px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Remove focus outline for mouse users */
+        *:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Bar -->
+    <header class="header-bar">
+        <div class="app-title">
+            <div class="app-logo"></div>
+            <span>Power Automate Optimisation Suite</span>
+        </div>
+        <nav class="header-nav">
+            <button class="nav-tab active" onclick="switchView('builder')">Flow Builder</button>
+            <button class="nav-tab" onclick="switchView('analyzer')">Impact Analyser</button>
+            <button class="nav-tab" onclick="switchView('optimizer')">Cost Optimiser</button>
+            <button class="nav-tab" onclick="switchView('dashboard')">Analytics</button>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Actions Library</div>
+                <input type="search" class="form-input" placeholder="Search actions...">
+            </div>
+            <div class="sidebar-content">
+                <!-- Triggers -->
+                <div class="action-category">
+                    <div class="category-header">Triggers</div>
+                    <div class="action-item" draggable="true" data-action="recurrence">
+                        <div class="action-label">
+                            <span class="action-icon">⏰</span>
+                            <span>Recurrence</span>
+                        </div>
+                        <span class="license-badge license-standard">Free</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-action="sharepoint-created">
+                        <div class="action-label">
+                            <span class="action-icon">📄</span>
+                            <span>When item created</span>
+                        </div>
+                        <span class="license-badge license-standard">Free</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-action="email-received">
+                        <div class="action-label">
+                            <span class="action-icon">✉</span>
+                            <span>When email arrives</span>
+                        </div>
+                        <span class="license-badge license-standard">Free</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-action="http-webhook">
+                        <div class="action-label">
+                            <span class="action-icon">🌐</span>
+                            <span>HTTP request</span>
+                        </div>
+                        <span class="license-badge license-premium">Premium</span>
+                    </div>
+                </div>
+
+                <!-- SharePoint Actions -->
+                <div class="action-category">
+                    <div class="category-header">SharePoint</div>
+                    <div class="action-item" draggable="true" data-action="get-items">
+                        <div class="action-label">
+                            <span class="action-icon">📋</span>
+                            <span>Get items</span>
+                        </div>
+                        <span class="license-badge license-standard">Free</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-action="create-item">
+                        <div class="action-label">
+                            <span class="action-icon">➕</span>
+                            <span>Create item</span>
+                        </div>
+                        <span class="license-badge license-standard">Free</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-action="update-item">
+                        <div class="action-label">
+                            <span class="action-icon">✏</span>
+                            <span>Update item</span>
+                        </div>
+                        <span class="license-badge license-standard">Free</span>
+                    </div>
+                </div>
+
+                <!-- SQL Actions -->
+                <div class="action-category">
+                    <div class="category-header">SQL Server</div>
+                    <div class="action-item" draggable="true" data-action="sql-get-rows">
+                        <div class="action-label">
+                            <span class="action-icon">🗄</span>
+                            <span>Get rows</span>
+                        </div>
+                        <span class="license-badge license-premium">Premium</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-action="sql-insert-row">
+                        <div class="action-label">
+                            <span class="action-icon">➕</span>
+                            <span>Insert row</span>
+                        </div>
+                        <span class="license-badge license-premium">Premium</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Canvas Container -->
+        <div class="canvas-container">
+            <div class="canvas-toolbar">
+                <button class="toolbar-button" onclick="saveFlow()">
+                    <span>💾</span>
+                    <span>Save</span>
+                </button>
+                <button class="toolbar-button" onclick="testFlow()">
+                    <span>▶</span>
+                    <span>Test</span>
+                </button>
+                <div class="toolbar-separator"></div>
+                <button class="toolbar-button" onclick="undoAction()">
+                    <span>↶</span>
+                    <span>Undo</span>
+                </button>
+                <button class="toolbar-button" onclick="redoAction()">
+                    <span>↷</span>
+                    <span>Redo</span>
+                </button>
+                <div class="toolbar-separator"></div>
+                <button class="toolbar-button" onclick="zoomIn()">
+                    <span>🔍</span>
+                    <span>Zoom In</span>
+                </button>
+                <button class="toolbar-button" onclick="zoomOut()">
+                    <span>🔍</span>
+                    <span>Zoom Out</span>
+                </button>
+            </div>
+            <div class="flow-canvas" id="flowCanvas">
+                <!-- Flow nodes will be added here -->
+                <button class="add-node-btn" onclick="showActionPicker()">
+                    + Add a trigger to start
+                </button>
+            </div>
+        </div>
+
+        <!-- Properties Panel -->
+        <aside class="properties-panel">
+            <div class="panel-header">
+                <div class="panel-title">Flow Metrics</div>
+            </div>
+            <div class="panel-content">
+                <!-- Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">£0</div>
+                        <div class="metric-label">Monthly Cost</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0s</div>
+                        <div class="metric-label">Runtime</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">PPR Usage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">Standard</div>
+                        <div class="metric-label">Licence</div>
+                    </div>
+                </div>
+
+                <!-- Configuration -->
+                <div class="form-group">
+                    <label class="form-label">User Count</label>
+                    <input type="number" class="form-input" value="1" min="1" max="10000" id="userCount">
+                    <div class="form-help">Number of users running this flow</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Account Type</label>
+                    <select class="form-select" id="accountType">
+                        <option value="user">Individual Users</option>
+                        <option value="service">Service Account</option>
+                    </select>
+                    <div class="form-help">Service accounts concentrate API calls</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Environment</label>
+                    <select class="form-select" id="environment">
+                        <option value="production">Production</option>
+                        <option value="sandbox">Sandbox</option>
+                        <option value="trial">Trial (90 days)</option>
+                    </select>
+                </div>
+
+                <!-- Best Practices Button -->
+                <button class="btn btn-secondary" onclick="showBestPractices()" style="width: 100%;">
+                    View Best Practices
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="status-bar">
+        <div class="status-item">
+            <span class="status-indicator"></span>
+            <span>Ready</span>
+        </div>
+        <div class="status-item">
+            <span>0 nodes</span>
+        </div>
+        <div class="status-item">
+            <span>Last saved: Never</span>
+        </div>
+    </footer>
+
+    <script>
+        // Professional Flow Builder Logic
+        let flowNodes = [];
+        let selectedNode = null;
+
+        // Drag and Drop
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDragAndDrop();
+            setupEventListeners();
+            loadFlowData();
+        });
+
+        function setupDragAndDrop() {
+            const actionItems = document.querySelectorAll('.action-item');
+            const canvas = document.getElementById('flowCanvas');
+
+            actionItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('action', item.dataset.action);
+                    item.classList.add('dragging');
+                });
+
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+            });
+
+            // Setup drop zones
+            document.addEventListener('dragover', (e) => {
+                const addBtn = e.target.closest('.add-node-btn');
+                if (addBtn) {
+                    e.preventDefault();
+                    addBtn.classList.add('drag-over');
+                }
+            });
+
+            document.addEventListener('dragleave', (e) => {
+                const addBtn = e.target.closest('.add-node-btn');
+                if (addBtn) {
+                    addBtn.classList.remove('drag-over');
+                }
+            });
+
+            document.addEventListener('drop', (e) => {
+                const addBtn = e.target.closest('.add-node-btn');
+                if (addBtn) {
+                    e.preventDefault();
+                    addBtn.classList.remove('drag-over');
+                    const action = e.dataTransfer.getData('action');
+                    addFlowNode(action);
+                }
+            });
+        }
+
+        function addFlowNode(action) {
+            const canvas = document.getElementById('flowCanvas');
+            const addBtn = canvas.querySelector('.add-node-btn');
+
+            // Create connector
+            const connector = document.createElement('div');
+            connector.className = 'flow-connector';
+
+            // Create node
+            const node = document.createElement('div');
+            node.className = 'flow-node';
+            node.dataset.action = action;
+            node.innerHTML = `
+                <div class="node-header">
+                    <div class="node-title">
+                        <span>${getActionTitle(action)}</span>
+                    </div>
+                    <div class="node-actions">
+                        <button class="node-action" onclick="configureNode(this)" title="Configure">⚙</button>
+                        <button class="node-action" onclick="deleteNode(this)" title="Delete">✕</button>
+                    </div>
+                </div>
+                <div class="node-body">
+                    <div class="node-config">
+                        Click configure to set up this action
+                    </div>
+                </div>
+            `;
+
+            // Insert before add button
+            canvas.insertBefore(connector, addBtn);
+            canvas.insertBefore(node, addBtn);
+
+            // Create new add button
+            const newAddBtn = document.createElement('button');
+            newAddBtn.className = 'add-node-btn';
+            newAddBtn.onclick = () => showActionPicker();
+            newAddBtn.innerHTML = '+ Add an action';
+            canvas.insertBefore(newAddBtn, addBtn);
+
+            // Update first add button text
+            if (flowNodes.length === 0) {
+                addBtn.style.display = 'none';
+            }
+
+            flowNodes.push({
+                id: Date.now(),
+                action: action,
+                element: node
+            });
+
+            updateMetrics();
+            showToast('Action added successfully', 'success');
+        }
+
+        function getActionTitle(action) {
+            const titles = {
+                'recurrence': 'Recurrence',
+                'sharepoint-created': 'When item created',
+                'email-received': 'When email arrives',
+                'http-webhook': 'HTTP request received',
+                'get-items': 'Get items',
+                'create-item': 'Create item',
+                'update-item': 'Update item',
+                'sql-get-rows': 'Get rows',
+                'sql-insert-row': 'Insert row'
+            };
+            return titles[action] || action;
+        }
+
+        function configureNode(btn) {
+            const node = btn.closest('.flow-node');
+            const action = node.dataset.action;
+            
+            // Show configuration modal
+            showConfigurationModal(action, node);
+        }
+
+        function deleteNode(btn) {
+            if (confirm('Are you sure you want to delete this action?')) {
+                const node = btn.closest('.flow-node');
+                const connector = node.previousElementSibling;
+                if (connector && connector.classList.contains('flow-connector')) {
+                    connector.remove();
+                }
+                node.remove();
+                
+                // Remove from flowNodes array
+                flowNodes = flowNodes.filter(n => n.element !== node);
+                
+                updateMetrics();
+                showToast('Action deleted', 'warning');
+            }
+        }
+
+        function updateMetrics() {
+            const metrics = calculateMetrics();
+            
+            // Update display
+            document.querySelectorAll('.metric-value')[0].textContent = `£${metrics.cost}`;
+            document.querySelectorAll('.metric-value')[1].textContent = `${metrics.runtime}s`;
+            document.querySelectorAll('.metric-value')[2].textContent = metrics.ppr;
+            document.querySelectorAll('.metric-value')[3].textContent = metrics.licence;
+            
+            // Update status bar
+            document.querySelector('.status-item span:last-child').textContent = `${flowNodes.length} nodes`;
+        }
+
+        function calculateMetrics() {
+            const userCount = parseInt(document.getElementById('userCount').value) || 1;
+            const accountType = document.getElementById('accountType').value;
+            
+            let hasPremium = flowNodes.some(n => 
+                ['http-webhook', 'sql-get-rows', 'sql-insert-row'].includes(n.action)
+            );
+            
+            let cost = 0;
+            let licence = 'Standard';
+            
+            if (hasPremium) {
+                if (accountType === 'service' || userCount > 7) {
+                    cost = 81.90; // Per-flow
+                    licence = 'Process';
+                } else {
+                    cost = 12.20 * userCount; // Per-user
+                    licence = 'Premium';
+                }
+            }
+            
+            return {
+                cost: cost.toFixed(2),
+                runtime: flowNodes.length * 2.5,
+                ppr: flowNodes.length * userCount * 150, // Estimated
+                licence: licence
+            };
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showConfigurationModal(action, node) {
+            // This would show the configuration modal
+            // For now, just show a toast
+            showToast(`Configure ${getActionTitle(action)}`, 'info');
+        }
+
+        function setupEventListeners() {
+            // User count change
+            document.getElementById('userCount').addEventListener('change', updateMetrics);
+            document.getElementById('accountType').addEventListener('change', updateMetrics);
+        }
+
+        function loadFlowData() {
+            // Load from localStorage if available
+            const saved = localStorage.getItem('flowData');
+            if (saved) {
+                // Restore flow
+            }
+        }
+
+        function saveFlow() {
+            localStorage.setItem('flowData', JSON.stringify(flowNodes));
+            document.querySelector('.status-item:last-child span').textContent = 
+                `Last saved: ${new Date().toLocaleTimeString()}`;
+            showToast('Flow saved successfully', 'success');
+        }
+
+        function testFlow() {
+            showToast('Testing flow...', 'info');
+            // Implement flow testing
+        }
+
+        // View switching
+        function switchView(view) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            showToast(`Switching to ${view} view`, 'info');
+        }
+
+        // Stub functions
+        function showActionPicker() { showToast('Action picker coming soon', 'info'); }
+        function undoAction() { showToast('Undo', 'info'); }
+        function redoAction() { showToast('Redo', 'info'); }
+        function zoomIn() { showToast('Zoom in', 'info'); }
+        function zoomOut() { showToast('Zoom out', 'info'); }
+        function showBestPractices() { showToast('Best practices guide', 'info'); }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        saveFlow();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        undoAction();
+                        break;
+                    case 'y':
+                        e.preventDefault();
+                        redoAction();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
