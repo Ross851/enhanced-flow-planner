@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Pre-Build Analysis Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #005a9e;
+            --ms-blue-light: #40a9ff;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-40: #e1dfdd;
+            --ms-gray-50: #d2d0ce;
+            --ms-gray-60: #c8c6c4;
+            --ms-gray-70: #a19f9d;
+            --ms-gray-80: #8a8886;
+            --ms-gray-90: #605e5c;
+            --ms-gray-100: #484644;
+            --ms-gray-110: #323130;
+            --ms-gray-120: #292827;
+            --ms-gray-130: #201f1e;
+            --border-radius: 2px;
+            --shadow-sm: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+            --shadow-md: 0 3.2px 7.2px 0 rgba(0,0,0,0.132), 0 0.6px 1.8px 0 rgba(0,0,0,0.108);
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--ms-gray-20);
+            color: var(--ms-gray-130);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-header {
+            background: white;
+            border-bottom: 1px solid var(--ms-gray-30);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ms-gray-130);
+        }
+
+        .ms-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--ms-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .metrics-bar {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--ms-gray-90);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .metric-value.good {
+            color: var(--ms-green);
+        }
+
+        .metric-value.warning {
+            color: var(--ms-orange);
+        }
+
+        .metric-value.critical {
+            color: var(--ms-red);
+        }
+
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .form-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-input,
+        .form-select {
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--ms-gray-60);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            color: var(--ms-gray-130);
+            background: white;
+            transition: border-color 0.1s;
+        }
+
+        .form-input:hover,
+        .form-select:hover {
+            border-color: var(--ms-gray-80);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+            box-shadow: 0 0 0 1px var(--ms-blue);
+        }
+
+        .form-input.error {
+            border-color: var(--ms-red);
+        }
+
+        .form-help {
+            font-size: 11px;
+            color: var(--ms-gray-90);
+            margin-top: 2px;
+        }
+
+        .form-error {
+            font-size: 11px;
+            color: var(--ms-red);
+            margin-top: 2px;
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .sidebar {
+            width: 400px;
+            background: var(--ms-gray-10);
+            border-left: 1px solid var(--ms-gray-30);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            background: white;
+            border-bottom: 1px solid var(--ms-gray-30);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .issue-count-badge {
+            background: var(--ms-gray-30);
+            color: var(--ms-gray-110);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .issue-count-badge.has-issues {
+            background: var(--ms-red);
+            color: white;
+        }
+
+        .issues-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .issue-item {
+            background: white;
+            border: 1px solid var(--ms-gray-30);
+            border-radius: var(--border-radius);
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: box-shadow 0.2s;
+        }
+
+        .issue-item:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .issue-severity {
+            display: inline-block;
+            width: 4px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+        }
+
+        .issue-item {
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .issue-item.critical .issue-severity {
+            background: var(--ms-red);
+        }
+
+        .issue-item.warning .issue-severity {
+            background: var(--ms-orange);
+        }
+
+        .issue-item.info .issue-severity {
+            background: var(--ms-blue);
+        }
+
+        .issue-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            margin-bottom: 4px;
+        }
+
+        .issue-description {
+            font-size: 12px;
+            color: var(--ms-gray-90);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .issue-impact {
+            display: flex;
+            gap: 16px;
+            padding: 8px;
+            background: var(--ms-gray-10);
+            border-radius: var(--border-radius);
+            margin-bottom: 8px;
+        }
+
+        .impact-item {
+            font-size: 11px;
+        }
+
+        .impact-label {
+            color: var(--ms-gray-90);
+        }
+
+        .impact-value {
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .impact-value.negative {
+            color: var(--ms-red);
+        }
+
+        .issue-fix {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--ms-gray-30);
+        }
+
+        .fix-text {
+            font-size: 12px;
+            color: var(--ms-gray-90);
+            margin-bottom: 8px;
+        }
+
+        .btn {
+            height: 32px;
+            padding: 0 16px;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+        }
+
+        .btn-primary {
+            background: var(--ms-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--ms-blue-dark);
+        }
+
+        .btn-secondary {
+            background: white;
+            border-color: var(--ms-gray-60);
+            color: var(--ms-gray-110);
+        }
+
+        .btn-secondary:hover {
+            background: var(--ms-gray-20);
+        }
+
+        .btn-sm {
+            height: 24px;
+            font-size: 12px;
+            padding: 0 12px;
+        }
+
+        .optimization-panel {
+            background: white;
+            border-top: 1px solid var(--ms-gray-30);
+            padding: 24px 32px;
+        }
+
+        .optimization-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            margin-bottom: 16px;
+        }
+
+        .comparison-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .comparison-column {
+            padding: 16px;
+            background: var(--ms-gray-10);
+            border-radius: var(--border-radius);
+        }
+
+        .comparison-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .comparison-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+        }
+
+        .comparison-metric-label {
+            color: var(--ms-gray-90);
+        }
+
+        .comparison-metric-value {
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            padding-top: 16px;
+            border-top: 1px solid var(--ms-gray-30);
+        }
+
+        .status-bar {
+            background: var(--ms-gray-110);
+            color: var(--ms-gray-30);
+            padding: 4px 24px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--ms-green);
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .no-issues {
+            padding: 32px;
+            text-align: center;
+        }
+
+        .no-issues-icon {
+            font-size: 48px;
+            color: var(--ms-green);
+            margin-bottom: 16px;
+        }
+
+        .no-issues-text {
+            font-size: 14px;
+            color: var(--ms-gray-90);
+        }
+
+        .alert-banner {
+            background: var(--ms-red);
+            color: white;
+            padding: 12px 24px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-banner.show {
+            display: flex;
+        }
+
+        .alert-banner.warning {
+            background: var(--ms-orange);
+        }
+
+        .alert-icon {
+            font-size: 16px;
+        }
+
+        .alert-text {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .info-icon {
+            color: var(--ms-gray-70);
+            cursor: help;
+            font-size: 12px;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-content {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--ms-gray-110);
+            color: white;
+            text-align: left;
+            border-radius: var(--border-radius);
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 11px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="content-area">
+            <div class="main-header">
+                <div class="header-title">
+                    <div class="ms-logo">PA</div>
+                    <h1>Power Automate Pre-Build Analysis</h1>
+                </div>
+                <div class="metrics-bar">
+                    <div class="metric-item">
+                        <div class="metric-value" id="efficiency-score">0%</div>
+                        <div class="metric-label">Efficiency</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="monthly-cost">£0</div>
+                        <div class="metric-label">Monthly Cost</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="runtime">0s</div>
+                        <div class="metric-label">Runtime</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="risk-level">Low</div>
+                        <div class="metric-label">Risk Level</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-banner" id="alert-banner">
+                <span class="alert-icon">⚠️</span>
+                <span class="alert-text" id="alert-text">Critical issues detected that will prevent your flow from working</span>
+            </div>
+
+            <div class="main-layout">
+                <div class="form-container">
+                    <form id="flow-form">
+                        <div class="form-section">
+                            <h2 class="section-header">Flow Configuration</h2>
+                            <div class="form-grid">
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Items to Process
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">Total number of items your flow will process in each run</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" class="form-input" id="items" value="1000" min="1" max="1000000">
+                                    <div class="form-error" id="items-error"></div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Actions per Item
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">Average number of actions needed to process each item</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" class="form-input" id="actionsPerItem" value="3" min="1" max="100">
+                                    <div class="form-error" id="actions-error"></div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Primary Connector
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">The main service your flow connects to</span>
+                                        </span>
+                                    </label>
+                                    <select class="form-select" id="connector">
+                                        <option value="SharePoint">SharePoint</option>
+                                        <option value="Teams">Teams</option>
+                                        <option value="GraphAPI">Graph API</option>
+                                        <option value="SQL">SQL Server (Premium)</option>
+                                        <option value="CustomHTTP">Custom HTTP (Premium)</option>
+                                        <option value="Dataverse">Dataverse</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Concurrency Level
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">Number of items processed in parallel (1-50)</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" class="form-input" id="concurrency" value="1" min="1" max="50">
+                                    <div class="form-error" id="concurrency-error"></div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Daily Executions
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">How many times per day will this flow run?</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" class="form-input" id="executions" value="1" min="1" max="1440">
+                                    <div class="form-error" id="executions-error"></div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Flow Pattern
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">The architectural pattern of your flow</span>
+                                        </span>
+                                    </label>
+                                    <select class="form-select" id="flowPattern">
+                                        <option value="simple">Simple Sequential</option>
+                                        <option value="apply_to_each">Apply to Each Loop</option>
+                                        <option value="nested_apply">Nested Apply to Each</option>
+                                        <option value="parallel_branches">Parallel Branches</option>
+                                        <option value="child_flows">Child Flows</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Expected Error Rate (%)
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">Percentage of items that might fail</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" class="form-input" id="errorRate" value="5" min="0" max="100">
+                                    <div class="form-error" id="error-error"></div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Average Action Time (ms)
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">How long each action takes to execute</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" class="form-input" id="avgMs" value="500" min="10" max="10000">
+                                    <div class="form-error" id="time-error"></div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">
+                                        Number of Users
+                                        <span class="tooltip">
+                                            <span class="info-icon">ⓘ</span>
+                                            <span class="tooltip-content">Number of users who will use this flow</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" class="form-input" id="users" value="10" min="1" max="10000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2 class="section-header">Licensing & Governance</h2>
+                            <div class="form-grid">
+                                <div class="form-field">
+                                    <label class="form-label">Existing Premium Licenses</label>
+                                    <input type="number" class="form-input" id="premiumLicenses" value="0" min="0" max="10000">
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">Existing Process Licenses</label>
+                                    <input type="number" class="form-input" id="processLicenses" value="0" min="0" max="100">
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">Governance Level</label>
+                                    <select class="form-select" id="governanceLevel">
+                                        <option value="none">None</option>
+                                        <option value="basic">Basic</option>
+                                        <option value="standard">Standard</option>
+                                        <option value="strict">Strict</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="optimization-panel">
+                        <h3 class="optimization-header">Optimization Analysis</h3>
+                        <div class="comparison-table">
+                            <div class="comparison-column">
+                                <div class="comparison-title">Current Configuration</div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Monthly Cost</span>
+                                    <span class="comparison-metric-value" id="current-cost">£0</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Runtime</span>
+                                    <span class="comparison-metric-value" id="current-runtime">0s</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Error Rate</span>
+                                    <span class="comparison-metric-value" id="current-errors">0%</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Throttling Risk</span>
+                                    <span class="comparison-metric-value" id="current-throttling">Low</span>
+                                </div>
+                            </div>
+                            <div class="comparison-column">
+                                <div class="comparison-title">Optimized Configuration</div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Monthly Cost</span>
+                                    <span class="comparison-metric-value" id="optimized-cost">£0</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Runtime</span>
+                                    <span class="comparison-metric-value" id="optimized-runtime">0s</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Error Rate</span>
+                                    <span class="comparison-metric-value" id="optimized-errors">0%</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="comparison-metric-label">Throttling Risk</span>
+                                    <span class="comparison-metric-value" id="optimized-throttling">None</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-bar">
+                            <button type="button" class="btn btn-primary" onclick="applyOptimizations()">Apply Optimizations</button>
+                            <button type="button" class="btn btn-secondary" onclick="exportConfig()">Export Configuration</button>
+                            <button type="button" class="btn btn-secondary" onclick="shareConfig()">Share Link</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="sidebar-header">
+                        <span class="sidebar-title">Issue Analysis</span>
+                        <span class="issue-count-badge" id="issue-count">0</span>
+                    </div>
+                    <div class="issues-list" id="issues-list">
+                        <div class="no-issues">
+                            <div class="no-issues-icon">✓</div>
+                            <div class="no-issues-text">No issues detected. Your flow configuration is optimized.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <span><span class="status-indicator"></span>Analysis Active</span>
+                <span>Last Updated: <span id="last-updated">Just now</span></span>
+                <span>Version 5.0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const AI_MODELS = {
+            'gpt-4o-mini': { creditsPerKTokens: 1, name: 'GPT-4o mini' },
+            'gpt-4': { creditsPerKTokens: 10, name: 'GPT-4' },
+            'gpt-4-turbo': { creditsPerKTokens: 20, name: 'GPT-4 Turbo' }
+        };
+
+        const LICENSES = {
+            premium: { price: 12.20, pprLimit: 40000, aiCredits: 5000 },
+            process: { price: 81.90, pprLimit: 250000, aiCredits: 5000, stackable: true, associatedFlows: 25 },
+            hosted: { price: 118.60, pprLimit: 250000, aiCredits: 5000, hostedMachine: true },
+            copilotStudio: { price: 200, messages: 25000 }
+        };
+
+        const analyzer = {
+            issues: [],
+            
+            connectorLimits: {
+                'SharePoint': { rpm: 600, premium: false },
+                'Teams': { rpm: 120, premium: false },
+                'GraphAPI': { rpm: 150, premium: false },
+                'SQL': { rpm: 300, premium: true },
+                'CustomHTTP': { rpm: 60, premium: true },
+                'Dataverse': { rpm: 6000, premium: false }
+            },
+
+            patternOverhead: {
+                'simple': 1.0,
+                'apply_to_each': 1.1,
+                'nested_apply': 1.4,
+                'parallel_branches': 0.9,
+                'child_flows': 1.1
+            },
+
+            analyze: function() {
+                this.issues = [];
+                const config = this.getConfig();
+                
+                this.checkThrottling(config);
+                this.checkTimeout(config);
+                this.checkLicensing(config);
+                this.checkPerformance(config);
+                this.checkGovernance(config);
+                this.checkCostOptimization(config);
+                this.checkErrorHandling(config);
+                this.checkConcurrency(config);
+                
+                this.updateUI();
+                this.updateMetrics(config);
+                this.updateComparison(config);
+            },
+
+            getConfig: function() {
+                return {
+                    items: parseInt(document.getElementById('items').value) || 0,
+                    actionsPerItem: parseInt(document.getElementById('actionsPerItem').value) || 0,
+                    connector: document.getElementById('connector').value,
+                    concurrency: parseInt(document.getElementById('concurrency').value) || 1,
+                    executions: parseInt(document.getElementById('executions').value) || 1,
+                    flowPattern: document.getElementById('flowPattern').value,
+                    errorRate: parseInt(document.getElementById('errorRate').value) || 0,
+                    avgMs: parseInt(document.getElementById('avgMs').value) || 500,
+                    users: parseInt(document.getElementById('users').value) || 1,
+                    premiumLicenses: parseInt(document.getElementById('premiumLicenses').value) || 0,
+                    processLicenses: parseInt(document.getElementById('processLicenses').value) || 0,
+                    governanceLevel: document.getElementById('governanceLevel').value
+                };
+            },
+
+            checkThrottling: function(config) {
+                const totalActions = config.items * config.actionsPerItem;
+                const runtime = (config.items / config.concurrency) * config.avgMs;
+                const rpm = (totalActions / (runtime / 60000)) * this.patternOverhead[config.flowPattern];
+                const limit = this.connectorLimits[config.connector].rpm;
+                
+                if (rpm > limit * 0.8) {
+                    const severity = rpm > limit ? 'critical' : 'warning';
+                    this.issues.push({
+                        type: severity,
+                        title: 'Throttling Risk',
+                        description: `Flow will generate ${Math.round(rpm)} requests/minute, exceeding ${config.connector} limit of ${limit} RPM.`,
+                        impact: {
+                            'Performance': '-60%',
+                            'Reliability': '-40%'
+                        },
+                        solution: `Reduce concurrency to ${Math.max(1, Math.floor(config.concurrency * (limit / rpm) * 0.8))}`,
+                        autoFix: () => {
+                            document.getElementById('concurrency').value = Math.max(1, Math.floor(config.concurrency * (limit / rpm) * 0.8));
+                            this.analyze();
+                        }
+                    });
+                }
+            },
+
+            checkTimeout: function(config) {
+                const runtime = (config.items / config.concurrency) * config.avgMs * this.patternOverhead[config.flowPattern];
+                const runtimeMinutes = runtime / 60000;
+                
+                if (runtimeMinutes > 30) {
+                    this.issues.push({
+                        type: 'critical',
+                        title: 'Timeout Risk',
+                        description: `Flow runtime of ${Math.round(runtimeMinutes)} minutes exceeds 30-minute limit.`,
+                        impact: {
+                            'Completion': '0%',
+                            'Data Loss': 'High'
+                        },
+                        solution: `Process in batches of ${Math.floor(config.items * 30 / runtimeMinutes)} items`,
+                        autoFix: () => {
+                            document.getElementById('items').value = Math.floor(config.items * 30 / runtimeMinutes);
+                            this.analyze();
+                        }
+                    });
+                }
+            },
+
+            checkLicensing: function(config) {
+                const isPremium = this.connectorLimits[config.connector].premium;
+                
+                if (isPremium && config.premiumLicenses === 0 && config.processLicenses === 0) {
+                    this.issues.push({
+                        type: 'critical',
+                        title: 'Premium License Required',
+                        description: `${config.connector} requires premium licensing (enforced April 1, 2025).`,
+                        impact: {
+                            'Cost': `+£${(config.users * 12.20).toFixed(2)}/mo`,
+                            'Compliance': 'Required'
+                        },
+                        solution: `Add Process license (£81.90/month)`,
+                        autoFix: () => {
+                            document.getElementById('processLicenses').value = 1;
+                            this.analyze();
+                        }
+                    });
+                }
+            },
+
+            checkPerformance: function(config) {
+                if (config.flowPattern === 'nested_apply' && config.items > 1000) {
+                    this.issues.push({
+                        type: 'warning',
+                        title: 'Performance Degradation',
+                        description: 'Nested loops with large datasets cause exponential slowdown.',
+                        impact: {
+                            'Performance': '-40%',
+                            'Memory': 'High'
+                        },
+                        solution: 'Use parallel branches pattern',
+                        autoFix: () => {
+                            document.getElementById('flowPattern').value = 'parallel_branches';
+                            this.analyze();
+                        }
+                    });
+                }
+            },
+
+            checkGovernance: function(config) {
+                if (config.governanceLevel === 'none') {
+                    this.issues.push({
+                        type: 'warning',
+                        title: 'Governance Risk',
+                        description: 'No governance can lead to compliance issues.',
+                        impact: {
+                            'GDPR Risk': 'High',
+                            'Audit': 'Failed'
+                        },
+                        solution: 'Implement basic governance',
+                        autoFix: () => {
+                            document.getElementById('governanceLevel').value = 'basic';
+                            this.analyze();
+                        }
+                    });
+                }
+            },
+
+            checkCostOptimization: function(config) {
+                const monthlyPPR = config.items * config.actionsPerItem * config.executions * 30;
+                const processLicensePPR = 250000 * 30;
+                
+                if (config.premiumLicenses > 3 && monthlyPPR > processLicensePPR) {
+                    const savings = (config.premiumLicenses * 12.20) - 81.90;
+                    if (savings > 0) {
+                        this.issues.push({
+                            type: 'info',
+                            title: 'Cost Optimization',
+                            description: `Save £${savings.toFixed(2)}/month with Process license.`,
+                            impact: {
+                                'Savings': `£${(savings * 12).toFixed(0)}/year`
+                            },
+                            solution: 'Switch to Process license',
+                            autoFix: () => {
+                                document.getElementById('processLicenses').value = 1;
+                                document.getElementById('premiumLicenses').value = 0;
+                                this.analyze();
+                            }
+                        });
+                    }
+                }
+            },
+
+            checkErrorHandling: function(config) {
+                if (config.errorRate > 20) {
+                    this.issues.push({
+                        type: 'warning',
+                        title: 'High Error Rate',
+                        description: `${config.errorRate}% errors will cause excessive retries.`,
+                        impact: {
+                            'PPR Usage': `+${config.errorRate * 2}%`,
+                            'Runtime': `+${config.errorRate}%`
+                        },
+                        solution: 'Implement error handling',
+                        autoFix: () => {
+                            document.getElementById('errorRate').value = 5;
+                            this.analyze();
+                        }
+                    });
+                }
+            },
+
+            checkConcurrency: function(config) {
+                if (config.concurrency === 1 && config.items > 1000) {
+                    const optimal = Math.min(20, Math.ceil(config.items / 100));
+                    const timeSaved = Math.round(((config.items * config.avgMs) - (config.items * config.avgMs / optimal)) / 60000);
+                    
+                    this.issues.push({
+                        type: 'info',
+                        title: 'Performance Optimization',
+                        description: `Enable concurrency to save ${timeSaved} minutes.`,
+                        impact: {
+                            'Runtime': `-${Math.round((1 - 1/optimal) * 100)}%`
+                        },
+                        solution: `Set concurrency to ${optimal}`,
+                        autoFix: () => {
+                            document.getElementById('concurrency').value = optimal;
+                            this.analyze();
+                        }
+                    });
+                }
+            },
+
+            updateUI: function() {
+                const list = document.getElementById('issues-list');
+                const badge = document.getElementById('issue-count');
+                const banner = document.getElementById('alert-banner');
+                
+                if (this.issues.length === 0) {
+                    list.innerHTML = `
+                        <div class="no-issues">
+                            <div class="no-issues-icon">✓</div>
+                            <div class="no-issues-text">No issues detected. Your flow configuration is optimized.</div>
+                        </div>
+                    `;
+                    badge.textContent = '0';
+                    badge.classList.remove('has-issues');
+                    banner.classList.remove('show');
+                } else {
+                    const sortOrder = { critical: 0, warning: 1, info: 2 };
+                    this.issues.sort((a, b) => sortOrder[a.type] - sortOrder[b.type]);
+                    
+                    badge.textContent = this.issues.length;
+                    badge.classList.add('has-issues');
+                    
+                    const critical = this.issues.filter(i => i.type === 'critical').length;
+                    const warning = this.issues.filter(i => i.type === 'warning').length;
+                    
+                    if (critical > 0) {
+                        banner.classList.add('show');
+                        banner.classList.remove('warning');
+                        document.getElementById('alert-text').textContent = `${critical} critical issue${critical > 1 ? 's' : ''} detected that will prevent your flow from working`;
+                    } else if (warning > 0) {
+                        banner.classList.add('show', 'warning');
+                        document.getElementById('alert-text').textContent = `${warning} warning${warning > 1 ? 's' : ''} that may impact performance`;
+                    } else {
+                        banner.classList.remove('show');
+                    }
+                    
+                    list.innerHTML = this.issues.map((issue, idx) => `
+                        <div class="issue-item ${issue.type}">
+                            <div class="issue-severity"></div>
+                            <div class="issue-title">${issue.title}</div>
+                            <div class="issue-description">${issue.description}</div>
+                            ${issue.impact ? `
+                                <div class="issue-impact">
+                                    ${Object.entries(issue.impact).map(([k, v]) => `
+                                        <div class="impact-item">
+                                            <span class="impact-label">${k}:</span>
+                                            <span class="impact-value ${v.toString().startsWith('-') ? 'negative' : ''}">${v}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                            <div class="issue-fix">
+                                <div class="fix-text">${issue.solution}</div>
+                                ${issue.autoFix ? `
+                                    <button class="btn btn-sm btn-primary" onclick="analyzer.issues[${idx}].autoFix()">
+                                        Apply Fix
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+            },
+
+            updateMetrics: function(config) {
+                const efficiency = Math.max(0, 100 - (this.issues.filter(i => i.type === 'critical').length * 20) - (this.issues.filter(i => i.type === 'warning').length * 10));
+                const runtime = (config.items / config.concurrency) * config.avgMs / 1000;
+                
+                let cost = 0;
+                if (config.processLicenses > 0) {
+                    cost = config.processLicenses * 81.90;
+                } else if (config.premiumLicenses > 0) {
+                    cost = config.premiumLicenses * 12.20;
+                } else if (this.connectorLimits[config.connector].premium) {
+                    cost = config.users * 12.20;
+                }
+                
+                const efficiencyEl = document.getElementById('efficiency-score');
+                efficiencyEl.textContent = `${efficiency}%`;
+                efficiencyEl.className = efficiency >= 80 ? 'metric-value good' : efficiency >= 60 ? 'metric-value warning' : 'metric-value critical';
+                
+                document.getElementById('monthly-cost').textContent = `£${cost.toFixed(2)}`;
+                document.getElementById('runtime').textContent = `${Math.round(runtime)}s`;
+                
+                const riskEl = document.getElementById('risk-level');
+                const risk = this.issues.filter(i => i.type === 'critical').length > 0 ? 'High' : 
+                            this.issues.filter(i => i.type === 'warning').length > 0 ? 'Medium' : 'Low';
+                riskEl.textContent = risk;
+                riskEl.className = risk === 'High' ? 'metric-value critical' : risk === 'Medium' ? 'metric-value warning' : 'metric-value good';
+            },
+
+            updateComparison: function(config) {
+                const runtime = (config.items / config.concurrency) * config.avgMs * this.patternOverhead[config.flowPattern] / 1000;
+                
+                let cost = 0;
+                if (config.processLicenses > 0) {
+                    cost = config.processLicenses * 81.90;
+                } else if (config.premiumLicenses > 0) {
+                    cost = config.premiumLicenses * 12.20;
+                } else if (this.connectorLimits[config.connector].premium) {
+                    cost = config.users * 12.20;
+                }
+                
+                document.getElementById('current-cost').textContent = `£${cost.toFixed(2)}`;
+                document.getElementById('current-runtime').textContent = `${Math.round(runtime)}s`;
+                document.getElementById('current-errors').textContent = `${config.errorRate}%`;
+                
+                const rpm = (config.items * config.actionsPerItem / (runtime * 1000 / 60000)) * this.patternOverhead[config.flowPattern];
+                const limit = this.connectorLimits[config.connector].rpm;
+                document.getElementById('current-throttling').textContent = rpm > limit * 0.8 ? 'High' : 'Low';
+                
+                // Calculate optimized values
+                let optConfig = { ...config };
+                if (config.flowPattern === 'nested_apply') optConfig.flowPattern = 'parallel_branches';
+                if (config.concurrency === 1 && config.items > 1000) optConfig.concurrency = Math.min(20, Math.ceil(config.items / 100));
+                if (config.errorRate > 20) optConfig.errorRate = 5;
+                
+                const optRuntime = (optConfig.items / optConfig.concurrency) * optConfig.avgMs * this.patternOverhead[optConfig.flowPattern] / 1000;
+                let optCost = cost;
+                
+                const monthlyPPR = config.items * config.actionsPerItem * config.executions * 30;
+                if (config.premiumLicenses > 3 && monthlyPPR > 7500000) {
+                    optCost = 81.90;
+                }
+                
+                document.getElementById('optimized-cost').textContent = `£${optCost.toFixed(2)}`;
+                document.getElementById('optimized-runtime').textContent = `${Math.round(optRuntime)}s`;
+                document.getElementById('optimized-errors').textContent = `${optConfig.errorRate}%`;
+                document.getElementById('optimized-throttling').textContent = 'None';
+            }
+        };
+
+        function applyOptimizations() {
+            const fixes = analyzer.issues.filter(i => i.autoFix);
+            if (fixes.length === 0) {
+                alert('No optimizations available.');
+                return;
+            }
+            
+            if (confirm(`Apply ${fixes.length} optimization${fixes.length > 1 ? 's' : ''}?`)) {
+                fixes.forEach(issue => issue.autoFix());
+            }
+        }
+
+        function exportConfig() {
+            const config = analyzer.getConfig();
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `flow-config-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function shareConfig() {
+            const config = analyzer.getConfig();
+            const encoded = btoa(JSON.stringify(config));
+            const url = `${window.location.origin}${window.location.pathname}?config=${encoded}`;
+            navigator.clipboard.writeText(url).then(() => alert('Link copied to clipboard'));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load from URL if present
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('config')) {
+                try {
+                    const config = JSON.parse(atob(params.get('config')));
+                    Object.keys(config).forEach(key => {
+                        const el = document.getElementById(key);
+                        if (el) el.value = config[key];
+                    });
+                } catch (e) {}
+            }
+            
+            // Add event listeners
+            document.querySelectorAll('.form-input, .form-select').forEach(el => {
+                el.addEventListener('input', () => analyzer.analyze());
+                el.addEventListener('change', () => analyzer.analyze());
+            });
+            
+            analyzer.analyze();
+        });
+    </script>
+</body>
+</html>

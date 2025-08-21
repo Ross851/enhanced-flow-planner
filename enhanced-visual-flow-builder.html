@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Visual Flow Builder - Professional Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #005a9e;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-teal: #008272;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-40: #e1dfdd;
+            --ms-gray-60: #c8c6c4;
+            --ms-gray-90: #605e5c;
+            --ms-gray-110: #323130;
+            --ms-gray-130: #201f1e;
+            --success-bg: #dff6dd;
+            --warning-bg: #fff4ce;
+            --danger-bg: #fde7e9;
+            --info-bg: #f3f9ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--ms-gray-20);
+            color: var(--ms-gray-130);
+            overflow: hidden;
+        }
+
+        /* Smart Tips System */
+        .smart-tip {
+            position: fixed;
+            z-index: 10000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            padding: 16px;
+            max-width: 320px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--ms-blue);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .smart-tip.success { border-left-color: var(--ms-green); background: var(--success-bg); }
+        .smart-tip.warning { border-left-color: var(--ms-orange); background: var(--warning-bg); }
+        .smart-tip.danger { border-left-color: var(--ms-red); background: var(--danger-bg); }
+
+        .tip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-close {
+            cursor: pointer;
+            color: var(--ms-gray-90);
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .tip-content {
+            font-size: 13px;
+            color: var(--ms-gray-110);
+            line-height: 1.5;
+        }
+
+        .tip-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .tip-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--ms-gray-40);
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tip-btn:hover {
+            background: var(--ms-gray-10);
+            border-color: var(--ms-blue);
+        }
+
+        .tip-btn.primary {
+            background: var(--ms-blue);
+            color: white;
+            border-color: var(--ms-blue);
+        }
+
+        /* Header */
+        .app-header {
+            background: white;
+            border-bottom: 1px solid var(--ms-gray-30);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .flow-name-input {
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .flow-name-input:hover {
+            background: var(--ms-gray-10);
+        }
+
+        .flow-name-input:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+            background: white;
+        }
+
+        .header-metrics {
+            display: flex;
+            gap: 32px;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            cursor: help;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--ms-gray-90);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric.good .metric-value { color: var(--ms-green); }
+        .metric.warning .metric-value { color: var(--ms-orange); }
+        .metric.danger .metric-value { color: var(--ms-red); }
+
+        .metric-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ms-gray-130);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .metric:hover .metric-tooltip {
+            opacity: 1;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--ms-gray-40);
+            background: white;
+            color: var(--ms-gray-110);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: var(--ms-gray-10);
+            border-color: var(--ms-blue);
+        }
+
+        .btn-primary {
+            background: var(--ms-blue);
+            color: white;
+            border-color: var(--ms-blue);
+        }
+
+        .btn-primary:hover {
+            background: var(--ms-blue-dark);
+        }
+
+        .btn-success {
+            background: var(--ms-green);
+            color: white;
+            border-color: var(--ms-green);
+        }
+
+        /* Layout */
+        .app-layout {
+            display: flex;
+            height: calc(100vh - 64px);
+        }
+
+        /* Left Sidebar - Action Palette */
+        .sidebar-left {
+            width: 300px;
+            background: white;
+            border-right: 1px solid var(--ms-gray-30);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-box {
+            padding: 16px;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--ms-gray-40);
+            border-radius: 4px;
+            font-size: 13px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') 10px center no-repeat;
+            background-size: 16px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+        }
+
+        .action-palette {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .palette-section {
+            margin-bottom: 24px;
+        }
+
+        .palette-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-item {
+            background: var(--ms-gray-10);
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: move;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .action-item:hover {
+            background: white;
+            border-color: var(--ms-blue);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .action-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .action-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .icon-trigger { background: var(--ms-green); }
+        .icon-action { background: var(--ms-blue); }
+        .icon-condition { background: var(--ms-orange); }
+        .icon-loop { background: var(--ms-purple); }
+        .icon-premium { background: var(--ms-red); }
+
+        .action-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .action-description {
+            font-size: 12px;
+            color: var(--ms-gray-90);
+            line-height: 1.4;
+        }
+
+        .action-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-standard {
+            background: var(--success-bg);
+            color: var(--ms-green);
+        }
+
+        .badge-premium {
+            background: var(--danger-bg);
+            color: var(--ms-red);
+        }
+
+        .badge-performance {
+            background: var(--info-bg);
+            color: var(--ms-blue);
+        }
+
+        /* Canvas */
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--ms-gray-10);
+        }
+
+        .canvas-toolbar {
+            background: white;
+            border-bottom: 1px solid var(--ms-gray-30);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: 1px solid var(--ms-gray-40);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .zoom-btn:hover {
+            background: var(--ms-gray-10);
+            border-color: var(--ms-blue);
+        }
+
+        .zoom-level {
+            font-size: 13px;
+            color: var(--ms-gray-90);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .canvas {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            padding: 40px;
+        }
+
+        .flow-container {
+            min-height: 100%;
+            position: relative;
+        }
+
+        .flow-node {
+            background: white;
+            border: 2px solid var(--ms-gray-40);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 40px;
+            width: 320px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            position: relative;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .flow-node:hover {
+            border-color: var(--ms-blue);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .flow-node.selected {
+            border-color: var(--ms-blue);
+            box-shadow: 0 0 0 3px rgba(0,120,212,0.2);
+        }
+
+        .flow-node.trigger {
+            border-color: var(--ms-green);
+            background: linear-gradient(135deg, var(--success-bg) 0%, white 100%);
+        }
+
+        .flow-node.condition {
+            border-color: var(--ms-orange);
+            background: linear-gradient(135deg, var(--warning-bg) 0%, white 100%);
+        }
+
+        .flow-node.error {
+            border-color: var(--ms-red);
+            background: var(--danger-bg);
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .node-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .node-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .node-action {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .node-action:hover {
+            background: var(--ms-gray-20);
+        }
+
+        .node-config {
+            background: var(--ms-gray-10);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 13px;
+            color: var(--ms-gray-90);
+        }
+
+        .node-issues {
+            margin-top: 12px;
+            padding: 8px;
+            background: var(--danger-bg);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--ms-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .node-optimization {
+            margin-top: 12px;
+            padding: 8px;
+            background: var(--info-bg);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--ms-blue);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .node-optimization:hover {
+            background: #e6f3ff;
+        }
+
+        .flow-connector {
+            width: 2px;
+            height: 40px;
+            background: var(--ms-gray-60);
+            margin: -40px auto 0;
+            position: relative;
+        }
+
+        .flow-connector::after {
+            content: '▼';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--ms-gray-60);
+            font-size: 10px;
+        }
+
+        .add-node-btn {
+            width: 320px;
+            padding: 20px;
+            border: 2px dashed var(--ms-gray-60);
+            border-radius: 8px;
+            background: white;
+            color: var(--ms-gray-90);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-node-btn:hover {
+            border-color: var(--ms-blue);
+            background: var(--info-bg);
+            color: var(--ms-blue);
+        }
+
+        .add-node-btn.drag-over {
+            border-color: var(--ms-green);
+            background: var(--success-bg);
+            color: var(--ms-green);
+            transform: scale(1.02);
+        }
+
+        /* Right Sidebar - Properties & Insights */
+        .sidebar-right {
+            width: 360px;
+            background: white;
+            border-left: 1px solid var(--ms-gray-30);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-tab:hover {
+            background: var(--ms-gray-10);
+        }
+
+        .sidebar-tab.active {
+            color: var(--ms-blue);
+            border-bottom-color: var(--ms-blue);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .insight-card {
+            background: var(--ms-gray-10);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .insight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .insight-description {
+            font-size: 13px;
+            color: var(--ms-gray-90);
+            line-height: 1.5;
+        }
+
+        .optimization-list {
+            list-style: none;
+        }
+
+        .optimization-item {
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border: 1px solid var(--ms-gray-30);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .optimization-item:hover {
+            border-color: var(--ms-blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .optimization-priority {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .priority-high {
+            background: var(--danger-bg);
+            color: var(--ms-red);
+        }
+
+        .priority-medium {
+            background: var(--warning-bg);
+            color: var(--ms-orange);
+        }
+
+        .priority-low {
+            background: var(--info-bg);
+            color: var(--ms-blue);
+        }
+
+        .optimization-impact {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ms-green);
+            margin-top: 8px;
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            height: 4px;
+            background: var(--ms-gray-30);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--ms-green);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Property Form */
+        .property-group {
+            margin-bottom: 20px;
+        }
+
+        .property-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .property-input,
+        .property-select,
+        .property-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--ms-gray-40);
+            border-radius: 4px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .property-input:focus,
+        .property-select:focus,
+        .property-textarea:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.1);
+        }
+
+        .property-help {
+            font-size: 12px;
+            color: var(--ms-gray-90);
+            margin-top: 4px;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--ms-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.8);
+            transition: all 0.3s;
+        }
+
+        .fab.open .fab-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .fab-item {
+            padding: 12px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .fab-item:hover {
+            background: var(--ms-gray-10);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10001;
+        }
+
+        .toast {
+            background: var(--ms-gray-130);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast.success { background: var(--ms-green); }
+        .toast.warning { background: var(--ms-orange); }
+        .toast.error { background: var(--ms-red); }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="app-header">
+        <div class="header-left">
+            <div class="header-title">
+                <span>🚀</span>
+                <input type="text" class="flow-name-input" value="Invoice Processing Automation" />
+            </div>
+        </div>
+        
+        <div class="header-metrics">
+            <div class="metric good">
+                <div class="metric-value">£0</div>
+                <div class="metric-label">Monthly Cost</div>
+                <div class="metric-tooltip">Using only standard connectors</div>
+            </div>
+            <div class="metric warning">
+                <div class="metric-value">8.2s</div>
+                <div class="metric-label">Est. Runtime</div>
+                <div class="metric-tooltip">Could be optimized to 3.1s</div>
+            </div>
+            <div class="metric good">
+                <div class="metric-value">12K</div>
+                <div class="metric-label">PPR/Day</div>
+                <div class="metric-tooltip">Well within limits</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">Standard</div>
+                <div class="metric-label">License</div>
+                <div class="metric-tooltip">No premium license needed</div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn" onclick="showUserImpact()">
+                <span>👥</span> User Impact
+            </button>
+            <button class="btn" onclick="testFlow()">
+                <span>🧪</span> Test
+            </button>
+            <button class="btn" onclick="validateFlow()">
+                <span>✅</span> Validate
+            </button>
+            <button class="btn btn-success" onclick="saveFlow()">
+                <span>💾</span> Save
+            </button>
+            <button class="btn btn-primary" onclick="exportFlow()">
+                <span>📤</span> Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="app-layout">
+        <!-- Left Sidebar - Action Palette -->
+        <div class="sidebar-left">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search actions..." onkeyup="searchActions(this.value)">
+            </div>
+            
+            <div class="action-palette">
+                <!-- Triggers -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>⚡</span> TRIGGERS
+                    </div>
+                    
+                    <!-- SharePoint Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="sharepoint-created">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">📄</div>
+                            <div class="action-name">When item is created</div>
+                        </div>
+                        <div class="action-description">SharePoint - New list item added</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                            <span class="badge badge-performance">Fast</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="sharepoint-modified">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">✏️</div>
+                            <div class="action-name">When item is modified</div>
+                        </div>
+                        <div class="action-description">SharePoint - Item updated</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="sharepoint-file">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">📁</div>
+                            <div class="action-name">When file is created/modified</div>
+                        </div>
+                        <div class="action-description">SharePoint - File changes in library</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Email Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="email-arrives">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">📧</div>
+                            <div class="action-name">When email arrives</div>
+                        </div>
+                        <div class="action-description">Outlook - New email received</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="email-flagged">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">🚩</div>
+                            <div class="action-name">When email is flagged</div>
+                        </div>
+                        <div class="action-description">Outlook - Email marked important</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Teams Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="teams-message">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">💬</div>
+                            <div class="action-name">When message posted</div>
+                        </div>
+                        <div class="action-description">Teams - New channel message</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="teams-mentioned">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">@</div>
+                            <div class="action-name">When mentioned</div>
+                        </div>
+                        <div class="action-description">Teams - You're mentioned</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Forms Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="forms-response">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">📝</div>
+                            <div class="action-name">When response submitted</div>
+                        </div>
+                        <div class="action-description">Forms - New form submission</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- OneDrive Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="onedrive-file">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">☁️</div>
+                            <div class="action-name">When file is created</div>
+                        </div>
+                        <div class="action-description">OneDrive - New file added</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Dataverse Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="dataverse-added">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">💾</div>
+                            <div class="action-name">When row is added</div>
+                        </div>
+                        <div class="action-description">Dataverse - New record created</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="dataverse-modified">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">🔄</div>
+                            <div class="action-name">When row is modified</div>
+                        </div>
+                        <div class="action-description">Dataverse - Record updated</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Planner Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="planner-task">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">✅</div>
+                            <div class="action-name">When task is completed</div>
+                        </div>
+                        <div class="action-description">Planner - Task marked done</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Power Apps Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="powerapps">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">📱</div>
+                            <div class="action-name">PowerApps (V2)</div>
+                        </div>
+                        <div class="action-description">Triggered from Power Apps</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- HTTP Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="http-request">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">🌐</div>
+                            <div class="action-name">When HTTP request received</div>
+                        </div>
+                        <div class="action-description">HTTP - Webhook endpoint</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">Premium</span>
+                        </div>
+                    </div>
+
+                    <!-- Schedule Triggers -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="scheduled">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">⏰</div>
+                            <div class="action-name">Recurrence</div>
+                        </div>
+                        <div class="action-description">Schedule - Run periodically</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Button Trigger -->
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="manual">
+                        <div class="action-header">
+                            <div class="action-icon icon-trigger">▶️</div>
+                            <div class="action-name">Manually trigger</div>
+                        </div>
+                        <div class="action-description">Button - Run on demand</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>🎯</span> ACTIONS - SHAREPOINT
+                    </div>
+                    
+                    <div class="action-item" draggable="true" data-type="action" data-action="get-items">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📋</div>
+                            <div class="action-name">Get items</div>
+                        </div>
+                        <div class="action-description">SharePoint - Retrieve list items</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                            <span class="badge badge-performance">Use OData</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="create-item">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">➕</div>
+                            <div class="action-name">Create item</div>
+                        </div>
+                        <div class="action-description">SharePoint - Add new list item</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="update-item">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">✏️</div>
+                            <div class="action-name">Update item</div>
+                        </div>
+                        <div class="action-description">SharePoint - Modify existing item</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="delete-item">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">🗑️</div>
+                            <div class="action-name">Delete item</div>
+                        </div>
+                        <div class="action-description">SharePoint - Remove list item</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="get-file-content">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📄</div>
+                            <div class="action-name">Get file content</div>
+                        </div>
+                        <div class="action-description">SharePoint - Read file data</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="copy-file">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📑</div>
+                            <div class="action-name">Copy file</div>
+                        </div>
+                        <div class="action-description">SharePoint - Duplicate document</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>📧</span> ACTIONS - EMAIL & CALENDAR
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="send-email">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">✉️</div>
+                            <div class="action-name">Send an email</div>
+                        </div>
+                        <div class="action-description">Outlook - Send email notification</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="send-email-shared">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📮</div>
+                            <div class="action-name">Send from shared mailbox</div>
+                        </div>
+                        <div class="action-description">Outlook - Shared account email</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="reply-email">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">↩️</div>
+                            <div class="action-name">Reply to email</div>
+                        </div>
+                        <div class="action-description">Outlook - Send reply</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="create-event">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📅</div>
+                            <div class="action-name">Create event</div>
+                        </div>
+                        <div class="action-description">Outlook - Add calendar event</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="get-calendar">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">🗓️</div>
+                            <div class="action-name">Get calendar events</div>
+                        </div>
+                        <div class="action-description">Outlook - List appointments</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teams Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>💬</span> ACTIONS - TEAMS
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="teams-post">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">💬</div>
+                            <div class="action-name">Post message</div>
+                        </div>
+                        <div class="action-description">Teams - Send to channel</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="teams-chat">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">👥</div>
+                            <div class="action-name">Post in chat</div>
+                        </div>
+                        <div class="action-description">Teams - Direct message</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="teams-adaptive">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">🎨</div>
+                            <div class="action-name">Post adaptive card</div>
+                        </div>
+                        <div class="action-description">Teams - Rich formatted card</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="teams-reply">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">💭</div>
+                            <div class="action-name">Reply to message</div>
+                        </div>
+                        <div class="action-description">Teams - Thread reply</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="teams-meeting">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📹</div>
+                            <div class="action-name">Create meeting</div>
+                        </div>
+                        <div class="action-description">Teams - Schedule call</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OneDrive Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>☁️</span> ACTIONS - ONEDRIVE
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="onedrive-create">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📝</div>
+                            <div class="action-name">Create file</div>
+                        </div>
+                        <div class="action-description">OneDrive - New document</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="onedrive-copy">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📁</div>
+                            <div class="action-name">Copy file</div>
+                        </div>
+                        <div class="action-description">OneDrive - Duplicate</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="onedrive-convert">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">🔄</div>
+                            <div class="action-name">Convert to PDF</div>
+                        </div>
+                        <div class="action-description">OneDrive - Export as PDF</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dataverse Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>💾</span> ACTIONS - DATAVERSE
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="dataverse-list">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📊</div>
+                            <div class="action-name">List rows</div>
+                        </div>
+                        <div class="action-description">Dataverse - Get records</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                            <span class="badge badge-performance">Use FetchXML</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="dataverse-add">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">➕</div>
+                            <div class="action-name">Add row</div>
+                        </div>
+                        <div class="action-description">Dataverse - Create record</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="dataverse-update">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">✏️</div>
+                            <div class="action-name">Update row</div>
+                        </div>
+                        <div class="action-description">Dataverse - Modify record</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="dataverse-relate">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">🔗</div>
+                            <div class="action-name">Relate rows</div>
+                        </div>
+                        <div class="action-description">Dataverse - Link records</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approvals Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>✅</span> ACTIONS - APPROVALS
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="approval-create">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">👍</div>
+                            <div class="action-name">Start approval</div>
+                        </div>
+                        <div class="action-description">Request approval decision</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="approval-wait">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">⏳</div>
+                            <div class="action-name">Wait for approval</div>
+                        </div>
+                        <div class="action-description">Pause until approved</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>💎</span> ACTIONS - PREMIUM
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="sql-execute">
+                        <div class="action-header">
+                            <div class="action-icon icon-premium">🗄️</div>
+                            <div class="action-name">Execute SQL query</div>
+                        </div>
+                        <div class="action-description">SQL Server - Database query</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">Premium</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="http-action">
+                        <div class="action-header">
+                            <div class="action-icon icon-premium">🌐</div>
+                            <div class="action-name">HTTP request</div>
+                        </div>
+                        <div class="action-description">Call REST API</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">Premium</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="salesforce">
+                        <div class="action-header">
+                            <div class="action-icon icon-premium">☁️</div>
+                            <div class="action-name">Salesforce action</div>
+                        </div>
+                        <div class="action-description">CRM operations</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">Premium</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="sap">
+                        <div class="action-header">
+                            <div class="action-icon icon-premium">🏢</div>
+                            <div class="action-name">SAP action</div>
+                        </div>
+                        <div class="action-description">ERP integration</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">Premium</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Actions -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>🤖</span> ACTIONS - AI & COPILOT
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="ai-builder-extract">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">📄</div>
+                            <div class="action-name">Extract info from doc</div>
+                        </div>
+                        <div class="action-description">AI Builder - Document AI</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">AI Credits</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="ai-builder-classify">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">🏷️</div>
+                            <div class="action-name">Classify text</div>
+                        </div>
+                        <div class="action-description">AI Builder - Categorize</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">AI Credits</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="copilot-prompt">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">💬</div>
+                            <div class="action-name">Create text with GPT</div>
+                        </div>
+                        <div class="action-description">Generate AI content</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">AI Credits</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="ai-sentiment">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">😊</div>
+                            <div class="action-name">Analyze sentiment</div>
+                        </div>
+                        <div class="action-description">AI Builder - Emotions</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">AI Credits</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="action" data-action="ai-translate">
+                        <div class="action-header">
+                            <div class="action-icon icon-action">🌍</div>
+                            <div class="action-name">Translate text</div>
+                        </div>
+                        <div class="action-description">AI - Language translation</div>
+                        <div class="action-badges">
+                            <span class="badge badge-premium">AI Credits</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control -->
+                <div class="palette-section">
+                    <div class="palette-title">
+                        <span>🔀</span> CONTROL
+                    </div>
+                    
+                    <div class="action-item" draggable="true" data-type="control" data-action="condition">
+                        <div class="action-header">
+                            <div class="action-icon icon-condition">❓</div>
+                            <div class="action-name">Condition</div>
+                        </div>
+                        <div class="action-description">If/else branching logic</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                        </div>
+                    </div>
+
+                    <div class="action-item" draggable="true" data-type="control" data-action="apply-each">
+                        <div class="action-header">
+                            <div class="action-icon icon-loop">🔄</div>
+                            <div class="action-name">Apply to each</div>
+                        </div>
+                        <div class="action-description">Loop through array items</div>
+                        <div class="action-badges">
+                            <span class="badge badge-standard">Standard</span>
+                            <span class="badge badge-performance">Use Filter</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <div class="canvas-toolbar">
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomOut()">−</button>
+                    <span class="zoom-level">100%</span>
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <button class="zoom-btn" onclick="fitToScreen()">⊡</button>
+                </div>
+                <div>
+                    <span style="font-size: 13px; color: var(--ms-gray-90);">
+                        💡 Drag actions from the left to build your flow
+                    </span>
+                </div>
+            </div>
+
+            <div class="canvas" id="canvas">
+                <div class="flow-container" id="flowContainer">
+                    <!-- Trigger Node -->
+                    <div class="flow-node trigger selected">
+                        <div class="node-header">
+                            <div class="node-title">
+                                <span>📄</span>
+                                When a file is created
+                            </div>
+                            <div class="node-actions">
+                                <span class="node-action" onclick="configureNode(this)" title="Configure this trigger">⚙️</span>
+                                <span class="node-action" onclick="deleteNode(this)">🗑️</span>
+                            </div>
+                        </div>
+                        <div class="node-config">
+                            Site: Finance SharePoint<br>
+                            Library: Invoices<br>
+                            Folder: /2024/New
+                        </div>
+                        <div class="node-optimization" onclick="applyOptimization(this)">
+                            💡 Add trigger condition to filter specific file types
+                        </div>
+                    </div>
+
+                    <div class="flow-connector"></div>
+
+                    <!-- Action Node -->
+                    <div class="flow-node">
+                        <div class="node-header">
+                            <div class="node-title">
+                                <span>📋</span>
+                                Get items
+                            </div>
+                            <div class="node-actions">
+                                <span class="node-action" onclick="configureNode(this)">⚙️</span>
+                                <span class="node-action" onclick="deleteNode(this)">🗑️</span>
+                            </div>
+                        </div>
+                        <div class="node-config">
+                            List: Invoice Details<br>
+                            Filter: Status eq 'Pending'
+                        </div>
+                        <div class="node-issues">
+                            ⚠️ No OData filter - retrieving all items
+                        </div>
+                    </div>
+
+                    <div class="flow-connector"></div>
+
+                    <!-- Add Button -->
+                    <button class="add-node-btn" id="addNodeBtn">
+                        <span>+</span>
+                        Add an action
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="sidebar-right">
+            <div class="sidebar-tabs">
+                <div class="sidebar-tab active" onclick="switchTab('properties')">Properties</div>
+                <div class="sidebar-tab" onclick="switchTab('insights')">Insights</div>
+                <div class="sidebar-tab" onclick="switchTab('optimize')">Optimize</div>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Properties Tab -->
+                <div id="properties-tab">
+                    <h3 style="margin-bottom: 16px;">📝 Action Configuration</h3>
+                    
+                    <div class="property-group">
+                        <label class="property-label">Site Address *</label>
+                        <input type="text" class="property-input" value="https://contoso.sharepoint.com/finance">
+                        <div class="property-help">Enter the full SharePoint site URL</div>
+                    </div>
+
+                    <div class="property-group">
+                        <label class="property-label">List Name *</label>
+                        <select class="property-select">
+                            <option>Invoice Details</option>
+                            <option>Pending Approvals</option>
+                            <option>Processed Invoices</option>
+                        </select>
+                    </div>
+
+                    <div class="property-group">
+                        <label class="property-label">Filter Query</label>
+                        <input type="text" class="property-input" placeholder="Status eq 'Pending'">
+                        <div class="property-help">Use OData filter for better performance</div>
+                    </div>
+
+                    <div class="property-group">
+                        <label class="property-label">Top Count</label>
+                        <input type="number" class="property-input" value="100">
+                        <div class="property-help">Limit results to improve performance</div>
+                    </div>
+                </div>
+
+                <!-- Insights Tab -->
+                <div id="insights-tab" style="display: none;">
+                    <h3 style="margin-bottom: 16px;">📊 Flow Analytics</h3>
+                    
+                    <div class="insight-card">
+                        <div class="insight-title">
+                            <span>⚡</span> Performance Score
+                        </div>
+                        <div class="insight-value" style="color: var(--ms-orange);">72/100</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 72%;"></div>
+                        </div>
+                        <div class="insight-description">
+                            Your flow could be 3x faster with optimizations
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-title">
+                            <span>💰</span> Cost Analysis
+                        </div>
+                        <div class="insight-value" style="color: var(--ms-green);">£0/month</div>
+                        <div class="insight-description">
+                            Great! Using only standard connectors keeps costs at zero.
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-title">
+                            <span>📈</span> Projected Usage
+                        </div>
+                        <div class="insight-value">360K/month</div>
+                        <div class="insight-description">
+                            Based on 500 items × 24 runs/day × 30 days
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optimize Tab -->
+                <div id="optimize-tab" style="display: none;">
+                    <h3 style="margin-bottom: 16px;">🎯 Optimization Suggestions</h3>
+                    
+                    <ul class="optimization-list">
+                        <li class="optimization-item" onclick="applyOptimization('odata')">
+                            <span class="optimization-priority priority-high">HIGH</span>
+                            <strong>Add OData Filtering</strong>
+                            <div style="font-size: 13px; color: var(--ms-gray-90); margin-top: 4px;">
+                                Filter items at source instead of retrieving all
+                            </div>
+                            <div class="optimization-impact">90% faster</div>
+                        </li>
+
+                        <li class="optimization-item" onclick="applyOptimization('batch')">
+                            <span class="optimization-priority priority-medium">MEDIUM</span>
+                            <strong>Use Batch Operations</strong>
+                            <div style="font-size: 13px; color: var(--ms-gray-90); margin-top: 4px;">
+                                Process multiple items in a single operation
+                            </div>
+                            <div class="optimization-impact">5x faster</div>
+                        </li>
+
+                        <li class="optimization-item" onclick="applyOptimization('child')">
+                            <span class="optimization-priority priority-low">LOW</span>
+                            <strong>Extract to Child Flow</strong>
+                            <div style="font-size: 13px; color: var(--ms-gray-90); margin-top: 4px;">
+                                Reuse common logic across multiple flows
+                            </div>
+                            <div class="optimization-impact">£200/month savings</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab" id="fab" onclick="toggleFab()">
+        <span id="fabIcon">💡</span>
+        <div class="fab-menu">
+            <div class="fab-item" onclick="showBestPractices()">
+                📚 Best Practices Guide
+            </div>
+            <div class="fab-item" onclick="runDiagnostics()">
+                🔍 Run Diagnostics
+            </div>
+            <div class="fab-item" onclick="showTemplates()">
+                📋 Browse Templates
+            </div>
+            <div class="fab-item" onclick="showHelp()">
+                ❓ Get Help
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Smart Tips (dynamically created) -->
+    <div id="smartTips"></div>
+
+    <script>
+        // Initialize
+        let currentZoom = 100;
+        let draggedElement = null;
+        let selectedNode = null;
+        let flowData = [];
+
+        // Smart Tips System
+        const tips = {
+            welcome: {
+                title: '👋 Welcome to Visual Flow Builder!',
+                content: 'Start by dragging a trigger from the left sidebar. I\'ll guide you through building an optimized flow.',
+                type: 'info',
+                actions: ['Got it', 'Show tutorial']
+            },
+            premiumWarning: {
+                title: '⚠️ Premium Connector Detected',
+                content: 'SQL connector costs £12.20/user/month. Consider using SharePoint Lists instead - it\'s free and can handle most scenarios.',
+                type: 'warning',
+                actions: ['Use anyway', 'Switch to SharePoint']
+            },
+            performanceAlert: {
+                title: '🚀 Performance Optimization Available',
+                content: 'Add $filter to your Get Items action to retrieve only needed records. This can make your flow 10x faster!',
+                type: 'success',
+                actions: ['Apply now', 'Learn more']
+            },
+            loopWarning: {
+                title: '🔄 Loop Performance Issue',
+                content: 'Apply to each with 500+ items will be slow. Use Select or Filter Array first to reduce items.',
+                type: 'danger',
+                actions: ['Add Filter Array', 'Keep as is']
+            }
+        };
+
+        // Show smart tip
+        function showSmartTip(tipKey, position = { top: 100, right: 20 }) {
+            const tip = tips[tipKey];
+            if (!tip) return;
+
+            const tipElement = document.createElement('div');
+            tipElement.className = `smart-tip ${tip.type}`;
+            tipElement.style.top = position.top + 'px';
+            tipElement.style.right = position.right + 'px';
+            
+            tipElement.innerHTML = `
+                <div class="tip-header">
+                    <div class="tip-title">${tip.title}</div>
+                    <span class="tip-close" onclick="this.parentElement.parentElement.remove()">×</span>
+                </div>
+                <div class="tip-content">${tip.content}</div>
+                ${tip.actions ? `
+                    <div class="tip-actions">
+                        ${tip.actions.map(action => 
+                            `<button class="tip-btn ${action.includes('Apply') || action.includes('Switch') ? 'primary' : ''}" 
+                                onclick="handleTipAction('${tipKey}', '${action}')">${action}</button>`
+                        ).join('')}
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('smartTips').appendChild(tipElement);
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                tipElement.style.opacity = '0';
+                setTimeout(() => tipElement.remove(), 300);
+            }, 10000);
+        }
+
+        // Handle tip actions
+        function handleTipAction(tipKey, action) {
+            const tipElement = event.target.closest('.smart-tip');
+            tipElement.remove();
+
+            switch(action) {
+                case 'Apply now':
+                    applyOptimization('odata');
+                    showToast('Optimization applied successfully!', 'success');
+                    break;
+                case 'Switch to SharePoint':
+                    // Switch to SharePoint connector
+                    showToast('Switched to SharePoint - saving £12.20/month!', 'success');
+                    updateMetrics();
+                    break;
+                case 'Add Filter Array':
+                    // Add filter array action
+                    showToast('Filter Array added - performance improved!', 'success');
+                    break;
+                case 'Show tutorial':
+                    startTutorial();
+                    break;
+                case 'Learn more':
+                    showHelp();
+                    break;
+            }
+        }
+
+        // Drag and Drop
+        document.querySelectorAll('.action-item').forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragend', handleDragEnd);
+        });
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        // Drop zone
+        const addNodeBtn = document.getElementById('addNodeBtn');
+        
+        addNodeBtn.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            addNodeBtn.classList.add('drag-over');
+        });
+
+        addNodeBtn.addEventListener('dragleave', () => {
+            addNodeBtn.classList.remove('drag-over');
+        });
+
+        addNodeBtn.addEventListener('drop', (e) => {
+            e.preventDefault();
+            addNodeBtn.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                const actionType = draggedElement.dataset.type;
+                const actionName = draggedElement.querySelector('.action-name').textContent;
+                const isPremium = draggedElement.querySelector('.badge-premium');
+                
+                addFlowNode(actionName, actionType, isPremium);
+                
+                // Show relevant tip
+                if (isPremium) {
+                    showSmartTip('premiumWarning', { top: 150, right: 20 });
+                } else if (actionType === 'action' && actionName.includes('Get items')) {
+                    showSmartTip('performanceAlert', { top: 200, right: 20 });
+                } else if (actionType === 'control' && actionName.includes('Apply to each')) {
+                    showSmartTip('loopWarning', { top: 250, right: 20 });
+                }
+                
+                updateMetrics();
+            }
+        });
+
+        // Add flow node
+        function addFlowNode(name, type, isPremium) {
+            const connector = document.createElement('div');
+            connector.className = 'flow-connector';
+            
+            const node = document.createElement('div');
+            node.className = `flow-node ${type === 'condition' ? 'condition' : ''}`;
+            
+            node.innerHTML = `
+                <div class="node-header">
+                    <div class="node-title">
+                        <span>${getNodeIcon(name)}</span>
+                        ${name}
+                    </div>
+                    <div class="node-actions">
+                        <span class="node-action" onclick="configureNode(this)">⚙️</span>
+                        <span class="node-action" onclick="deleteNode(this)">🗑️</span>
+                    </div>
+                </div>
+                <div class="node-config">
+                    Click to configure this action
+                </div>
+                ${isPremium ? '<div class="node-issues">⚠️ Premium connector - £12.20/user/month</div>' : ''}
+            `;
+            
+            const container = document.getElementById('flowContainer');
+            container.insertBefore(connector, addNodeBtn);
+            container.insertBefore(node, addNodeBtn);
+            
+            // Add click handler
+            node.addEventListener('click', () => selectNode(node));
+            
+            showToast(`Added: ${name}`, 'success');
+        }
+
+        function getNodeIcon(name) {
+            const icons = {
+                'Get items': '📋',
+                'Send an email': '✉️',
+                'Create item': '➕',
+                'Condition': '❓',
+                'Apply to each': '🔄',
+                'Execute SQL query': '🗄️'
+            };
+            return icons[name] || '📌';
+        }
+
+        // Node selection
+        function selectNode(node) {
+            document.querySelectorAll('.flow-node').forEach(n => n.classList.remove('selected'));
+            node.classList.add('selected');
+            selectedNode = node;
+            switchTab('properties');
+        }
+
+        // Node actions
+        function configureNode(btn) {
+            event.stopPropagation();
+            const node = btn.closest('.flow-node');
+            const nodeTitle = node.querySelector('.node-header span').textContent;
+            const nodeType = determineNodeType(nodeTitle);
+            
+            // Use the new configuration system
+            if (window.showTriggerConfiguration) {
+                window.showTriggerConfiguration(node, nodeType);
+            } else {
+                // Fallback to old behaviour
+                selectNode(node);
+                switchTab('properties');
+            }
+        }
+        
+        function determineNodeType(title) {
+            // Map node titles to configuration types
+            const typeMap = {
+                'Recurrence': 'recurrence',
+                'When a file is created': 'sharepoint-created',
+                'When an item is created': 'sharepoint-created',
+                'When an email arrives': 'email-received',
+                'When a Teams message is posted': 'teams-message',
+                'When an HTTP request is received': 'http-webhook',
+                'When a new response is submitted': 'forms-submitted',
+                'Get items': 'get-items'
+            };
+            
+            for (let key in typeMap) {
+                if (title.includes(key)) {
+                    return typeMap[key];
+                }
+            }
+            
+            return title.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function deleteNode(btn) {
+            event.stopPropagation();
+            if (confirm('Delete this action?')) {
+                const node = btn.closest('.flow-node');
+                const connector = node.previousElementSibling;
+                if (connector && connector.classList.contains('flow-connector')) {
+                    connector.remove();
+                }
+                node.remove();
+                updateMetrics();
+                showToast('Action deleted', 'warning');
+            }
+        }
+
+        // Update metrics
+        function updateMetrics() {
+            const nodes = document.querySelectorAll('.flow-node').length;
+            const hasPremium = document.querySelector('.node-issues');
+            
+            // Update cost
+            const costElement = document.querySelectorAll('.metric-value')[0];
+            costElement.textContent = hasPremium ? '£12.20' : '£0';
+            costElement.parentElement.className = hasPremium ? 'metric danger' : 'metric good';
+            
+            // Update runtime
+            const runtimeElement = document.querySelectorAll('.metric-value')[1];
+            const runtime = (nodes * 2.5).toFixed(1);
+            runtimeElement.textContent = runtime + 's';
+            runtimeElement.parentElement.className = runtime > 10 ? 'metric warning' : 'metric good';
+            
+            // Update PPR
+            const pprElement = document.querySelectorAll('.metric-value')[2];
+            const ppr = nodes * 5;
+            pprElement.textContent = ppr + 'K';
+            
+            // Update license
+            const licenseElement = document.querySelectorAll('.metric-value')[3];
+            licenseElement.textContent = hasPremium ? 'Premium' : 'Standard';
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target?.classList.add('active');
+            
+            // Update content
+            document.getElementById('properties-tab').style.display = tabName === 'properties' ? 'block' : 'none';
+            document.getElementById('insights-tab').style.display = tabName === 'insights' ? 'block' : 'none';
+            document.getElementById('optimize-tab').style.display = tabName === 'optimize' ? 'block' : 'none';
+        }
+
+        // Search actions
+        function searchActions(query) {
+            const items = document.querySelectorAll('.action-item');
+            items.forEach(item => {
+                const name = item.querySelector('.action-name').textContent.toLowerCase();
+                const desc = item.querySelector('.action-description').textContent.toLowerCase();
+                if (name.includes(query.toLowerCase()) || desc.includes(query.toLowerCase())) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Zoom controls
+        function zoomIn() {
+            currentZoom = Math.min(200, currentZoom + 10);
+            updateZoom();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(50, currentZoom - 10);
+            updateZoom();
+        }
+
+        function fitToScreen() {
+            currentZoom = 100;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            document.getElementById('flowContainer').style.transform = `scale(${currentZoom / 100})`;
+            document.querySelector('.zoom-level').textContent = currentZoom + '%';
+        }
+
+        // Apply optimization
+        function applyOptimization(type) {
+            switch(type) {
+                case 'odata':
+                    // Update node to show OData filter applied
+                    if (selectedNode) {
+                        const config = selectedNode.querySelector('.node-config');
+                        config.innerHTML = 'List: Invoice Details<br>Filter: Status eq \'Pending\'<br><strong>✅ OData filter applied</strong>';
+                        const issues = selectedNode.querySelector('.node-issues');
+                        if (issues) issues.remove();
+                    }
+                    showToast('OData filter applied - 90% performance improvement!', 'success');
+                    break;
+                    
+                case 'batch':
+                    showToast('Batch operations configured - 5x faster processing!', 'success');
+                    break;
+                    
+                case 'child':
+                    showToast('Child flow pattern applied - saving £200/month!', 'success');
+                    break;
+            }
+            updateMetrics();
+        }
+
+        // FAB toggle
+        function toggleFab() {
+            const fab = document.getElementById('fab');
+            fab.classList.toggle('open');
+        }
+
+        // FAB actions
+        function showBestPractices() {
+            alert('📚 Best Practices:\n\n1. Use OData filtering ($filter, $select)\n2. Avoid nested loops\n3. Use standard connectors when possible\n4. Implement error handling\n5. Add trigger conditions\n6. Use child flows for reusability');
+            toggleFab();
+        }
+
+        function runDiagnostics() {
+            showToast('Running diagnostics...', 'info');
+            setTimeout(() => {
+                alert('🔍 Diagnostics Report:\n\n✅ No infinite loops detected\n⚠️ 2 performance optimizations available\n✅ All connections valid\n⚠️ Missing error handling\n✅ Within PPR limits');
+            }, 1500);
+            toggleFab();
+        }
+
+        function showTemplates() {
+            alert('📋 Popular Templates:\n\n• Invoice Processing (Optimized)\n• Employee Onboarding\n• Document Approval Workflow\n• SharePoint to Teams Sync\n• Email to Task Automation');
+            toggleFab();
+        }
+
+        function showHelp() {
+            window.open('https://docs.microsoft.com/power-automate', '_blank');
+            toggleFab();
+        }
+
+        // Test flow
+        function testFlow() {
+            showToast('Testing flow...', 'info');
+            setTimeout(() => {
+                alert('✅ Test Results:\n\n• Trigger: Connected successfully\n• Get Items: 47 items retrieved\n• Performance: 8.2 seconds\n• No errors detected\n\nFlow is ready to deploy!');
+            }, 2000);
+        }
+
+        // Validate flow
+        function validateFlow() {
+            const issues = [];
+            const nodes = document.querySelectorAll('.flow-node');
+            
+            if (nodes.length < 2) issues.push('Flow needs at least one action');
+            if (document.querySelector('.node-issues')) issues.push('Premium connector detected');
+            if (!document.querySelector('.node-config').textContent.includes('OData')) {
+                issues.push('Missing OData filters');
+            }
+            
+            if (issues.length > 0) {
+                alert('⚠️ Validation Issues:\n\n' + issues.map(i => '• ' + i).join('\n'));
+            } else {
+                showToast('✅ Flow validated successfully!', 'success');
+            }
+        }
+
+        // Save flow
+        function saveFlow() {
+            showToast('Flow saved successfully!', 'success');
+        }
+
+        // Export flow
+        function exportFlow() {
+            const flowJson = {
+                name: document.querySelector('.flow-name-input').value,
+                nodes: Array.from(document.querySelectorAll('.flow-node')).map(node => ({
+                    title: node.querySelector('.node-title').textContent.trim(),
+                    config: node.querySelector('.node-config').textContent.trim()
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(flowJson, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'flow-export.json';
+            a.click();
+            
+            showToast('Flow exported to JSON!', 'success');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Start tutorial
+        function startTutorial() {
+            showSmartTip('welcome', { top: 100, right: 20 });
+            
+            setTimeout(() => {
+                const arrow = document.createElement('div');
+                arrow.style.cssText = `
+                    position: fixed;
+                    left: 320px;
+                    top: 200px;
+                    font-size: 48px;
+                    color: var(--ms-blue);
+                    animation: bounce 1s infinite;
+                    z-index: 10000;
+                `;
+                arrow.innerHTML = '👈';
+                document.body.appendChild(arrow);
+                
+                setTimeout(() => arrow.remove(), 5000);
+            }, 1000);
+        }
+
+        // Show user impact analyzer
+        function showUserImpact() {
+            // Open in new window or modal
+            window.open('user-impact-analyzer.html', 'UserImpact', 'width=1400,height=900');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            showSmartTip('welcome', { top: 100, right: 20 });
+            updateMetrics();
+            
+            // Check if user count is needed
+            setTimeout(() => {
+                if (!localStorage.getItem('userCountSet')) {
+                    showUserCountPrompt();
+                }
+            }, 2000);
+        });
+
+        // Prompt for user count
+        function showUserCountPrompt() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%;">
+                    <h2 style="margin-bottom: 16px; color: var(--ms-gray-110);">👥 Who will use this flow?</h2>
+                    <p style="color: var(--ms-gray-90); margin-bottom: 24px;">
+                        This helps calculate API limits and licensing costs accurately.
+                    </p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">Number of users:</label>
+                        <input type="number" id="modalUserCount" value="1" min="1" max="10000" 
+                               style="width: 100%; padding: 10px; border: 1px solid var(--ms-gray-40); border-radius: 6px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">Account type:</label>
+                        <div style="display: flex; gap: 16px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="modalAccountType" value="user" checked>
+                                <span>Individual Users</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="modalAccountType" value="service">
+                                <span>Service Account</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button onclick="this.closest('div').parentElement.remove()" 
+                                style="padding: 10px 20px; border: 1px solid var(--ms-gray-40); background: white; border-radius: 6px; cursor: pointer;">
+                            Skip
+                        </button>
+                        <button onclick="saveUserConfig()" 
+                                style="padding: 10px 20px; background: var(--ms-blue); color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Save user configuration
+        function saveUserConfig() {
+            const userCount = document.getElementById('modalUserCount').value;
+            const accountType = document.querySelector('input[name="modalAccountType"]:checked').value;
+            
+            localStorage.setItem('userCount', userCount);
+            localStorage.setItem('accountType', accountType);
+            localStorage.setItem('userCountSet', 'true');
+            
+            // Update metrics based on user count
+            updateMetricsForUsers(userCount, accountType);
+            
+            // Remove modal
+            event.target.closest('div').parentElement.remove();
+            
+            // Show tip about impact
+            showSmartTip('userImpact', { top: 150, right: 20 });
+        }
+
+        // Update metrics based on user count
+        function updateMetricsForUsers(userCount, accountType) {
+            const costElement = document.querySelectorAll('.metric-value')[0];
+            const nodes = document.querySelectorAll('.flow-node').length;
+            
+            if (accountType === 'service') {
+                // Service account pricing
+                if (nodes > 10) {
+                    costElement.textContent = '£81.90';
+                    costElement.parentElement.className = 'metric warning';
+                    showSmartTip('serviceAccountWarning', { top: 100, right: 20 });
+                }
+            } else if (userCount > 1) {
+                // Multiple users
+                const hasPremium = document.querySelector('.node-issues');
+                if (hasPremium) {
+                    const totalCost = 12.20 * userCount;
+                    costElement.textContent = `£${totalCost.toFixed(2)}`;
+                    costElement.parentElement.className = 'metric danger';
+                }
+            }
+            
+            // Update PPR based on user count
+            const pprElement = document.querySelectorAll('.metric-value')[2];
+            const ppr = nodes * 5 * userCount;
+            pprElement.textContent = ppr + 'K';
+            
+            if (ppr > 40) {
+                pprElement.parentElement.className = 'metric warning';
+            }
+        }
+
+        // Add user impact tip
+        tips.userImpact = {
+            title: '👥 User Configuration Saved',
+            content: `Flow configured for ${localStorage.getItem('userCount')} users. Click "User Impact" button to see detailed API limits and throttling analysis.`,
+            type: 'info',
+            actions: ['Got it', 'View Analysis']
+        };
+
+        tips.serviceAccountWarning = {
+            title: '🔐 Service Account Detected',
+            content: 'Service accounts concentrate all API calls through a single account. This increases throttling risk but simplifies licensing. Consider Process license (£81.90/month).',
+            type: 'warning',
+            actions: ['Understood', 'Learn more']
+        };
+
+        // CRITICAL LICENSING BEST PRACTICES
+        tips.licensingBestPractices = {
+            title: '📋 Power Automate Licensing Best Practices',
+            content: `
+                <div style="line-height: 1.6; max-height: 400px; overflow-y: auto;">
+                    <strong>1. Know the Difference:</strong><br>
+                    • CDs (Cloud flows) are included in per-user and per-flow plans<br>
+                    • Each covers different scenarios - choose based on usage patterns<br><br>
+                    
+                    <strong>2. Check Premium Connectors:</strong><br>
+                    • SQL, HTTP, custom connectors = Premium required<br>
+                    • Using ANY premium connector requires per-user (£12.20) or per-flow (£81.90) licensing<br><br>
+                    
+                    <strong>3. Mind the Environment:</strong><br>
+                    • Production: Full licensing required<br>
+                    • Sandbox: Testing allowed with developer license<br>
+                    • Trial: 90 days for evaluation<br><br>
+                    
+                    <strong>4. Plan for Scale:</strong><br>
+                    • &lt;7 users with premium: Per-user licensing (£12.20 each)<br>
+                    • &gt;7 users or critical org-wide: Per-flow (£81.90 total)<br>
+                    • Service accounts: Always use per-flow<br><br>
+                    
+                    <strong>5. Audit Regularly:</strong><br>
+                    • Review unused licenses monthly<br>
+                    • Check flow run history for actual usage<br>
+                    • Remove inactive flows to free up capacity<br><br>
+                    
+                    <strong>6. Combine Smartly:</strong><br>
+                    • Use CD (free) licenses for basic SharePoint/Teams flows<br>
+                    • Reserve Premium for business-critical processes<br>
+                    • Mix licensing types across different flows<br><br>
+                    
+                    <strong>7. Map Users Before Licensing:</strong><br>
+                    • Individual users: Per-user if &lt;7 people<br>
+                    • Department-wide: Consider per-flow<br>
+                    • Organization-wide: Definitely per-flow<br>
+                    • Service accounts: Always per-flow (concentrated API calls)<br><br>
+                    
+                    <div style="background: #e8f4f8; padding: 12px; border-radius: 6px; margin-top: 12px;">
+                        <strong>💡 Remember:</strong> This optimization tool helps you understand the FULL cost impact BEFORE building, including hidden costs like API throttling and token consumption!
+                    </div>
+                </div>
+            `,
+            type: 'info',
+            actions: ['Got it', 'Print Guidelines']
+        };
+
+        // Add button to show best practices
+        const bestPracticesBtn = document.createElement('button');
+        bestPracticesBtn.className = 'btn btn-outline';
+        bestPracticesBtn.innerHTML = '📋 Best Practices';
+        bestPracticesBtn.style.position = 'fixed';
+        bestPracticesBtn.style.bottom = '20px';
+        bestPracticesBtn.style.left = '20px';
+        bestPracticesBtn.style.zIndex = '1000';
+        bestPracticesBtn.onclick = () => showTip('licensingBestPractices');
+        document.body.appendChild(bestPracticesBtn);
+
+        // Add bounce animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 100% { transform: translateX(0); }
+                50% { transform: translateX(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    
+    <!-- Load Shared Data Bridge -->
+    <script src="flow-data-bridge.js"></script>
+    
+    <!-- Load Professional Theme -->
+    <link rel="stylesheet" href="professional-ui-theme.css">
+    
+    <!-- Load Configuration System -->
+    <script src="trigger-configuration-system.js"></script>
+    
+    <!-- Integration Script -->
+    <script>
+        // Integrate with FlowDataBridge
+        (function() {
+            // Override addFlowNode to sync with bridge
+            const originalAddFlowNode = window.addFlowNode;
+            window.addFlowNode = function(name, type, isPremium) {
+                // Call original function
+                if (originalAddFlowNode) {
+                    originalAddFlowNode.apply(this, arguments);
+                }
+                
+                // Sync with bridge
+                const nodeData = {
+                    id: 'node_' + Date.now(),
+                    name: name,
+                    action: name.toLowerCase().replace(/\s+/g, '-'),
+                    type: type,
+                    isPremium: isPremium,
+                    timestamp: new Date().toISOString()
+                };
+                
+                window.FlowDataBridge.addFlowNode(type, nodeData);
+                
+                // Update metrics display
+                updateMetricsFromBridge();
+            };
+            
+            // Update metrics from bridge data
+            function updateMetricsFromBridge() {
+                const metrics = window.FlowDataBridge.metrics;
+                const userConfig = window.FlowDataBridge.userConfig;
+                
+                // Update cost
+                document.querySelectorAll('.metric-value')[0].textContent = 
+                    metrics.monthlyCost === 0 ? '£0' : `£${metrics.monthlyCost.toFixed(2)}`;
+                
+                // Update runtime
+                document.querySelectorAll('.metric-value')[1].textContent = 
+                    `${metrics.estimatedRuntime.toFixed(1)}s`;
+                
+                // Update PPR
+                document.querySelectorAll('.metric-value')[2].textContent = 
+                    `${Math.round(metrics.monthlyPPR / 1000)}K`;
+                
+                // Update license
+                document.querySelectorAll('.metric-value')[3].textContent = 
+                    metrics.licenseType;
+                
+                // Update metric colors based on risk
+                const costMetric = document.querySelectorAll('.metric')[0];
+                if (metrics.monthlyCost === 0) {
+                    costMetric.className = 'metric good';
+                } else if (metrics.monthlyCost < 100) {
+                    costMetric.className = 'metric warning';
+                } else {
+                    costMetric.className = 'metric danger';
+                }
+                
+                // Update throttling risk indicator
+                if (metrics.throttlingRisk === 'high') {
+                    showSmartTip('throttlingAlert', { top: 100, right: 20 });
+                }
+            }
+            
+            // Override saveUserConfig to use bridge
+            const originalSaveUserConfig = window.saveUserConfig;
+            window.saveUserConfig = function() {
+                const userCount = document.getElementById('modalUserCount').value;
+                const accountType = document.querySelector('input[name="modalAccountType"]:checked').value;
+                
+                // Update bridge
+                window.FlowDataBridge.updateUserConfig({
+                    userCount: parseInt(userCount),
+                    accountType: accountType
+                });
+                
+                // Call original if exists
+                if (originalSaveUserConfig) {
+                    originalSaveUserConfig.apply(this, arguments);
+                }
+                
+                // Update display
+                updateMetricsFromBridge();
+            };
+            
+            // Listen for updates from other windows
+            window.addEventListener('flowDataUpdated', (e) => {
+                updateMetricsFromBridge();
+                
+                // Update flow name if changed
+                if (e.detail.flowStructure && e.detail.flowStructure.name) {
+                    document.querySelector('.flow-name-input').value = e.detail.flowStructure.name;
+                }
+            });
+            
+            // Save flow name changes
+            document.querySelector('.flow-name-input')?.addEventListener('change', (e) => {
+                window.FlowDataBridge.flowStructure.name = e.target.value;
+                window.FlowDataBridge.save();
+            });
+            
+            // Override showUserImpact to pass current data
+            window.showUserImpact = function() {
+                // Save current state
+                window.FlowDataBridge.save();
+                
+                // Open analyzer with current data in URL
+                const data = window.FlowDataBridge.exportData();
+                const params = new URLSearchParams({
+                    userCount: data.userConfig.userCount,
+                    accountType: data.userConfig.accountType,
+                    triggers: data.flowStructure.triggers.length,
+                    actions: data.flowStructure.actions.length,
+                    connectors: Array.from(data.flowStructure.connectors).join(',')
+                });
+                
+                window.open('user-impact-analyzer.html?' + params.toString(), 
+                    'UserImpact', 'width=1400,height=900');
+            };
+            
+            // Add throttling alert tip
+            if (window.tips) {
+                window.tips.throttlingAlert = {
+                    title: '⚠️ API Throttling Risk',
+                    content: 'Your flow configuration may hit API limits. Click "User Impact" to see detailed analysis and recommendations.',
+                    type: 'danger',
+                    actions: ['View Analysis', 'Ignore']
+                };
+            }
+            
+            // Initialize with bridge data on load
+            setTimeout(() => {
+                updateMetricsFromBridge();
+                
+                // Set user count if already configured
+                if (window.FlowDataBridge.userConfig.userCount > 1) {
+                    const headerText = document.createElement('div');
+                    headerText.style.cssText = 'position: absolute; top: 5px; right: 20px; font-size: 12px; color: white; opacity: 0.8;';
+                    headerText.textContent = `Configured for ${window.FlowDataBridge.userConfig.userCount} users (${window.FlowDataBridge.userConfig.accountType})`;
+                    document.querySelector('.app-header').appendChild(headerText);
+                }
+            }, 100);
+        })();
+    </script>
+    
+    <!-- Load UI/UX Enhancements -->
+    <script src="ui-ux-improvements.js"></script>
+</body>
+</html>

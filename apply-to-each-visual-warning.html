@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply to Each Impact Visualiser - CRITICAL WARNING SYSTEM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --danger: #d13438;
+            --warning: #ff8c00;
+            --success: #107c10;
+            --primary: #0078d4;
+            --surface: #ffffff;
+            --surface-secondary: #faf9f8;
+            --text-primary: #323130;
+            --text-secondary: #605e5c;
+            --font-system: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-system);
+            background: #f3f2f1;
+            padding: 20px;
+        }
+
+        .warning-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* CRITICAL WARNING BANNER */
+        .critical-warning {
+            background: var(--danger);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+
+        .critical-warning h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-icon {
+            font-size: 32px;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        /* Impact Calculator */
+        .impact-calculator {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .calculator-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .input-field {
+            padding: 10px;
+            border: 2px solid #e1dfdd;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Results Display */
+        .results-panel {
+            background: linear-gradient(135deg, #fee0e0, #fff4ce);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid var(--danger);
+        }
+
+        .result-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .result-card.success {
+            border-left-color: var(--success);
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .result-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Visual Comparison */
+        .comparison-section {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .comparison-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .comparison-bars {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .bar-container {
+            flex: 1;
+        }
+
+        .bar-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .bar-visual {
+            height: 200px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--danger);
+            transition: height 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .bar-fill.optimised {
+            background: var(--success);
+        }
+
+        /* Examples Section */
+        .examples-section {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .example-card {
+            border: 2px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .example-card.bad {
+            border-color: var(--danger);
+            background: #fff5f5;
+        }
+
+        .example-card.good {
+            border-color: var(--success);
+            background: #f5fff5;
+        }
+
+        .example-badge {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-bad {
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .badge-good {
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .example-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .example-code {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+
+        .example-impact {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e1dfdd;
+        }
+
+        .impact-stat {
+            text-align: center;
+        }
+
+        .impact-number {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .impact-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendations-section {
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .recommendation-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .recommendation-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid white;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-desc {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        /* Calculate Button */
+        .calculate-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calculate-btn:hover {
+            background: #005a9e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Nested Loop Warning */
+        .nested-warning {
+            background: var(--danger);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .nested-warning.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nested-calculation {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-family: 'Consolas', monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Critical Warning -->
+    <div class="warning-container">
+        <div class="critical-warning">
+            <h1>
+                <span class="warning-icon">⚠️</span>
+                CRITICAL: Apply to Each Multiplies API Calls!
+            </h1>
+            <p>Each iteration of Apply to Each executes ALL actions inside as separate API calls. This is the #1 cause of flow failures and throttling!</p>
+        </div>
+
+        <!-- Impact Calculator -->
+        <div class="impact-calculator">
+            <h2 class="calculator-title">Apply to Each Impact Calculator</h2>
+            
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label class="input-label">Number of Items</label>
+                    <input type="number" class="input-field" id="itemCount" value="100" min="1">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Actions Inside Loop</label>
+                    <input type="number" class="input-field" id="actionsInLoop" value="3" min="1">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Daily Flow Runs</label>
+                    <input type="number" class="input-field" id="dailyRuns" value="10" min="1">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Concurrency</label>
+                    <input type="number" class="input-field" id="concurrency" value="1" min="1" max="50">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Nested Loops?</label>
+                    <select class="input-field" id="hasNested">
+                        <option value="no">No</option>
+                        <option value="yes">Yes - DANGER!</option>
+                    </select>
+                </div>
+                
+                <div class="input-group" id="nestedItemsGroup" style="display: none;">
+                    <label class="input-label">Items in Nested Loop</label>
+                    <input type="number" class="input-field" id="nestedItems" value="50" min="1">
+                </div>
+            </div>
+            
+            <button class="calculate-btn" onclick="calculateImpact()">Calculate Impact</button>
+            
+            <!-- Results -->
+            <div class="results-panel" id="resultsPanel" style="display: none;">
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-value" id="singleRunCalls">0</div>
+                        <div class="result-label">API Calls Per Run</div>
+                    </div>
+                    
+                    <div class="result-card warning">
+                        <div class="result-value" id="dailyCalls">0</div>
+                        <div class="result-label">Daily API Calls</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-value" id="monthlyCalls">0</div>
+                        <div class="result-label">Monthly API Calls</div>
+                    </div>
+                    
+                    <div class="result-card warning">
+                        <div class="result-value" id="estimatedTime">0</div>
+                        <div class="result-label">Estimated Time</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-value" id="throttlingRisk">Low</div>
+                        <div class="result-label">Throttling Risk</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nested Warning -->
+            <div class="nested-warning" id="nestedWarning">
+                <h3>🚨 EXPONENTIAL DISASTER DETECTED!</h3>
+                <p>Nested Apply to Each creates exponential API calls!</p>
+                <div class="nested-calculation" id="nestedCalc"></div>
+            </div>
+        </div>
+
+        <!-- Visual Comparison -->
+        <div class="comparison-section">
+            <h3 class="comparison-title">Impact Comparison</h3>
+            <div class="comparison-bars">
+                <div class="bar-container">
+                    <div class="bar-label">❌ Without Optimisation</div>
+                    <div class="bar-visual">
+                        <div class="bar-fill" id="barBad" style="height: 0%;">
+                            <span id="barBadText">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bar-container">
+                    <div class="bar-label">✅ With Filter & Select</div>
+                    <div class="bar-visual">
+                        <div class="bar-fill optimised" id="barGood" style="height: 0%;">
+                            <span id="barGoodText">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examples -->
+        <div class="examples-section">
+            <h3 class="calculator-title">Real-World Examples</h3>
+            <div class="example-grid">
+                <div class="example-card bad">
+                    <span class="example-badge badge-bad">Bad Practice</span>
+                    <div class="example-title">Unfiltered Loop</div>
+                    <div class="example-code">
+                        Get Items (5000 records)<br>
+                        ↓<br>
+                        Apply to Each<br>
+                        &nbsp;&nbsp;→ Condition (Status = Active)<br>
+                        &nbsp;&nbsp;→ Update Item<br>
+                        &nbsp;&nbsp;→ Send Email
+                    </div>
+                    <div class="example-impact">
+                        <div class="impact-stat">
+                            <div class="impact-number" style="color: var(--danger);">15,000</div>
+                            <div class="impact-label">API Calls</div>
+                        </div>
+                        <div class="impact-stat">
+                            <div class="impact-number" style="color: var(--danger);">125 min</div>
+                            <div class="impact-label">Runtime</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="example-card good">
+                    <span class="example-badge badge-good">Best Practice</span>
+                    <div class="example-title">Optimised with Filter</div>
+                    <div class="example-code">
+                        Get Items (Filter: Status eq 'Active')<br>
+                        ↓ Returns 100 items<br>
+                        Select (ID, Title, Email)<br>
+                        ↓<br>
+                        Apply to Each (Concurrency: 20)<br>
+                        &nbsp;&nbsp;→ Batch Update
+                    </div>
+                    <div class="example-impact">
+                        <div class="impact-stat">
+                            <div class="impact-number" style="color: var(--success);">101</div>
+                            <div class="impact-label">API Calls</div>
+                        </div>
+                        <div class="impact-stat">
+                            <div class="impact-number" style="color: var(--success);">3 min</div>
+                            <div class="impact-label">Runtime</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations-section">
+            <h3 style="font-size: 20px; margin-bottom: 20px;">Critical Optimisation Strategies</h3>
+            <div class="recommendation-list">
+                <div class="recommendation-item">
+                    <div class="recommendation-title">1. ALWAYS Filter at Source</div>
+                    <div class="recommendation-desc">
+                        Use OData filters in Get Items: Status eq 'Active' and Modified gt '2024-01-01'
+                        This can reduce iterations by 90-95%!
+                    </div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-title">2. Use Select Before Apply to Each</div>
+                    <div class="recommendation-desc">
+                        Map complex objects to simple structure. Only include fields you need.
+                        Reduces memory usage and improves performance by 50%.
+                    </div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-title">3. Enable Concurrency (Carefully)</div>
+                    <div class="recommendation-desc">
+                        Set to 20-50 for parallel processing. Watch API limits!
+                        Can improve speed by 10x but increases API calls per minute.
+                    </div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-title">4. NEVER Nest Apply to Each</div>
+                    <div class="recommendation-desc">
+                        100 outer × 50 inner = 5,000 iterations! Use Filter Array or restructure data.
+                        Exponential complexity will cause failures.
+                    </div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-title">5. Consider Batch Operations</div>
+                    <div class="recommendation-desc">
+                        Instead of updating items one by one, use SharePoint $batch or SQL bulk operations.
+                        Reduces 1000 API calls to 1!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load the calculator
+        document.getElementById('hasNested').addEventListener('change', function() {
+            const nestedGroup = document.getElementById('nestedItemsGroup');
+            nestedGroup.style.display = this.value === 'yes' ? 'block' : 'none';
+        });
+
+        function calculateImpact() {
+            const itemCount = parseInt(document.getElementById('itemCount').value);
+            const actionsInLoop = parseInt(document.getElementById('actionsInLoop').value);
+            const dailyRuns = parseInt(document.getElementById('dailyRuns').value);
+            const concurrency = parseInt(document.getElementById('concurrency').value);
+            const hasNested = document.getElementById('hasNested').value === 'yes';
+            const nestedItems = parseInt(document.getElementById('nestedItems').value);
+            
+            // Calculate API calls
+            let singleRunCalls = itemCount * actionsInLoop;
+            
+            if (hasNested) {
+                singleRunCalls *= nestedItems;
+                
+                // Show nested warning
+                const nestedWarning = document.getElementById('nestedWarning');
+                nestedWarning.classList.add('show');
+                document.getElementById('nestedCalc').innerHTML = `
+                    Calculation: ${itemCount} outer items × ${nestedItems} inner items × ${actionsInLoop} actions<br>
+                    = ${singleRunCalls.toLocaleString()} API calls per run!<br>
+                    = ${(singleRunCalls * dailyRuns * 30).toLocaleString()} API calls per month!
+                `;
+            }
+            
+            const dailyCalls = singleRunCalls * dailyRuns;
+            const monthlyCalls = dailyCalls * 30;
+            
+            // Calculate time
+            const timePerCall = concurrency > 1 ? 0.5 : 1.5;
+            const totalSeconds = (singleRunCalls * timePerCall) / Math.min(concurrency, 50);
+            const totalMinutes = Math.round(totalSeconds / 60);
+            
+            // Calculate throttling risk
+            const callsPerMinute = actionsInLoop * Math.min(concurrency, 50);
+            let throttlingRisk = 'Low';
+            let riskColor = 'var(--success)';
+            
+            if (callsPerMinute > 300) {
+                throttlingRisk = 'CRITICAL';
+                riskColor = 'var(--danger)';
+            } else if (callsPerMinute > 200) {
+                throttlingRisk = 'High';
+                riskColor = 'var(--warning)';
+            } else if (callsPerMinute > 100) {
+                throttlingRisk = 'Medium';
+                riskColor = 'var(--warning)';
+            }
+            
+            // Update display
+            document.getElementById('singleRunCalls').textContent = singleRunCalls.toLocaleString();
+            document.getElementById('dailyCalls').textContent = dailyCalls.toLocaleString();
+            document.getElementById('monthlyCalls').textContent = monthlyCalls.toLocaleString();
+            document.getElementById('estimatedTime').textContent = totalMinutes + ' min';
+            document.getElementById('throttlingRisk').textContent = throttlingRisk;
+            document.getElementById('throttlingRisk').style.color = riskColor;
+            
+            // Show results
+            document.getElementById('resultsPanel').style.display = 'block';
+            
+            // Update comparison bars
+            const optimisedCalls = Math.ceil(singleRunCalls * 0.05); // 95% reduction possible
+            const maxCalls = Math.max(singleRunCalls, 1000);
+            
+            document.getElementById('barBad').style.height = Math.min((singleRunCalls / maxCalls) * 100, 100) + '%';
+            document.getElementById('barBadText').textContent = singleRunCalls.toLocaleString();
+            
+            document.getElementById('barGood').style.height = Math.max((optimisedCalls / maxCalls) * 100, 5) + '%';
+            document.getElementById('barGoodText').textContent = optimisedCalls.toLocaleString();
+        }
+        
+        // Calculate on load with defaults
+        calculateImpact();
+    </script>
+</body>
+</html>

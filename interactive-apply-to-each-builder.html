@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply to Each - Interactive Builder - SEE What Happens Inside!</title>
+    <style>
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #004578;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-90: #605e5c;
+            --ms-gray-130: #323130;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Tutorial Mode */
+        .tutorial-banner {
+            background: var(--ms-blue);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+
+        .step-indicator {
+            background: white;
+            color: var(--ms-blue);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: 700;
+        }
+
+        /* Main Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 400px;
+            gap: 20px;
+        }
+
+        /* Action Library */
+        .action-library {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .library-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        .action-card {
+            background: var(--ms-gray-10);
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-card:hover {
+            background: var(--ms-blue);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .action-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .action-icon {
+            font-size: 24px;
+        }
+
+        .action-details {
+            flex: 1;
+        }
+
+        .action-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .action-api {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* Flow Builder */
+        .flow-builder {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .builder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .builder-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--ms-gray-130);
+        }
+
+        .reset-btn {
+            background: var(--ms-gray-90);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Flow Steps */
+        .flow-container {
+            min-height: 500px;
+        }
+
+        .flow-step {
+            background: var(--ms-gray-10);
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .flow-step.trigger {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .step-info {
+            font-size: 13px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        /* Apply to Each Container */
+        .apply-to-each-container {
+            border: 3px solid var(--ms-orange);
+            border-radius: 12px;
+            background: rgba(255, 140, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .loop-header {
+            background: var(--ms-orange);
+            color: white;
+            margin: -20px -20px 20px -20px;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loop-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .loop-items {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .loop-items input {
+            width: 80px;
+            padding: 5px;
+            border: 2px solid var(--ms-orange);
+            border-radius: 4px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* Inside Loop Area */
+        .inside-loop-area {
+            border: 3px dashed var(--ms-orange);
+            border-radius: 8px;
+            min-height: 150px;
+            padding: 20px;
+            background: white;
+            position: relative;
+        }
+
+        .inside-loop-area.drag-over {
+            background: rgba(0, 120, 212, 0.1);
+            border-color: var(--ms-blue);
+        }
+
+        .drop-hint {
+            text-align: center;
+            color: var(--ms-gray-90);
+            font-size: 16px;
+            padding: 40px;
+        }
+
+        .inside-label {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: white;
+            padding: 5px 15px;
+            border: 2px solid var(--ms-orange);
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--ms-orange);
+            font-size: 14px;
+        }
+
+        /* Actions Inside Loop */
+        .action-in-loop {
+            background: white;
+            border: 2px solid var(--ms-blue);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .action-in-loop .multiplier-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--ms-red);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 12px;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .remove-action {
+            margin-left: auto;
+            background: var(--ms-red);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Impact Panel */
+        .impact-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .impact-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        /* Big Number Display */
+        .big-number {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .number-label {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .number-value {
+            color: white;
+            font-size: 72px;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: numberPulse 2s infinite;
+        }
+
+        @keyframes numberPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .number-formula {
+            color: white;
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* Breakdown */
+        .breakdown {
+            background: var(--ms-gray-10);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .breakdown-label {
+            font-weight: 600;
+            color: var(--ms-gray-90);
+        }
+
+        .breakdown-value {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Warning Messages */
+        .warning-message {
+            background: var(--ms-red);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .success-message {
+            background: var(--ms-green);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        /* Visual Execution Flow */
+        .execution-visual {
+            background: var(--ms-gray-10);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .execution-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .execution-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .execution-number {
+            background: var(--ms-blue);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        .execution-text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .execution-api {
+            color: var(--ms-red);
+            font-weight: 700;
+        }
+
+        /* Connector Line */
+        .connector-line {
+            text-align: center;
+            font-size: 20px;
+            color: var(--ms-gray-90);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Tutorial Banner -->
+        <div class="tutorial-banner">
+            👋 Let's build a flow together! Watch what happens when you put actions INSIDE Apply to Each
+            <div class="step-indicator">Step 1: Start with a trigger</div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Action Library -->
+            <div class="action-library">
+                <h3 class="library-title">📦 Drag These Actions</h3>
+                
+                <div class="action-card" draggable="true" data-action="get-items" data-api="1">
+                    <span class="action-icon">📋</span>
+                    <div class="action-details">
+                        <div class="action-name">Get items</div>
+                        <div class="action-api">1 API call - Gets list items</div>
+                    </div>
+                </div>
+
+                <div class="action-card" draggable="true" data-action="get-user" data-api="1">
+                    <span class="action-icon">👤</span>
+                    <div class="action-details">
+                        <div class="action-name">Get user profile</div>
+                        <div class="action-api">1 API call</div>
+                    </div>
+                </div>
+
+                <div class="action-card" draggable="true" data-action="send-email" data-api="1">
+                    <span class="action-icon">📧</span>
+                    <div class="action-details">
+                        <div class="action-name">Send an email</div>
+                        <div class="action-api">1 API call</div>
+                    </div>
+                </div>
+
+                <div class="action-card" draggable="true" data-action="update-item" data-api="1">
+                    <span class="action-icon">✏️</span>
+                    <div class="action-details">
+                        <div class="action-name">Update item</div>
+                        <div class="action-api">1 API call</div>
+                    </div>
+                </div>
+
+                <div class="action-card" draggable="true" data-action="post-teams" data-api="1">
+                    <span class="action-icon">💬</span>
+                    <div class="action-details">
+                        <div class="action-name">Post to Teams</div>
+                        <div class="action-api">1 API call</div>
+                    </div>
+                </div>
+
+                <div class="action-card" draggable="true" data-action="create-task" data-api="1">
+                    <span class="action-icon">✅</span>
+                    <div class="action-details">
+                        <div class="action-name">Create task</div>
+                        <div class="action-api">1 API call</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: var(--ms-gray-10); border-radius: 8px;">
+                    <strong style="color: var(--ms-orange);">💡 Try this:</strong><br>
+                    <small>Drag multiple actions INSIDE the Apply to Each loop and watch the API calls multiply!</small>
+                </div>
+            </div>
+
+            <!-- Flow Builder -->
+            <div class="flow-builder">
+                <div class="builder-header">
+                    <h2 class="builder-title">Your Flow</h2>
+                    <button class="reset-btn" onclick="resetFlow()">Start Over</button>
+                </div>
+
+                <div class="flow-container">
+                    <!-- Trigger -->
+                    <div class="flow-step trigger">
+                        <div class="step-header">
+                            <span class="step-name">⚡ When an item is created</span>
+                        </div>
+                        <div class="step-info">Triggers when a new invoice is added to SharePoint</div>
+                    </div>
+
+                    <div class="connector-line">↓</div>
+
+                    <!-- Get Items -->
+                    <div class="flow-step">
+                        <div class="step-header">
+                            <span class="step-name">📋 Get items</span>
+                            <span style="color: var(--ms-blue); font-weight: 700;">1 API call</span>
+                        </div>
+                        <div class="step-info">Gets 100 invoice items from SharePoint list</div>
+                    </div>
+
+                    <div class="connector-line">↓</div>
+
+                    <!-- Apply to Each -->
+                    <div class="apply-to-each-container">
+                        <div class="loop-header">
+                            <span class="loop-title">🔁 Apply to each</span>
+                            <div class="loop-items">
+                                Processing 
+                                <input type="number" id="loopCount" value="100" min="1" max="1000" onchange="updateCalculations()">
+                                items
+                            </div>
+                        </div>
+
+                        <div class="inside-loop-area" id="dropZone">
+                            <span class="inside-label">INSIDE THE LOOP - Actions here MULTIPLY!</span>
+                            <div class="drop-hint" id="dropHint">
+                                🎯 Drag actions HERE to put them INSIDE the loop<br>
+                                <small>Each action will run for EVERY item (100 times!)</small>
+                            </div>
+                            <div id="actionsInLoop"></div>
+                        </div>
+                    </div>
+
+                    <div class="connector-line">↓</div>
+
+                    <!-- Final Action -->
+                    <div class="flow-step">
+                        <div class="step-header">
+                            <span class="step-name">✅ Complete</span>
+                        </div>
+                        <div class="step-info">Flow execution complete</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impact Panel -->
+            <div class="impact-panel">
+                <h3 class="impact-title">💥 Real-Time Impact</h3>
+
+                <!-- Big Number -->
+                <div class="big-number">
+                    <div class="number-label">TOTAL API CALLS</div>
+                    <div class="number-value" id="totalAPICalls">1</div>
+                    <div class="number-formula" id="formula">1 (Get items only)</div>
+                </div>
+
+                <!-- Breakdown -->
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Outside loop:</span>
+                        <span class="breakdown-value" id="outsideCalls">1 call</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Loop iterations:</span>
+                        <span class="breakdown-value" id="loopIterations">100 times</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Actions inside loop:</span>
+                        <span class="breakdown-value" id="actionsInside">0 actions</span>
+                    </div>
+                    <div class="breakdown-item" style="border-bottom: none; padding-top: 10px;">
+                        <span class="breakdown-label" style="color: var(--ms-red);">Inside loop calls:</span>
+                        <span class="breakdown-value" style="color: var(--ms-red); font-size: 24px;" id="insideCalls">0 calls</span>
+                    </div>
+                </div>
+
+                <!-- Visual Execution -->
+                <div class="execution-visual" id="executionVisual" style="display: none;">
+                    <div class="execution-title">What actually happens:</div>
+                    <div id="executionSteps"></div>
+                </div>
+
+                <!-- Messages -->
+                <div id="messageArea"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let actionsInLoop = [];
+        let draggedElement = null;
+        let tutorialStep = 1;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDragAndDrop();
+            updateCalculations();
+        });
+
+        function initializeDragAndDrop() {
+            // Make action cards draggable
+            const cards = document.querySelectorAll('.action-card');
+            cards.forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Make drop zone droppable
+            const dropZone = document.getElementById('dropZone');
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('drop', handleDrop);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+            
+            // Update hint
+            const hint = document.getElementById('dropHint');
+            if (actionsInLoop.length === 0) {
+                hint.innerHTML = '🎯 DROP IT HERE! It will run 100 times!';
+            }
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                const actionType = draggedElement.getAttribute('data-action');
+                const apiCalls = parseInt(draggedElement.getAttribute('data-api'));
+                const actionName = draggedElement.querySelector('.action-name').textContent;
+                const actionIcon = draggedElement.querySelector('.action-icon').textContent;
+                
+                addActionToLoop(actionType, actionName, actionIcon, apiCalls);
+                
+                // Update tutorial
+                updateTutorial();
+            }
+        }
+
+        function addActionToLoop(type, name, icon, apiCalls) {
+            const action = {
+                type: type,
+                name: name,
+                icon: icon,
+                apiCalls: apiCalls
+            };
+            
+            actionsInLoop.push(action);
+            renderActionsInLoop();
+            updateCalculations();
+            
+            // Show impact immediately
+            showImpactAnimation();
+        }
+
+        function renderActionsInLoop() {
+            const container = document.getElementById('actionsInLoop');
+            const hint = document.getElementById('dropHint');
+            
+            if (actionsInLoop.length === 0) {
+                hint.style.display = 'block';
+                container.innerHTML = '';
+                return;
+            }
+            
+            hint.style.display = 'none';
+            
+            container.innerHTML = actionsInLoop.map((action, index) => `
+                <div class="action-in-loop">
+                    <span class="multiplier-badge">×100</span>
+                    <span style="font-size: 20px;">${action.icon}</span>
+                    <div style="flex: 1;">
+                        <strong>${action.name}</strong><br>
+                        <small>Runs 100 times = ${action.apiCalls * 100} API calls!</small>
+                    </div>
+                    <button class="remove-action" onclick="removeAction(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeAction(index) {
+            actionsInLoop.splice(index, 1);
+            renderActionsInLoop();
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            const loopCount = parseInt(document.getElementById('loopCount').value) || 100;
+            
+            // Calculate totals
+            const outsideLoopCalls = 1; // Get items
+            const insideLoopCalls = actionsInLoop.reduce((sum, action) => sum + action.apiCalls, 0) * loopCount;
+            const totalCalls = outsideLoopCalls + insideLoopCalls;
+            
+            // Update displays
+            document.getElementById('totalAPICalls').textContent = totalCalls.toLocaleString();
+            document.getElementById('outsideCalls').textContent = `${outsideLoopCalls} call`;
+            document.getElementById('loopIterations').textContent = `${loopCount} times`;
+            document.getElementById('actionsInside').textContent = `${actionsInLoop.length} action${actionsInLoop.length !== 1 ? 's' : ''}`;
+            document.getElementById('insideCalls').textContent = `${insideLoopCalls.toLocaleString()} calls`;
+            
+            // Update formula
+            if (actionsInLoop.length > 0) {
+                const actionsSum = actionsInLoop.reduce((sum, action) => sum + action.apiCalls, 0);
+                document.getElementById('formula').textContent = 
+                    `1 + (${loopCount} items × ${actionsSum} action${actionsSum > 1 ? 's' : ''}) = ${totalCalls.toLocaleString()}`;
+            } else {
+                document.getElementById('formula').textContent = '1 (Get items only)';
+            }
+            
+            // Show execution visual if actions exist
+            if (actionsInLoop.length > 0) {
+                showExecutionVisual(loopCount);
+            } else {
+                document.getElementById('executionVisual').style.display = 'none';
+            }
+            
+            // Update messages
+            updateMessages(totalCalls, insideLoopCalls);
+        }
+
+        function showExecutionVisual(loopCount) {
+            const visual = document.getElementById('executionVisual');
+            const steps = document.getElementById('executionSteps');
+            
+            visual.style.display = 'block';
+            
+            // Show first few iterations
+            let html = '';
+            const showCount = Math.min(3, loopCount);
+            
+            for (let i = 1; i <= showCount; i++) {
+                html += `<div class="execution-item">
+                    <span class="execution-number">${i}</span>
+                    <span class="execution-text">Item ${i}:</span>
+                    <span class="execution-api">${actionsInLoop.length} API call${actionsInLoop.length !== 1 ? 's' : ''}</span>
+                </div>`;
+            }
+            
+            if (loopCount > 3) {
+                html += `<div style="text-align: center; padding: 10px; font-style: italic;">
+                    ... repeats ${loopCount - 3} more times ...
+                </div>`;
+            }
+            
+            steps.innerHTML = html;
+        }
+
+        function updateMessages(totalCalls, insideLoopCalls) {
+            const messageArea = document.getElementById('messageArea');
+            
+            if (totalCalls > 1000) {
+                messageArea.innerHTML = `
+                    <div class="warning-message">
+                        🚨 CRITICAL: ${totalCalls.toLocaleString()} API calls will cause throttling!<br>
+                        <strong>Your flow WILL fail!</strong><br>
+                        Solution: Use filtering BEFORE the loop or batch operations!
+                    </div>
+                `;
+            } else if (totalCalls > 500) {
+                messageArea.innerHTML = `
+                    <div class="warning-message">
+                        ⚠️ WARNING: ${totalCalls.toLocaleString()} API calls is very high!<br>
+                        Consider optimising with filters or Select action.
+                    </div>
+                `;
+            } else if (actionsInLoop.length > 0 && totalCalls < 100) {
+                messageArea.innerHTML = `
+                    <div class="success-message">
+                        ✅ Good job! ${totalCalls} API calls is manageable.<br>
+                        But remember: filtering at source is always better!
+                    </div>
+                `;
+            } else {
+                messageArea.innerHTML = '';
+            }
+        }
+
+        function showImpactAnimation() {
+            const value = document.getElementById('totalAPICalls');
+            value.style.animation = 'none';
+            setTimeout(() => {
+                value.style.animation = 'numberPulse 0.5s ease';
+            }, 10);
+        }
+
+        function updateTutorial() {
+            const banner = document.querySelector('.tutorial-banner');
+            const step = document.querySelector('.step-indicator');
+            
+            if (actionsInLoop.length === 1) {
+                banner.innerHTML = `
+                    😱 See that? Your action is now running 100 times! That's 100 API calls!
+                    <div class="step-indicator">Step 2: Add more actions to see multiplication</div>
+                `;
+            } else if (actionsInLoop.length === 2) {
+                banner.innerHTML = `
+                    🤯 Now you have 2 actions × 100 items = 200 API calls! It multiplies!
+                    <div class="step-indicator">Step 3: Try adding one more...</div>
+                `;
+            } else if (actionsInLoop.length >= 3) {
+                banner.innerHTML = `
+                    💥 BOOM! ${actionsInLoop.length} actions × 100 items = ${actionsInLoop.length * 100} API calls!
+                    <div class="step-indicator">This is why flows fail!</div>
+                `;
+            }
+        }
+
+        function resetFlow() {
+            actionsInLoop = [];
+            document.getElementById('loopCount').value = 100;
+            renderActionsInLoop();
+            updateCalculations();
+            
+            // Reset tutorial
+            document.querySelector('.tutorial-banner').innerHTML = `
+                👋 Let's build a flow together! Watch what happens when you put actions INSIDE Apply to Each
+                <div class="step-indicator">Step 1: Start with a trigger</div>
+            `;
+        }
+    </script>
+</body>
+</html>

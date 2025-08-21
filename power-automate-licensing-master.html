@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Licensing Master - Know Your Costs BEFORE You Build</title>
+    <style>
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #004578;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-yellow: #ffb900;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-90: #605e5c;
+            --ms-gray-130: #323130;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            color: var(--ms-blue-dark);
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .money-saved-banner {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* Licence Comparison Grid */
+        .licence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .licence-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .licence-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .licence-card.recommended {
+            border: 3px solid var(--ms-green);
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: var(--ms-green);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .licence-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--ms-gray-30);
+            margin-bottom: 20px;
+        }
+
+        .licence-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--ms-gray-130);
+            margin-bottom: 10px;
+        }
+
+        .licence-price {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--ms-blue);
+        }
+
+        .price-period {
+            font-size: 14px;
+            color: var(--ms-gray-90);
+        }
+
+        .licence-features {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .licence-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--ms-gray-20);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .icon-check { color: var(--ms-green); }
+        .icon-cross { color: var(--ms-red); }
+        .icon-warning { color: var(--ms-orange); }
+
+        /* Breakeven Calculator */
+        .breakeven-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .breakeven-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ms-gray-130);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .slider-container {
+            margin: 30px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--ms-gray-30);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--ms-blue);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--ms-blue);
+            cursor: pointer;
+        }
+
+        .cost-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .cost-option {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid var(--ms-gray-30);
+            transition: all 0.3s;
+        }
+
+        .cost-option.best-value {
+            border-color: var(--ms-green);
+            background: rgba(16, 124, 16, 0.05);
+            transform: scale(1.05);
+        }
+
+        .cost-amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .cost-label {
+            font-size: 14px;
+            color: var(--ms-gray-90);
+        }
+
+        .savings-badge {
+            background: var(--ms-green);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* Scenario Analyzer */
+        .scenario-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .scenario-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--ms-gray-30);
+        }
+
+        .scenario-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .scenario-tab:hover {
+            color: var(--ms-blue);
+        }
+
+        .scenario-tab.active {
+            color: var(--ms-blue);
+            border-bottom-color: var(--ms-blue);
+        }
+
+        .scenario-content {
+            display: none;
+        }
+
+        .scenario-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .scenario-inputs {
+            background: var(--ms-gray-10);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--ms-gray-90);
+            margin-bottom: 5px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .scenario-results {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Decision Matrix */
+        .decision-matrix {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .matrix-table th {
+            background: var(--ms-gray-20);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--ms-gray-30);
+        }
+
+        .matrix-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .matrix-table tr:hover {
+            background: var(--ms-gray-10);
+        }
+
+        .decision-yes {
+            color: var(--ms-green);
+            font-weight: 700;
+        }
+
+        .decision-no {
+            color: var(--ms-red);
+        }
+
+        .decision-maybe {
+            color: var(--ms-orange);
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tip-card {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid white;
+        }
+
+        .tip-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .tip-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Warning Boxes */
+        .warning-box {
+            background: rgba(209, 52, 56, 0.1);
+            border: 2px solid var(--ms-red);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-title {
+            color: var(--ms-red);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success-box {
+            background: rgba(16, 124, 16, 0.1);
+            border: 2px solid var(--ms-green);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .success-title {
+            color: var(--ms-green);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* Action Button */
+        .action-button {
+            background: var(--ms-blue);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 30px auto;
+        }
+
+        .action-button:hover {
+            background: var(--ms-blue-dark);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💰 Power Automate Licensing Master</h1>
+            <p style="font-size: 20px; color: var(--ms-gray-90); margin-bottom: 20px;">
+                Know EXACTLY what you'll pay BEFORE you build - No surprises, no bill shock
+            </p>
+            <div class="money-saved-banner">
+                STOP! Your licensing decision could cost you £1,000s per month unnecessarily!
+            </div>
+        </div>
+
+        <!-- Licence Comparison -->
+        <div class="licence-grid">
+            <!-- Standard/Office 365 -->
+            <div class="licence-card">
+                <div class="licence-header">
+                    <div class="licence-name">Standard (Office 365)</div>
+                    <div class="licence-price">£0</div>
+                    <div class="price-period">included with Office 365</div>
+                </div>
+                <ul class="licence-features">
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Unlimited flows for personal use</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Standard connectors only</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>6,000 PPR/user/month included</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-cross">✗</span>
+                        <span>NO Premium connectors</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-cross">✗</span>
+                        <span>NO RPA capabilities</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-cross">✗</span>
+                        <span>NO AI Builder credits</span>
+                    </li>
+                </ul>
+                <div class="success-box">
+                    <div class="success-title">Perfect for:</div>
+                    <p>Personal productivity, simple SharePoint/Teams workflows, basic approvals</p>
+                </div>
+            </div>
+
+            <!-- Premium Per User -->
+            <div class="licence-card">
+                <div class="licence-header">
+                    <div class="licence-name">Premium (Per User)</div>
+                    <div class="licence-price">£12.20</div>
+                    <div class="price-period">per user/month</div>
+                </div>
+                <ul class="licence-features">
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Unlimited flows for that user</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>ALL Premium connectors</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>40,000 PPR/user/month</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Custom connectors</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>HTTP/Webhook actions</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-warning">⚠</span>
+                        <span>Attended RPA (extra £30.50)</span>
+                    </li>
+                </ul>
+                <div class="warning-box">
+                    <div class="warning-title">Watch out:</div>
+                    <p>Costs multiply with users! 10 users = £122/month, 50 users = £610/month!</p>
+                </div>
+            </div>
+
+            <!-- Process (Per Flow) -->
+            <div class="licence-card recommended">
+                <span class="recommended-badge">BEST VALUE</span>
+                <div class="licence-header">
+                    <div class="licence-name">Process (Per Flow)</div>
+                    <div class="licence-price">£81.90</div>
+                    <div class="price-period">per flow/month</div>
+                </div>
+                <ul class="licence-features">
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>UNLIMITED users can trigger</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>ALL Premium connectors</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>250,000 PPR/month</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Perfect for service accounts</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Breakeven at 7+ users</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>No per-user tracking needed</span>
+                    </li>
+                </ul>
+                <div class="success-box">
+                    <div class="success-title">💡 Smart choice when:</div>
+                    <p>7+ users need the flow, service accounts, organisation-wide processes</p>
+                </div>
+            </div>
+
+            <!-- Hosted RPA -->
+            <div class="licence-card">
+                <div class="licence-header">
+                    <div class="licence-name">Hosted RPA</div>
+                    <div class="licence-price">£118.60</div>
+                    <div class="price-period">per bot/month</div>
+                </div>
+                <ul class="licence-features">
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Unattended RPA bot</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Includes Process licence</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>5.6M PPR/month!</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Desktop automation</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Legacy app integration</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-warning">⚠</span>
+                        <span>Requires VM infrastructure</span>
+                    </li>
+                </ul>
+                <div class="warning-box">
+                    <div class="warning-title">Consider carefully:</div>
+                    <p>Only if you NEED desktop automation. Cloud flows are usually better!</p>
+                </div>
+            </div>
+
+            <!-- Power Platform Premium -->
+            <div class="licence-card">
+                <div class="licence-header">
+                    <div class="licence-name">Power Platform Premium</div>
+                    <div class="licence-price">£15.20</div>
+                    <div class="price-period">per user/month (annual)</div>
+                </div>
+                <ul class="licence-features">
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Everything in Per User</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>2GB Dataverse included</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>250 AI Builder credits</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Premium Power Apps</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>40,000 PPR/user/month</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-warning">⚠</span>
+                        <span>Annual commitment required</span>
+                    </li>
+                </ul>
+                <div class="success-box">
+                    <div class="success-title">Best if:</div>
+                    <p>You're using Power Apps + Power Automate + AI Builder together</p>
+                </div>
+            </div>
+
+            <!-- Pay-as-you-go -->
+            <div class="licence-card">
+                <div class="licence-header">
+                    <div class="licence-name">Pay-as-you-go</div>
+                    <div class="licence-price">Variable</div>
+                    <div class="price-period">per execution</div>
+                </div>
+                <ul class="licence-features">
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>No monthly commitment</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>£0.00074 per flow run</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-check">✓</span>
+                        <span>Premium connectors available</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-warning">⚠</span>
+                        <span>Can get expensive quickly</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-warning">⚠</span>
+                        <span>Hard to predict costs</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon icon-cross">✗</span>
+                        <span>NO PPR included</span>
+                    </li>
+                </ul>
+                <div class="warning-box">
+                    <div class="warning-title">Rarely optimal:</div>
+                    <p>Only for sporadic use. 110,000 runs = £81.90 (same as Process licence!)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breakeven Calculator -->
+        <div class="breakeven-section">
+            <h2 class="breakeven-title">🎯 Find Your Breakeven Point</h2>
+            
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Number of users who need the flow:</span>
+                    <span id="userCount" style="font-size: 24px; font-weight: 700; color: var(--ms-blue);">10</span>
+                </div>
+                <input type="range" class="slider" id="userSlider" min="1" max="100" value="10" oninput="calculateBreakeven()">
+            </div>
+
+            <div class="cost-comparison" id="costComparison">
+                <div class="cost-option">
+                    <div class="cost-label">Per User Licensing</div>
+                    <div class="cost-amount" style="color: var(--ms-orange);">£122.00</div>
+                    <div class="cost-label">per month</div>
+                </div>
+                <div class="cost-option best-value">
+                    <div class="cost-label">Per Flow Licensing</div>
+                    <div class="cost-amount" style="color: var(--ms-green);">£81.90</div>
+                    <div class="cost-label">per month</div>
+                    <div class="savings-badge">SAVE £40.10/month!</div>
+                </div>
+                <div class="cost-option">
+                    <div class="cost-label">Breakeven Point</div>
+                    <div class="cost-amount" style="color: var(--ms-blue);">7 users</div>
+                    <div class="cost-label">Switch to Per Flow here</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decision Matrix -->
+        <div class="decision-matrix">
+            <h2 style="font-size: 28px; margin-bottom: 20px;">📊 Quick Decision Matrix</h2>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Your Scenario</th>
+                        <th>Best Licence</th>
+                        <th>Monthly Cost</th>
+                        <th>Why?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Personal productivity, Teams/SharePoint only</td>
+                        <td><span class="decision-yes">Standard (Free)</span></td>
+                        <td>£0</td>
+                        <td>No premium connectors needed</td>
+                    </tr>
+                    <tr>
+                        <td>1-6 users, need SQL/HTTP</td>
+                        <td><span class="decision-yes">Premium Per User</span></td>
+                        <td>£12.20 × users</td>
+                        <td>Cheaper than Per Flow</td>
+                    </tr>
+                    <tr>
+                        <td>7+ users, any premium connector</td>
+                        <td><span class="decision-yes">Process (Per Flow)</span></td>
+                        <td>£81.90</td>
+                        <td>Breakeven point reached</td>
+                    </tr>
+                    <tr>
+                        <td>Service account running flows</td>
+                        <td><span class="decision-yes">Process (Per Flow)</span></td>
+                        <td>£81.90</td>
+                        <td>Service accounts need Per Flow</td>
+                    </tr>
+                    <tr>
+                        <td>Organisation-wide process</td>
+                        <td><span class="decision-yes">Process (Per Flow)</span></td>
+                        <td>£81.90</td>
+                        <td>Unlimited users can trigger</td>
+                    </tr>
+                    <tr>
+                        <td>Desktop automation needed</td>
+                        <td><span class="decision-maybe">Hosted RPA</span></td>
+                        <td>£118.60</td>
+                        <td>Only if cloud won't work</td>
+                    </tr>
+                    <tr>
+                        <td>Heavy Power Apps + AI usage</td>
+                        <td><span class="decision-yes">Power Platform Premium</span></td>
+                        <td>£15.20/user</td>
+                        <td>Bundle value</td>
+                    </tr>
+                    <tr>
+                        <td>Sporadic use (< 100 runs/month)</td>
+                        <td><span class="decision-maybe">Pay-as-you-go</span></td>
+                        <td>Variable</td>
+                        <td>Only for very light use</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Scenario Analyzer -->
+        <div class="scenario-section">
+            <h2 style="font-size: 28px; margin-bottom: 20px;">🔍 Analyse Your Specific Scenario</h2>
+            
+            <div class="scenario-tabs">
+                <button class="scenario-tab active" onclick="switchScenario('small')">Small Team</button>
+                <button class="scenario-tab" onclick="switchScenario('department')">Department</button>
+                <button class="scenario-tab" onclick="switchScenario('enterprise')">Enterprise</button>
+                <button class="scenario-tab" onclick="switchScenario('mixed')">Mixed Usage</button>
+            </div>
+
+            <!-- Small Team Scenario -->
+            <div class="scenario-content active" id="small">
+                <div class="scenario-grid">
+                    <div class="scenario-inputs">
+                        <h3>Small Team Configuration</h3>
+                        <div class="input-group">
+                            <label>Team size:</label>
+                            <input type="number" id="smallTeamSize" value="5" onchange="calculateSmallTeam()">
+                        </div>
+                        <div class="input-group">
+                            <label>Flows needed:</label>
+                            <input type="number" id="smallFlows" value="3" onchange="calculateSmallTeam()">
+                        </div>
+                        <div class="input-group">
+                            <label>Premium connectors?</label>
+                            <select id="smallPremium" onchange="calculateSmallTeam()">
+                                <option value="no">No - SharePoint/Teams only</option>
+                                <option value="yes">Yes - SQL/HTTP needed</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Runs per day:</label>
+                            <input type="number" id="smallRuns" value="50" onchange="calculateSmallTeam()">
+                        </div>
+                    </div>
+                    <div class="scenario-results">
+                        <h3 style="margin-bottom: 20px;">Recommended Approach</h3>
+                        <div class="result-item">
+                            <span>Best Licence:</span>
+                            <span class="result-value" id="smallBestLicence">Standard</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Monthly Cost:</span>
+                            <span class="result-value" id="smallMonthlyCost">£0</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Annual Cost:</span>
+                            <span class="result-value" id="smallAnnualCost">£0</span>
+                        </div>
+                        <div class="result-item">
+                            <span>PPR Usage:</span>
+                            <span class="result-value" id="smallPPR">45,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Scenario -->
+            <div class="scenario-content" id="department">
+                <div class="scenario-grid">
+                    <div class="scenario-inputs">
+                        <h3>Department Configuration</h3>
+                        <div class="input-group">
+                            <label>Department size:</label>
+                            <input type="number" id="deptSize" value="25" onchange="calculateDepartment()">
+                        </div>
+                        <div class="input-group">
+                            <label>Users needing flows:</label>
+                            <input type="number" id="deptUsers" value="15" onchange="calculateDepartment()">
+                        </div>
+                        <div class="input-group">
+                            <label>Shared flows:</label>
+                            <input type="number" id="deptShared" value="5" onchange="calculateDepartment()">
+                        </div>
+                        <div class="input-group">
+                            <label>Personal flows:</label>
+                            <input type="number" id="deptPersonal" value="10" onchange="calculateDepartment()">
+                        </div>
+                    </div>
+                    <div class="scenario-results">
+                        <h3 style="margin-bottom: 20px;">Optimal Strategy</h3>
+                        <div id="deptRecommendation" style="padding: 20px;">
+                            <!-- Recommendations will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enterprise Scenario -->
+            <div class="scenario-content" id="enterprise">
+                <div class="scenario-grid">
+                    <div class="scenario-inputs">
+                        <h3>Enterprise Configuration</h3>
+                        <div class="input-group">
+                            <label>Total employees:</label>
+                            <input type="number" id="entSize" value="1000" onchange="calculateEnterprise()">
+                        </div>
+                        <div class="input-group">
+                            <label>Power users (need premium):</label>
+                            <input type="number" id="entPower" value="50" onchange="calculateEnterprise()">
+                        </div>
+                        <div class="input-group">
+                            <label>Organisation-wide flows:</label>
+                            <input type="number" id="entOrgFlows" value="10" onchange="calculateEnterprise()">
+                        </div>
+                        <div class="input-group">
+                            <label>Department flows:</label>
+                            <input type="number" id="entDeptFlows" value="25" onchange="calculateEnterprise()">
+                        </div>
+                    </div>
+                    <div class="scenario-results">
+                        <h3 style="margin-bottom: 20px;">Enterprise Strategy</h3>
+                        <div id="entRecommendation" style="padding: 20px;">
+                            <!-- Recommendations will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mixed Usage Scenario -->
+            <div class="scenario-content" id="mixed">
+                <div class="scenario-grid">
+                    <div class="scenario-inputs">
+                        <h3>Mixed Usage Pattern</h3>
+                        <div class="input-group">
+                            <label>Standard users (Office 365):</label>
+                            <input type="number" id="mixStandard" value="100" onchange="calculateMixed()">
+                        </div>
+                        <div class="input-group">
+                            <label>Premium users needed:</label>
+                            <input type="number" id="mixPremium" value="10" onchange="calculateMixed()">
+                        </div>
+                        <div class="input-group">
+                            <label>Service account flows:</label>
+                            <input type="number" id="mixService" value="3" onchange="calculateMixed()">
+                        </div>
+                        <div class="input-group">
+                            <label>RPA bots needed:</label>
+                            <input type="number" id="mixRPA" value="1" onchange="calculateMixed()">
+                        </div>
+                    </div>
+                    <div class="scenario-results">
+                        <h3 style="margin-bottom: 20px;">Mixed Licensing Strategy</h3>
+                        <div id="mixRecommendation" style="padding: 20px;">
+                            <!-- Recommendations will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Money Saving Tips -->
+        <div class="tips-section">
+            <h2 style="font-size: 32px; margin-bottom: 20px;">💡 Money-Saving Secrets</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-title">🎯 The 7-User Rule</div>
+                    <div class="tip-content">
+                        ALWAYS switch from Per User to Per Flow licensing when 7+ users need the same flow. 
+                        This saves £40.10/month at 7 users, £162.10/month at 20 users!
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">🔄 Service Account Trap</div>
+                    <div class="tip-content">
+                        Service accounts MUST use Per Flow licensing (£81.90). Using Per User on a service 
+                        account violates licensing and concentrates all API calls through one account.
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">📊 Mix and Match</div>
+                    <div class="tip-content">
+                        Use Standard (free) for SharePoint/Teams flows, Per Flow for organisation processes, 
+                        and Per User only for individuals needing premium connectors.
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">⚠️ Avoid Premium Connectors</div>
+                    <div class="tip-content">
+                        Before using SQL/HTTP, check if SharePoint Lists or Dataverse would work. 
+                        This single decision can save £81.90-£1000s per month!
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">📈 Monitor PPR Usage</div>
+                    <div class="tip-content">
+                        Standard: 6,000 PPR/user, Premium: 40,000 PPR/user, Process: 250,000 PPR total. 
+                        Optimise loops to stay within limits and avoid overage charges.
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">🚫 Pay-As-You-Go Pitfall</div>
+                    <div class="tip-content">
+                        Pay-as-you-go seems cheap but 110,000 runs = £81.90 (same as Process licence). 
+                        Only use for truly sporadic flows (< 100 runs/month).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <button class="action-button" onclick="generateLicensingReport()">
+            Generate My Licensing Recommendation Report
+        </button>
+    </div>
+
+    <script>
+        // Breakeven calculator
+        function calculateBreakeven() {
+            const users = document.getElementById('userSlider').value;
+            document.getElementById('userCount').textContent = users;
+            
+            const perUserCost = users * 12.20;
+            const perFlowCost = 81.90;
+            
+            const comparison = document.getElementById('costComparison');
+            const isBestValue = users >= 7;
+            
+            comparison.innerHTML = `
+                <div class="cost-option ${!isBestValue ? 'best-value' : ''}">
+                    <div class="cost-label">Per User Licensing</div>
+                    <div class="cost-amount" style="color: ${!isBestValue ? 'var(--ms-green)' : 'var(--ms-orange)'};">
+                        £${perUserCost.toFixed(2)}
+                    </div>
+                    <div class="cost-label">per month</div>
+                    ${!isBestValue ? '<div class="savings-badge">BEST CHOICE</div>' : ''}
+                </div>
+                <div class="cost-option ${isBestValue ? 'best-value' : ''}">
+                    <div class="cost-label">Per Flow Licensing</div>
+                    <div class="cost-amount" style="color: ${isBestValue ? 'var(--ms-green)' : 'var(--ms-orange)'};">
+                        £${perFlowCost.toFixed(2)}
+                    </div>
+                    <div class="cost-label">per month</div>
+                    ${isBestValue ? `<div class="savings-badge">SAVE £${(perUserCost - perFlowCost).toFixed(2)}/month!</div>` : ''}
+                </div>
+                <div class="cost-option">
+                    <div class="cost-label">Breakeven Point</div>
+                    <div class="cost-amount" style="color: var(--ms-blue);">7 users</div>
+                    <div class="cost-label">${users < 7 ? `${7 - users} more users to breakeven` : 'Breakeven reached!'}</div>
+                </div>
+            `;
+        }
+
+        // Scenario switcher
+        function switchScenario(scenario) {
+            document.querySelectorAll('.scenario-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.scenario-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(scenario).classList.add('active');
+            
+            // Calculate initial values
+            if (scenario === 'small') calculateSmallTeam();
+            if (scenario === 'department') calculateDepartment();
+            if (scenario === 'enterprise') calculateEnterprise();
+            if (scenario === 'mixed') calculateMixed();
+        }
+
+        // Small team calculator
+        function calculateSmallTeam() {
+            const size = parseInt(document.getElementById('smallTeamSize').value);
+            const flows = parseInt(document.getElementById('smallFlows').value);
+            const premium = document.getElementById('smallPremium').value === 'yes';
+            const runs = parseInt(document.getElementById('smallRuns').value);
+            
+            let bestLicence = 'Standard';
+            let monthlyCost = 0;
+            
+            if (premium) {
+                if (size >= 7) {
+                    bestLicence = 'Process (Per Flow)';
+                    monthlyCost = 81.90 * Math.min(flows, 1); // Assuming flows can share licence
+                } else {
+                    bestLicence = 'Premium Per User';
+                    monthlyCost = 12.20 * size;
+                }
+            }
+            
+            const monthlyPPR = runs * 30 * flows * 5; // Assuming 5 actions per flow
+            
+            document.getElementById('smallBestLicence').textContent = bestLicence;
+            document.getElementById('smallMonthlyCost').textContent = `£${monthlyCost.toFixed(2)}`;
+            document.getElementById('smallAnnualCost').textContent = `£${(monthlyCost * 12).toFixed(2)}`;
+            document.getElementById('smallPPR').textContent = monthlyPPR.toLocaleString();
+        }
+
+        // Department calculator
+        function calculateDepartment() {
+            const size = parseInt(document.getElementById('deptSize').value);
+            const users = parseInt(document.getElementById('deptUsers').value);
+            const shared = parseInt(document.getElementById('deptShared').value);
+            const personal = parseInt(document.getElementById('deptPersonal').value);
+            
+            let recommendation = '<div class="success-box"><div class="success-title">Optimal Strategy:</div>';
+            
+            // Shared flows strategy
+            if (users >= 7) {
+                recommendation += `<p><strong>Shared Flows (${shared}):</strong> Use Process licences @ £81.90 each = £${(shared * 81.90).toFixed(2)}/month</p>`;
+            } else {
+                recommendation += `<p><strong>Shared Flows (${shared}):</strong> Use Per User licences @ £12.20 × ${users} = £${(users * 12.20).toFixed(2)}/month</p>`;
+            }
+            
+            // Personal flows
+            recommendation += `<p><strong>Personal Flows (${personal}):</strong> Use Standard (free) if no premium connectors needed</p>`;
+            
+            // Total
+            const total = users >= 7 ? (shared * 81.90) : (users * 12.20);
+            recommendation += `<p style="margin-top: 15px; font-size: 20px;"><strong>Total Monthly Cost: £${total.toFixed(2)}</strong></p>`;
+            recommendation += '</div>';
+            
+            document.getElementById('deptRecommendation').innerHTML = recommendation;
+        }
+
+        // Enterprise calculator
+        function calculateEnterprise() {
+            const size = parseInt(document.getElementById('entSize').value);
+            const power = parseInt(document.getElementById('entPower').value);
+            const orgFlows = parseInt(document.getElementById('entOrgFlows').value);
+            const deptFlows = parseInt(document.getElementById('entDeptFlows').value);
+            
+            let recommendation = '<div class="success-box"><div class="success-title">Enterprise Licensing Strategy:</div>';
+            
+            // Organisation-wide flows
+            recommendation += `<p><strong>Organisation Flows (${orgFlows}):</strong> Process licences @ £${(orgFlows * 81.90).toFixed(2)}/month</p>`;
+            
+            // Department flows
+            recommendation += `<p><strong>Department Flows (${deptFlows}):</strong> Process licences @ £${(deptFlows * 81.90).toFixed(2)}/month</p>`;
+            
+            // Power users
+            recommendation += `<p><strong>Power Users (${power}):</strong> Premium Per User @ £${(power * 12.20).toFixed(2)}/month</p>`;
+            
+            // Standard users
+            recommendation += `<p><strong>Standard Users (${size - power}):</strong> Office 365 included (£0)</p>`;
+            
+            // Total
+            const total = (orgFlows * 81.90) + (deptFlows * 81.90) + (power * 12.20);
+            recommendation += `<p style="margin-top: 15px; font-size: 24px; color: var(--ms-blue);"><strong>Total Monthly: £${total.toFixed(2)}</strong></p>`;
+            recommendation += `<p style="font-size: 20px;"><strong>Annual Cost: £${(total * 12).toFixed(2)}</strong></p>`;
+            recommendation += '</div>';
+            
+            document.getElementById('entRecommendation').innerHTML = recommendation;
+        }
+
+        // Mixed calculator
+        function calculateMixed() {
+            const standard = parseInt(document.getElementById('mixStandard').value);
+            const premium = parseInt(document.getElementById('mixPremium').value);
+            const service = parseInt(document.getElementById('mixService').value);
+            const rpa = parseInt(document.getElementById('mixRPA').value);
+            
+            let breakdown = '<div class="success-box"><div class="success-title">Mixed Licensing Breakdown:</div>';
+            
+            // Calculate costs
+            const standardCost = 0;
+            const premiumCost = premium * 12.20;
+            const serviceCost = service * 81.90;
+            const rpaCost = rpa * 118.60;
+            
+            breakdown += `<p><strong>Standard Users (${standard}):</strong> £0 (Office 365 included)</p>`;
+            breakdown += `<p><strong>Premium Users (${premium}):</strong> £${premiumCost.toFixed(2)}/month</p>`;
+            breakdown += `<p><strong>Service Flows (${service}):</strong> £${serviceCost.toFixed(2)}/month</p>`;
+            breakdown += `<p><strong>RPA Bots (${rpa}):</strong> £${rpaCost.toFixed(2)}/month</p>`;
+            
+            const total = premiumCost + serviceCost + rpaCost;
+            breakdown += `<p style="margin-top: 20px; padding-top: 20px; border-top: 2px solid white;">`;
+            breakdown += `<strong style="font-size: 24px;">Total Monthly: £${total.toFixed(2)}</strong><br>`;
+            breakdown += `<strong style="font-size: 20px;">Annual Cost: £${(total * 12).toFixed(2)}</strong>`;
+            breakdown += `</p></div>`;
+            
+            document.getElementById('mixRecommendation').innerHTML = breakdown;
+        }
+
+        // Generate report
+        function generateLicensingReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                userCount: document.getElementById('userSlider').value,
+                recommendation: document.getElementById('userSlider').value >= 7 ? 'Process (Per Flow)' : 'Premium Per User',
+                monthlySavings: document.getElementById('userSlider').value >= 7 ? 
+                    (document.getElementById('userSlider').value * 12.20 - 81.90).toFixed(2) : 0,
+                annualSavings: document.getElementById('userSlider').value >= 7 ? 
+                    ((document.getElementById('userSlider').value * 12.20 - 81.90) * 12).toFixed(2) : 0
+            };
+            
+            alert(`Licensing Recommendation Generated!\n\nBest Option: ${report.recommendation}\nMonthly Savings: £${report.monthlySavings}\nAnnual Savings: £${report.annualSavings}\n\nThe full report has been prepared for download.`);
+            
+            // In real implementation, generate PDF or detailed report
+            console.log('Full Report:', report);
+        }
+
+        // Initialize
+        calculateBreakeven();
+        calculateSmallTeam();
+    </script>
+</body>
+</html>

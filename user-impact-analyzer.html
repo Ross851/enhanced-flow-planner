@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Power Automate User Impact & API Limits Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0078d4;
+            --success: #107c10;
+            --warning: #ff8c00;
+            --danger: #d13438;
+            --info: #40a9ff;
+            --dark: #323130;
+            --light: #f3f2f1;
+            --border: #e1dfdd;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 24px;
+        }
+
+        /* User Configuration Panel */
+        .config-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .config-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #605e5c;
+            margin-top: 4px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .slider-container {
+            margin-top: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .slider-value {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #605e5c;
+            margin-top: 4px;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            display: grid;
+            gap: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-good {
+            background: #dff6dd;
+            color: var(--success);
+        }
+
+        .status-warning {
+            background: #fff4ce;
+            color: var(--warning);
+        }
+
+        .status-danger {
+            background: #fde7e9;
+            color: var(--danger);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric-box {
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .metric-box.warning {
+            border-left-color: var(--warning);
+            background: #fff9e6;
+        }
+
+        .metric-box.danger {
+            border-left-color: var(--danger);
+            background: #fff5f5;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #605e5c;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .metric-detail {
+            font-size: 12px;
+            color: #605e5c;
+            margin-top: 4px;
+        }
+
+        /* API Limits Table */
+        .limits-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .limits-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f8f9fa;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #605e5c;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .limits-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .limit-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .limit-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .limit-fill.safe {
+            background: var(--success);
+        }
+
+        .limit-fill.warning {
+            background: var(--warning);
+        }
+
+        .limit-fill.danger {
+            background: var(--danger);
+        }
+
+        /* Recommendations */
+        .recommendation {
+            padding: 16px;
+            background: #e3f2fd;
+            border-left: 4px solid var(--info);
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--dark);
+        }
+
+        .recommendation-text {
+            font-size: 14px;
+            color: #605e5c;
+            line-height: 1.5;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Alert Box */
+        .alert {
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-warning {
+            background: #fff4ce;
+            border: 1px solid #ffdb4e;
+            color: #8a6116;
+        }
+
+        .alert-danger {
+            background: #fde7e9;
+            border: 1px solid #f3989b;
+            color: #a80000;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .alert-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Calculate Button */
+        .calculate-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            background: #005a9e;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,120,212,0.3);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 User Impact & API Limits Calculator</h1>
+            <p>Understand how user count and account type affect your Power Automate flows</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Configuration Panel -->
+            <div class="config-panel">
+                <h2 class="config-title">
+                    <span>⚙️</span> Flow Configuration
+                </h2>
+
+                <div class="form-group">
+                    <label class="form-label">How many users will run this flow?</label>
+                    <input type="number" class="form-input" id="userCount" value="1" min="1" max="10000">
+                    <div class="form-help">Enter the number of unique users or concurrent executions</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Account Type</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="accountType" value="user" checked>
+                            <span>User Account</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="accountType" value="service">
+                            <span>Service Account</span>
+                        </label>
+                    </div>
+                    <div class="form-help">Service accounts have different throttling limits</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Flow Trigger Type</label>
+                    <select class="form-select" id="triggerType">
+                        <option value="manual">Manual / Instant</option>
+                        <option value="automated">Automated (SharePoint, Email)</option>
+                        <option value="scheduled">Scheduled / Recurrence</option>
+                        <option value="business">Business Process Flow</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Execution Frequency</label>
+                    <select class="form-select" id="frequency">
+                        <option value="minute">Every minute</option>
+                        <option value="5minutes">Every 5 minutes</option>
+                        <option value="15minutes">Every 15 minutes</option>
+                        <option value="hourly">Hourly</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="adhoc">Ad-hoc / Variable</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Average Actions per Flow Run</label>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="actionsSlider" min="1" max="100" value="10">
+                        <div class="slider-value">
+                            <span>1</span>
+                            <span id="actionsValue">10 actions</span>
+                            <span>100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Primary Connectors Used</label>
+                    <div style="display: grid; gap: 8px;">
+                        <label class="toggle-label">
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="sharepoint" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span>SharePoint (600 RPM limit)</span>
+                        </label>
+                        <label class="toggle-label">
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="sql">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span>SQL Server (300 RPM limit)</span>
+                        </label>
+                        <label class="toggle-label">
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="dataverse" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span>Dataverse (6000 RPM limit)</span>
+                        </label>
+                        <label class="toggle-label">
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="teams">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span>Teams (1800 RPM limit)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-label">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="peakHours">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span>Runs during peak hours (9AM-5PM)</span>
+                    </label>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateImpact()">
+                    Calculate Impact & Limits
+                </button>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel">
+                <!-- API Limits Card -->
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3 class="result-title">
+                            <span>⚡</span> API Throttling Analysis
+                        </h3>
+                        <span class="status-badge status-good" id="apiStatus">Within Limits</span>
+                    </div>
+
+                    <div id="apiAlert"></div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-box" id="rpmBox">
+                            <div class="metric-label">Requests Per Minute</div>
+                            <div class="metric-value" id="rpmValue">0</div>
+                            <div class="metric-detail" id="rpmDetail">Per user</div>
+                        </div>
+                        <div class="metric-box" id="dailyBox">
+                            <div class="metric-label">Daily API Calls</div>
+                            <div class="metric-value" id="dailyValue">0</div>
+                            <div class="metric-detail" id="dailyDetail">Total across all users</div>
+                        </div>
+                        <div class="metric-box" id="concurrentBox">
+                            <div class="metric-label">Concurrent Runs</div>
+                            <div class="metric-value" id="concurrentValue">0</div>
+                            <div class="metric-detail">Maximum parallel executions</div>
+                        </div>
+                    </div>
+
+                    <table class="limits-table">
+                        <thead>
+                            <tr>
+                                <th>Connector</th>
+                                <th>Your Usage</th>
+                                <th>Limit</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="limitsTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Licensing Impact Card -->
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3 class="result-title">
+                            <span>💰</span> Licensing Impact
+                        </h3>
+                        <span class="status-badge status-warning" id="licenseStatus">Review Needed</span>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">Monthly Cost</div>
+                            <div class="metric-value" id="costValue">£0</div>
+                            <div class="metric-detail" id="costDetail">Based on user count</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">License Type</div>
+                            <div class="metric-value" id="licenseType">Standard</div>
+                            <div class="metric-detail" id="licenseDetail">Recommended license</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">PPR Usage</div>
+                            <div class="metric-value" id="pprValue">0</div>
+                            <div class="metric-detail" id="pprDetail">Power Platform Requests/day</div>
+                        </div>
+                    </div>
+
+                    <div id="licenseAlert"></div>
+                </div>
+
+                <!-- Recommendations Card -->
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3 class="result-title">
+                            <span>💡</span> Optimization Recommendations
+                        </h3>
+                    </div>
+
+                    <div id="recommendations">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Service Account Benefits Card -->
+                <div class="result-card" id="serviceAccountCard" style="display: none;">
+                    <div class="result-header">
+                        <h3 class="result-title">
+                            <span>🔐</span> Service Account Configuration
+                        </h3>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <div class="alert-content">
+                            <div class="alert-title">Service Account Detected</div>
+                            <div class="alert-text">
+                                Service accounts have different throttling limits and licensing implications:
+                                <ul style="margin-top: 8px; margin-left: 20px;">
+                                    <li>Single account bears all API calls</li>
+                                    <li>Higher risk of throttling</li>
+                                    <li>Requires Process or Hosted license</li>
+                                    <li>Better for background automation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update slider value display
+        const actionsSlider = document.getElementById('actionsSlider');
+        const actionsValue = document.getElementById('actionsValue');
+        
+        actionsSlider.addEventListener('input', (e) => {
+            actionsValue.textContent = `${e.target.value} actions`;
+        });
+
+        // Connector limits (requests per minute)
+        const connectorLimits = {
+            sharepoint: { name: 'SharePoint', limit: 600, userLimit: 300 },
+            sql: { name: 'SQL Server', limit: 300, userLimit: 100 },
+            dataverse: { name: 'Dataverse', limit: 6000, userLimit: 500 },
+            teams: { name: 'Teams', limit: 1800, userLimit: 300 },
+            outlook: { name: 'Outlook', limit: 300, userLimit: 150 },
+            onedrive: { name: 'OneDrive', limit: 2000, userLimit: 500 }
+        };
+
+        // Frequency multipliers (executions per day)
+        const frequencyMultipliers = {
+            'minute': 1440,
+            '5minutes': 288,
+            '15minutes': 96,
+            'hourly': 24,
+            'daily': 1,
+            'weekly': 0.14,
+            'adhoc': 10
+        };
+
+        function calculateImpact() {
+            // Get input values
+            const userCount = parseInt(document.getElementById('userCount').value);
+            const accountType = document.querySelector('input[name="accountType"]:checked').value;
+            const triggerType = document.getElementById('triggerType').value;
+            const frequency = document.getElementById('frequency').value;
+            const actionsPerRun = parseInt(document.getElementById('actionsSlider').value);
+            const isPeakHours = document.getElementById('peakHours').checked;
+            
+            // Calculate base metrics
+            const executionsPerDay = frequencyMultipliers[frequency] * userCount;
+            const totalActionsPerDay = executionsPerDay * actionsPerRun;
+            
+            // Calculate RPM based on frequency
+            let rpm = 0;
+            if (frequency === 'minute') {
+                rpm = userCount;
+            } else if (frequency === '5minutes') {
+                rpm = Math.ceil(userCount / 5);
+            } else if (frequency === '15minutes') {
+                rpm = Math.ceil(userCount / 15);
+            } else {
+                rpm = Math.ceil(userCount / 60);
+            }
+            
+            // Adjust for service account
+            if (accountType === 'service') {
+                rpm = rpm * userCount; // All requests go through single account
+            }
+            
+            // Update API metrics
+            document.getElementById('rpmValue').textContent = rpm.toLocaleString();
+            document.getElementById('rpmDetail').textContent = accountType === 'service' ? 
+                'All through service account' : 'Per user';
+            
+            document.getElementById('dailyValue').textContent = totalActionsPerDay.toLocaleString();
+            document.getElementById('dailyDetail').textContent = `${executionsPerDay.toLocaleString()} executions × ${actionsPerRun} actions`;
+            
+            document.getElementById('concurrentValue').textContent = 
+                Math.min(userCount, accountType === 'service' ? 50 : userCount * 10);
+            
+            // Check connector limits
+            const limitsTableBody = document.getElementById('limitsTableBody');
+            limitsTableBody.innerHTML = '';
+            
+            let hasThrottlingRisk = false;
+            const activeConnectors = [];
+            
+            Object.keys(connectorLimits).forEach(key => {
+                const checkbox = document.getElementById(key);
+                if (checkbox && checkbox.checked) {
+                    activeConnectors.push(key);
+                    const connector = connectorLimits[key];
+                    const limit = accountType === 'service' ? connector.limit : connector.userLimit;
+                    const usage = rpm * (isPeakHours ? 1.5 : 1);
+                    const percentage = (usage / limit) * 100;
+                    
+                    const row = document.createElement('tr');
+                    let statusClass = 'safe';
+                    let statusText = 'OK';
+                    
+                    if (percentage > 80) {
+                        statusClass = 'danger';
+                        statusText = 'Critical';
+                        hasThrottlingRisk = true;
+                    } else if (percentage > 60) {
+                        statusClass = 'warning';
+                        statusText = 'Warning';
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${connector.name}</td>
+                        <td>${Math.round(usage)} RPM</td>
+                        <td>${limit} RPM</td>
+                        <td>
+                            <div class="limit-bar">
+                                <div class="limit-fill ${statusClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                            </div>
+                            <span style="font-size: 12px; color: var(--${statusClass === 'safe' ? 'success' : statusClass})">
+                                ${Math.round(percentage)}% - ${statusText}
+                            </span>
+                        </td>
+                    `;
+                    limitsTableBody.appendChild(row);
+                }
+            });
+            
+            // Update API status
+            const apiStatus = document.getElementById('apiStatus');
+            const apiAlert = document.getElementById('apiAlert');
+            
+            if (hasThrottlingRisk) {
+                apiStatus.textContent = 'Throttling Risk';
+                apiStatus.className = 'status-badge status-danger';
+                apiAlert.innerHTML = `
+                    <div class="alert alert-danger">
+                        <span class="alert-icon">🚨</span>
+                        <div class="alert-content">
+                            <div class="alert-title">High Throttling Risk Detected</div>
+                            <div class="alert-text">
+                                Your flow configuration will likely hit API throttling limits. 
+                                Consider reducing frequency, using batching, or implementing a queue system.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                apiStatus.textContent = 'Within Limits';
+                apiStatus.className = 'status-badge status-good';
+                apiAlert.innerHTML = '';
+            }
+            
+            // Calculate licensing
+            let monthlyC, licenseTypeName, licenseReason;
+            const pprPerDay = totalActionsPerDay;
+            
+            if (accountType === 'service') {
+                if (pprPerDay > 250000) {
+                    monthlyC = 118.60;
+                    licenseTypeName = 'Hosted RPA';
+                    licenseReason = 'Required for high-volume service account';
+                } else {
+                    monthlyC = 81.90;
+                    licenseTypeName = 'Process';
+                    licenseReason = 'Service account with moderate volume';
+                }
+            } else {
+                if (activeConnectors.includes('sql')) {
+                    monthlyC = 12.20 * userCount;
+                    licenseTypeName = 'Premium';
+                    licenseReason = 'Premium connectors detected';
+                } else if (pprPerDay > 40000) {
+                    monthlyC = 81.90;
+                    licenseTypeName = 'Process';
+                    licenseReason = 'High PPR usage';
+                } else {
+                    monthlyC = 0;
+                    licenseTypeName = 'Standard';
+                    licenseReason = 'Within free tier limits';
+                }
+            }
+            
+            document.getElementById('costValue').textContent = `£${monthlyC.toFixed(2)}`;
+            document.getElementById('costDetail').textContent = licenseReason;
+            document.getElementById('licenseType').textContent = licenseTypeName;
+            document.getElementById('pprValue').textContent = pprPerDay.toLocaleString();
+            
+            // Update license status
+            const licenseStatus = document.getElementById('licenseStatus');
+            if (monthlyC === 0) {
+                licenseStatus.textContent = 'Free Tier';
+                licenseStatus.className = 'status-badge status-good';
+            } else if (monthlyC < 100) {
+                licenseStatus.textContent = 'Review Needed';
+                licenseStatus.className = 'status-badge status-warning';
+            } else {
+                licenseStatus.textContent = 'Premium Required';
+                licenseStatus.className = 'status-badge status-danger';
+            }
+            
+            // Generate recommendations
+            const recommendations = [];
+            
+            if (userCount > 50 && accountType === 'user') {
+                recommendations.push({
+                    title: 'Consider Service Account',
+                    text: 'With ' + userCount + ' users, a service account with Process license (£81.90) might be more cost-effective than individual Premium licenses.'
+                });
+            }
+            
+            if (hasThrottlingRisk) {
+                recommendations.push({
+                    title: 'Implement Request Batching',
+                    text: 'Combine multiple operations into batch requests to reduce API calls by up to 90%.'
+                });
+            }
+            
+            if (frequency === 'minute' || frequency === '5minutes') {
+                recommendations.push({
+                    title: 'Reduce Polling Frequency',
+                    text: 'Consider using webhooks or event-driven triggers instead of frequent polling to reduce API calls.'
+                });
+            }
+            
+            if (activeConnectors.includes('sql')) {
+                recommendations.push({
+                    title: 'Replace SQL with SharePoint',
+                    text: 'SharePoint Lists can handle most scenarios and eliminate Premium licensing costs.'
+                });
+            }
+            
+            if (isPeakHours) {
+                recommendations.push({
+                    title: 'Schedule for Off-Peak Hours',
+                    text: 'Running flows outside 9-5 reduces competition for API limits and improves reliability.'
+                });
+            }
+            
+            const recommendationsDiv = document.getElementById('recommendations');
+            recommendationsDiv.innerHTML = recommendations.map(rec => `
+                <div class="recommendation">
+                    <div class="recommendation-title">${rec.title}</div>
+                    <div class="recommendation-text">${rec.text}</div>
+                </div>
+            `).join('');
+            
+            // Show/hide service account card
+            document.getElementById('serviceAccountCard').style.display = 
+                accountType === 'service' ? 'block' : 'none';
+        }
+
+        // Calculate on load
+        calculateImpact();
+    </script>
+    
+    <!-- Load Shared Data Bridge -->
+    <script src="flow-data-bridge.js"></script>
+    
+    <!-- Integration with Flow Builder -->
+    <script>
+        (function() {
+            // Load data from URL parameters if coming from flow builder
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('userCount')) {
+                document.getElementById('userCount').value = urlParams.get('userCount');
+                const accountType = urlParams.get('accountType');
+                if (accountType) {
+                    document.querySelector(`input[name="accountType"][value="${accountType}"]`).checked = true;
+                }
+            }
+            
+            // Sync with FlowDataBridge
+            if (window.FlowDataBridge) {
+                // Load current configuration
+                const bridge = window.FlowDataBridge;
+                document.getElementById('userCount').value = bridge.userConfig.userCount;
+                document.querySelector(`input[name="accountType"][value="${bridge.userConfig.accountType}"]`).checked = true;
+                
+                // Set connectors based on flow
+                Object.keys(bridge.connectorUsage).forEach(connector => {
+                    const checkbox = document.getElementById(connector);
+                    if (checkbox && bridge.connectorUsage[connector].count > 0) {
+                        checkbox.checked = true;
+                    }
+                });
+                
+                // Set actions slider based on flow
+                const totalActions = bridge.flowStructure.actions.length;
+                if (totalActions > 0) {
+                    document.getElementById('actionsSlider').value = totalActions;
+                    document.getElementById('actionsValue').textContent = `${totalActions} actions`;
+                }
+                
+                // Override calculateImpact to sync with bridge
+                const originalCalculateImpact = window.calculateImpact;
+                window.calculateImpact = function() {
+                    // Update bridge with current settings
+                    bridge.updateUserConfig({
+                        userCount: parseInt(document.getElementById('userCount').value),
+                        accountType: document.querySelector('input[name="accountType"]:checked').value,
+                        peakHours: document.getElementById('peakHours').checked
+                    });
+                    
+                    // Call original calculation
+                    originalCalculateImpact.apply(this, arguments);
+                    
+                    // Add bridge-specific insights
+                    displayBridgeInsights();
+                };
+                
+                // Display insights from bridge data
+                function displayBridgeInsights() {
+                    const recommendations = bridge.getRecommendations();
+                    const recommendationsDiv = document.getElementById('recommendations');
+                    
+                    if (recommendations.length > 0) {
+                        const bridgeSection = document.createElement('div');
+                        bridgeSection.innerHTML = `
+                            <h4 style="margin-top: 20px; margin-bottom: 12px; color: var(--primary);">
+                                📊 Based on Your Current Flow
+                            </h4>
+                        `;
+                        
+                        recommendations.forEach(rec => {
+                            const recElement = document.createElement('div');
+                            recElement.className = 'recommendation';
+                            recElement.innerHTML = `
+                                <div class="recommendation-title">${rec.title}</div>
+                                <div class="recommendation-text">${rec.description}</div>
+                                ${rec.savings ? `<div style="margin-top: 8px; font-weight: 600; color: var(--success);">
+                                    Potential Savings: £${rec.savings.toFixed(2)}/month
+                                </div>` : ''}
+                                ${rec.impact ? `<div style="margin-top: 8px; font-weight: 600; color: var(--info);">
+                                    Impact: ${rec.impact}
+                                </div>` : ''}
+                            `;
+                            bridgeSection.appendChild(recElement);
+                        });
+                        
+                        recommendationsDiv.appendChild(bridgeSection);
+                    }
+                    
+                    // Update header to show flow name
+                    if (bridge.flowStructure.name) {
+                        const header = document.querySelector('.header h1');
+                        header.innerHTML = `🎯 Impact Analysis: ${bridge.flowStructure.name}`;
+                    }
+                    
+                    // Show actual metrics from flow
+                    const metricsInfo = document.createElement('div');
+                    metricsInfo.style.cssText = 'background: #e3f2fd; padding: 16px; border-radius: 8px; margin-bottom: 20px;';
+                    metricsInfo.innerHTML = `
+                        <h4 style="margin-bottom: 12px;">Current Flow Metrics</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div>
+                                <strong>Total Actions:</strong> ${bridge.flowStructure.actions.length}
+                            </div>
+                            <div>
+                                <strong>Active Connectors:</strong> ${bridge.flowStructure.connectors.size}
+                            </div>
+                            <div>
+                                <strong>Premium Required:</strong> ${bridge.flowStructure.hasPremiumConnectors ? 'Yes' : 'No'}
+                            </div>
+                        </div>
+                    `;
+                    
+                    const firstCard = document.querySelector('.result-card');
+                    firstCard.insertBefore(metricsInfo, firstCard.querySelector('.metrics-grid'));
+                }
+                
+                // Listen for updates from flow builder
+                window.addEventListener('flowDataUpdated', (e) => {
+                    // Reload connector usage
+                    Object.keys(e.detail.connectorUsage).forEach(connector => {
+                        const checkbox = document.getElementById(connector);
+                        if (checkbox) {
+                            checkbox.checked = e.detail.connectorUsage[connector].count > 0;
+                        }
+                    });
+                    
+                    // Recalculate
+                    calculateImpact();
+                });
+                
+                // Save changes back to bridge
+                ['userCount', 'actionsSlider'].forEach(id => {
+                    document.getElementById(id)?.addEventListener('change', () => {
+                        bridge.updateUserConfig({
+                            userCount: parseInt(document.getElementById('userCount').value)
+                        });
+                    });
+                });
+                
+                document.querySelectorAll('input[name="accountType"]').forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        bridge.updateUserConfig({
+                            accountType: document.querySelector('input[name="accountType"]:checked').value
+                        });
+                    });
+                });
+                
+                // Calculate with bridge data
+                setTimeout(() => {
+                    calculateImpact();
+                }, 100);
+            }
+        })();
+    </script>
+</body>
+</html>

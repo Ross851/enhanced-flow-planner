@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Detection Test - Power Automate Planner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #0078d4;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .test-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+        .test-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .connector-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .premium {
+            background: linear-gradient(135deg, #ff4343, #ff6b6b);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        .standard {
+            background: #28a745;
+            color: white;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .details {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .label {
+            color: #666;
+        }
+        .value {
+            font-weight: 600;
+        }
+        .cost-impact {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .cost-premium {
+            background: #fff4e5;
+            border-left: 4px solid #ff9800;
+        }
+        .cost-standard {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        .scenario {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        .scenario h2 {
+            margin-top: 0;
+            color: white;
+        }
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .alert-icon {
+            font-size: 20px;
+        }
+        .alert-content {
+            flex: 1;
+        }
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .alert.warning {
+            background: #fff4e5;
+            border: 1px solid #ff9800;
+            color: #e65100;
+        }
+        .alert.error {
+            background: #ffebee;
+            border: 1px solid #ef5350;
+            color: #b71c1c;
+        }
+        .alert.success {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            color: #1b5e20;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Automatic License Detection Demo</h1>
+        <div class="subtitle">The planner now automatically detects when Premium licensing is required based on your connector selection</div>
+        
+        <div class="alert success">
+            <span class="alert-icon">✅</span>
+            <div class="alert-content">
+                <div class="alert-title">Feature Working!</div>
+                <div>The system automatically recognizes that different connectors require different licenses. SQL requires Premium, SharePoint doesn't.</div>
+            </div>
+        </div>
+
+        <h2>Connector License Requirements</h2>
+        <div class="test-grid">
+            <!-- SharePoint -->
+            <div class="test-card">
+                <div class="connector-name">
+                    SharePoint
+                    <span class="badge standard">Standard</span>
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="label">Rate Limit:</span>
+                        <span class="value">600 RPM</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">License Required:</span>
+                        <span class="value">M365 or Premium</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Min Cost:</span>
+                        <span class="value">£0/month (with M365)</span>
+                    </div>
+                </div>
+                <div class="cost-impact cost-standard">
+                    ✅ Works with existing M365 licenses up to 2K PPR/day
+                </div>
+            </div>
+
+            <!-- SQL Server -->
+            <div class="test-card">
+                <div class="connector-name">
+                    SQL Server
+                    <span class="badge premium">Premium</span>
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="label">Rate Limit:</span>
+                        <span class="value">300 RPM</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">License Required:</span>
+                        <span class="value">Premium or Process</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Min Cost:</span>
+                        <span class="value">£12.20/user/month</span>
+                    </div>
+                </div>
+                <div class="cost-impact cost-premium">
+                    ⚠️ Requires Premium licensing - automatically added to cost
+                </div>
+            </div>
+
+            <!-- Teams -->
+            <div class="test-card">
+                <div class="connector-name">
+                    Teams
+                    <span class="badge standard">Standard</span>
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="label">Rate Limit:</span>
+                        <span class="value">120 RPM</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">License Required:</span>
+                        <span class="value">M365 or Premium</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Min Cost:</span>
+                        <span class="value">£0/month (with M365)</span>
+                    </div>
+                </div>
+                <div class="cost-impact cost-standard">
+                    ✅ Works with existing M365 licenses up to 2K PPR/day
+                </div>
+            </div>
+
+            <!-- Custom HTTP -->
+            <div class="test-card">
+                <div class="connector-name">
+                    Custom HTTP
+                    <span class="badge premium">Premium</span>
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="label">Rate Limit:</span>
+                        <span class="value">60 RPM</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">License Required:</span>
+                        <span class="value">Premium or Process</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Min Cost:</span>
+                        <span class="value">£12.20/user/month</span>
+                    </div>
+                </div>
+                <div class="cost-impact cost-premium">
+                    ⚠️ Requires Premium licensing - automatically added to cost
+                </div>
+            </div>
+
+            <!-- Graph API -->
+            <div class="test-card">
+                <div class="connector-name">
+                    Graph API
+                    <span class="badge standard">Standard</span>
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="label">Rate Limit:</span>
+                        <span class="value">150 RPM</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">License Required:</span>
+                        <span class="value">M365 or Premium</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Min Cost:</span>
+                        <span class="value">£0/month (with M365)</span>
+                    </div>
+                </div>
+                <div class="cost-impact cost-standard">
+                    ✅ Works with existing M365 licenses up to 2K PPR/day
+                </div>
+            </div>
+
+            <!-- Dataverse -->
+            <div class="test-card">
+                <div class="connector-name">
+                    Dataverse
+                    <span class="badge standard">Standard</span>
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="label">Rate Limit:</span>
+                        <span class="value">6000 RPM</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">License Required:</span>
+                        <span class="value">M365 or Premium</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Min Cost:</span>
+                        <span class="value">£0/month (with M365)</span>
+                    </div>
+                </div>
+                <div class="cost-impact cost-standard">
+                    ✅ Works with existing M365 licenses up to 2K PPR/day
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario">
+            <h2>📊 Real-World Scenario</h2>
+            <p><strong>User's Question:</strong> "GET ITEMS, IS IT SHEPOINT. SQL ETC DIFFRNT THINKSTOMATICALLY A DIFFRENT LICENSE"</p>
+            <p><strong>Answer:</strong> YES! The planner now automatically recognizes this:</p>
+            <ul>
+                <li>✅ SharePoint "Get Items" = Standard license (£0 with M365)</li>
+                <li>⚠️ SQL "Get Items" = Premium license required (£12.20/user minimum)</li>
+                <li>🔄 The tool automatically updates costs when you switch connectors</li>
+                <li>💡 Visual indicators (STANDARD/PREMIUM badges) appear immediately</li>
+                <li>📊 Cost calculations adjust in real-time based on connector type</li>
+            </ul>
+        </div>
+
+        <div class="alert warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-content">
+                <div class="alert-title">Important: April 1, 2025 Enforcement</div>
+                <div>Microsoft will begin enforcing Premium connector licensing requirements on April 1, 2025. The automatic detection helps you prepare for this change.</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="unified-planner-v7.html" style="display: inline-block; padding: 12px 32px; background: #0078d4; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
+                Open Full Planner with Auto-Detection →
+            </a>
+        </div>
+    </div>
+</body>
+</html>

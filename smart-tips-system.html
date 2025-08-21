@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Smart Tips System - Interactive & Printable</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Smart Tips Container */
+        .smart-tips-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 400px;
+            max-height: 80vh;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .smart-tips-container.minimized {
+            width: 60px;
+            height: 60px;
+        }
+
+        .smart-tips-container.dragging {
+            transition: none;
+            opacity: 0.9;
+        }
+
+        /* Draggable Header */
+        .tips-header {
+            background: linear-gradient(135deg, #0078d4, #005a9e);
+            color: white;
+            padding: 16px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .tips-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tips-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tips-control-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .tips-control-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Tips Content */
+        .tips-content {
+            max-height: calc(80vh - 60px);
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .smart-tips-container.minimized .tips-content {
+            display: none;
+        }
+
+        /* Individual Tip */
+        .smart-tip {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #0078d4;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .smart-tip.critical {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .smart-tip.warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+
+        .smart-tip.success {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .tip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tip-severity {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            background: #dc3545;
+            color: white;
+        }
+
+        .severity-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .severity-info {
+            background: #0078d4;
+            color: white;
+        }
+
+        .tip-content {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .tip-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tip-action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tip-action-apply {
+            background: #28a745;
+            color: white;
+        }
+
+        .tip-action-apply:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .tip-action-learn {
+            background: #0078d4;
+            color: white;
+        }
+
+        .tip-action-learn:hover {
+            background: #005a9e;
+            transform: translateY(-1px);
+        }
+
+        .tip-action-dismiss {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .tip-action-dismiss:hover {
+            background: #d0d0d0;
+        }
+
+        /* Best Practice Links */
+        .tip-links {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .tip-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #0078d4;
+            text-decoration: none;
+            font-size: 12px;
+            margin-right: 12px;
+            margin-bottom: 4px;
+        }
+
+        .tip-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Flow Visualization */
+        .flow-visual {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .flow-connector {
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .flow-connector:hover {
+            transform: scale(1.05);
+        }
+
+        .connector-sharepoint {
+            background: linear-gradient(135deg, #036c70, #048a81);
+        }
+
+        .connector-sql {
+            background: linear-gradient(135deg, #cc2936, #e74c3c);
+        }
+
+        .connector-teams {
+            background: linear-gradient(135deg, #5558af, #7b83eb);
+        }
+
+        .connector-dataverse {
+            background: linear-gradient(135deg, #00bfa5, #00e5cc);
+        }
+
+        .connector-excel {
+            background: linear-gradient(135deg, #107c41, #21a366);
+        }
+
+        .connector-http {
+            background: linear-gradient(135deg, #ff6b6b, #ff8686);
+        }
+
+        .connector-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .connector-name {
+            font-size: 12px;
+        }
+
+        .connector-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4343;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            width: 40px;
+            height: 2px;
+            background: #ccc;
+            position: relative;
+            margin: 0 10px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #ccc;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .flow-tip {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .flow-tip::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #ffc107;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .smart-tips-container {
+                position: static;
+                width: 100%;
+                max-height: none;
+                box-shadow: none;
+                border: 1px solid #ddd;
+                margin-bottom: 20px;
+            }
+
+            .tips-controls {
+                display: none;
+            }
+
+            .tips-content {
+                max-height: none;
+            }
+
+            .smart-tip {
+                page-break-inside: avoid;
+            }
+
+            .tip-action-btn {
+                display: none;
+            }
+
+            .tip-links {
+                display: block;
+            }
+
+            .tip-link::after {
+                content: " (" attr(href) ")";
+                font-size: 10px;
+                color: #666;
+            }
+
+            /* QR Code for links in print */
+            .print-qr {
+                display: block;
+                width: 100px;
+                height: 100px;
+                margin-top: 10px;
+            }
+
+            .screen-only {
+                display: none;
+            }
+        }
+
+        @media screen {
+            .print-qr {
+                display: none;
+            }
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0078d4, #005a9e);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        /* Notification Toast */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            animation: slideUp 0.3s ease;
+            z-index: 2000;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Flow Visualization -->
+    <div class="flow-visual">
+        <h2>Your Power Automate Flow</h2>
+        <div style="margin-top: 20px;">
+            <!-- Flow Step 1 -->
+            <div class="flow-step">
+                <div class="flow-connector connector-sharepoint" onclick="showConnectorTip('sharepoint')">
+                    <div class="connector-icon">📁</div>
+                    <div class="connector-name">SharePoint</div>
+                </div>
+                <div class="flow-arrow">
+                    <div class="flow-tip">Add $filter here!</div>
+                </div>
+                <div class="flow-connector connector-excel" onclick="showConnectorTip('excel')">
+                    <div class="connector-icon">📊</div>
+                    <div class="connector-name">Excel</div>
+                </div>
+                <div class="flow-arrow"></div>
+                <div class="flow-connector connector-sql" onclick="showConnectorTip('sql')">
+                    <div class="connector-icon">🗄️</div>
+                    <div class="connector-name">SQL Server</div>
+                    <div class="connector-badge">PREMIUM</div>
+                </div>
+            </div>
+
+            <!-- Flow Step 2 -->
+            <div class="flow-step">
+                <div class="flow-connector connector-teams" onclick="showConnectorTip('teams')">
+                    <div class="connector-icon">💬</div>
+                    <div class="connector-name">Teams</div>
+                </div>
+                <div class="flow-arrow">
+                    <div class="flow-tip">Use batch operations</div>
+                </div>
+                <div class="flow-connector connector-dataverse" onclick="showConnectorTip('dataverse')">
+                    <div class="connector-icon">💎</div>
+                    <div class="connector-name">Dataverse</div>
+                </div>
+                <div class="flow-arrow"></div>
+                <div class="flow-connector connector-http" onclick="showConnectorTip('http')">
+                    <div class="connector-icon">🌐</div>
+                    <div class="connector-name">HTTP</div>
+                    <div class="connector-badge">PREMIUM</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smart Tips Panel (Draggable) -->
+    <div class="smart-tips-container" id="smartTips">
+        <div class="tips-header" id="tipsHeader">
+            <h3>
+                <span>💡</span>
+                Smart Tips
+            </h3>
+            <div class="tips-controls">
+                <button class="tips-control-btn" onclick="printTips()" title="Print">
+                    🖨️
+                </button>
+                <button class="tips-control-btn" onclick="toggleMinimize()" title="Minimize">
+                    ➖
+                </button>
+                <button class="tips-control-btn" onclick="closeTips()" title="Close">
+                    ✖️
+                </button>
+            </div>
+        </div>
+        <div class="tips-content" id="tipsContent">
+            <!-- Critical Tip -->
+            <div class="smart-tip critical" id="tip1">
+                <div class="tip-header">
+                    <div class="tip-title">
+                        ⚠️ SQL Premium License Required
+                    </div>
+                    <span class="tip-severity severity-critical">CRITICAL</span>
+                </div>
+                <div class="tip-content">
+                    Your flow uses SQL Server which requires Premium licensing. This will add £12.20/user/month or £81.90/flow/month to your costs.
+                </div>
+                <div class="tip-actions">
+                    <button class="tip-action-btn tip-action-apply" onclick="applyTip('switch-connector')">
+                        Switch to SharePoint
+                    </button>
+                    <button class="tip-action-btn tip-action-learn" onclick="learnMore('premium-connectors')">
+                        Learn More
+                    </button>
+                    <button class="tip-action-btn tip-action-dismiss" onclick="dismissTip('tip1')">
+                        Dismiss
+                    </button>
+                </div>
+                <div class="tip-links">
+                    <a href="https://docs.microsoft.com/power-automate/connectors" class="tip-link" target="_blank">
+                        📚 Connector Docs
+                    </a>
+                    <a href="https://aka.ms/flow-licensing" class="tip-link" target="_blank">
+                        💰 Licensing Guide
+                    </a>
+                </div>
+            </div>
+
+            <!-- Warning Tip -->
+            <div class="smart-tip warning" id="tip2">
+                <div class="tip-header">
+                    <div class="tip-title">
+                        🚀 Performance Optimization Available
+                    </div>
+                    <span class="tip-severity severity-warning">OPTIMIZE</span>
+                </div>
+                <div class="tip-content">
+                    Processing 5000+ items without filtering. Add OData $filter to reduce by 90% and prevent timeouts.
+                </div>
+                <div class="tip-actions">
+                    <button class="tip-action-btn tip-action-apply" onclick="applyTip('add-filter')">
+                        Add $filter Query
+                    </button>
+                    <button class="tip-action-btn tip-action-learn" onclick="learnMore('odata-filtering')">
+                        See Example
+                    </button>
+                    <button class="tip-action-btn tip-action-dismiss" onclick="dismissTip('tip2')">
+                        Later
+                    </button>
+                </div>
+                <div class="tip-links">
+                    <a href="https://john-liu.com/flow-performance" class="tip-link" target="_blank">
+                        🏆 John Liu's Tips
+                    </a>
+                    <a href="https://github.com/wyattdave/flow-patterns" class="tip-link" target="_blank">
+                        📖 David Wyatt Patterns
+                    </a>
+                </div>
+            </div>
+
+            <!-- Success Tip -->
+            <div class="smart-tip success" id="tip3">
+                <div class="tip-header">
+                    <div class="tip-title">
+                        ✅ Quick Win Available
+                    </div>
+                    <span class="tip-severity severity-info">TIP</span>
+                </div>
+                <div class="tip-content">
+                    Use Filter Array instead of Apply to Each with conditions for 100x performance improvement.
+                </div>
+                <div class="tip-actions">
+                    <button class="tip-action-btn tip-action-apply" onclick="applyTip('use-filter-array')">
+                        Apply Pattern
+                    </button>
+                    <button class="tip-action-btn tip-action-learn" onclick="learnMore('filter-array')">
+                        View Code
+                    </button>
+                </div>
+                <div class="tip-links">
+                    <a href="https://powerusers.microsoft.com/t5/Power-Automate-Cookbook/bd-p/FlowCookbook" class="tip-link" target="_blank">
+                        🍳 Flow Cookbook
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab screen-only" onclick="showAllTips()">
+        💡
+    </button>
+
+    <!-- Notification Toast -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Make tips draggable
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        const dragElement = document.getElementById("smartTips");
+        const dragHeader = document.getElementById("tipsHeader");
+
+        dragHeader.addEventListener("mousedown", dragStart);
+        document.addEventListener("mousemove", drag);
+        document.addEventListener("mouseup", dragEnd);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+
+            if (e.target === dragHeader || dragHeader.contains(e.target)) {
+                isDragging = true;
+                dragElement.classList.add('dragging');
+            }
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                dragElement.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+
+        function dragEnd(e) {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+            dragElement.classList.remove('dragging');
+        }
+
+        // Apply tip recommendations
+        function applyTip(action) {
+            let message = '';
+            
+            switch(action) {
+                case 'switch-connector':
+                    message = '✅ Switched to SharePoint connector - Saved £12.20/month!';
+                    document.querySelector('.connector-sql').className = 'flow-connector connector-sharepoint';
+                    document.querySelector('.connector-sql .connector-name').textContent = 'SharePoint';
+                    document.querySelector('.connector-badge').style.display = 'none';
+                    dismissTip('tip1');
+                    break;
+                case 'add-filter':
+                    message = '✅ Added $filter query - 90% performance improvement!';
+                    dismissTip('tip2');
+                    break;
+                case 'use-filter-array':
+                    message = '✅ Applied Filter Array pattern - 100x faster!';
+                    dismissTip('tip3');
+                    break;
+            }
+            
+            showNotification(message);
+        }
+
+        // Learn more about topics
+        function learnMore(topic) {
+            const urls = {
+                'premium-connectors': 'https://docs.microsoft.com/power-automate/connectors',
+                'odata-filtering': 'https://docs.microsoft.com/power-automate/odata-filters',
+                'filter-array': 'https://john-liu.com/filter-array-pattern'
+            };
+            
+            if (urls[topic]) {
+                window.open(urls[topic], '_blank');
+            }
+        }
+
+        // Dismiss individual tip
+        function dismissTip(tipId) {
+            const tip = document.getElementById(tipId);
+            tip.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => {
+                tip.style.display = 'none';
+            }, 300);
+        }
+
+        // Toggle minimize
+        function toggleMinimize() {
+            dragElement.classList.toggle('minimized');
+        }
+
+        // Close tips panel
+        function closeTips() {
+            dragElement.style.display = 'none';
+            showNotification('Tips hidden. Click 💡 to show again.');
+        }
+
+        // Show all tips
+        function showAllTips() {
+            dragElement.style.display = 'block';
+            dragElement.classList.remove('minimized');
+            document.querySelectorAll('.smart-tip').forEach(tip => {
+                tip.style.display = 'block';
+            });
+        }
+
+        // Print tips
+        function printTips() {
+            window.print();
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Show connector-specific tips
+        function showConnectorTip(connector) {
+            let message = '';
+            
+            switch(connector) {
+                case 'sharepoint':
+                    message = 'SharePoint: Standard connector, 600 RPM limit, works with M365 license';
+                    break;
+                case 'sql':
+                    message = '⚠️ SQL Server: Premium connector, requires additional licensing!';
+                    break;
+                case 'teams':
+                    message = 'Teams: Standard connector, 120 RPM limit';
+                    break;
+                case 'dataverse':
+                    message = 'Dataverse: High performance, 6000 RPM, use $expand for related data';
+                    break;
+                case 'excel':
+                    message = 'Excel: Standard connector, use batch operations for multiple rows';
+                    break;
+                case 'http':
+                    message = '⚠️ HTTP: Premium connector, 60 RPM limit';
+                    break;
+            }
+            
+            showNotification(message);
+        }
+
+        // Auto-show tips on load
+        setTimeout(() => {
+            showNotification('💡 Smart tips detected 3 optimization opportunities!');
+        }, 1000);
+    </script>
+</body>
+</html>

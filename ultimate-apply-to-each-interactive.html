@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply to Each - DRAG ACTIONS INSIDE AND WATCH THE DISASTER!</title>
+    <style>
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #004578;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-90: #605e5c;
+            --ms-gray-130: #323130;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            color: var(--ms-blue-dark);
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .warning-banner {
+            background: var(--ms-red);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 400px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Action Palette */
+        .action-palette {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .palette-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        .draggable-action {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .draggable-action:hover {
+            transform: translateX(10px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .draggable-action.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+            transform: rotate(5deg);
+        }
+
+        .action-icon {
+            font-size: 24px;
+        }
+
+        .action-details {
+            flex: 1;
+        }
+
+        .action-name {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .action-api {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .drag-me-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--ms-orange);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* Flow Canvas */
+        .flow-canvas {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .canvas-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--ms-gray-130);
+        }
+
+        /* Flow Step */
+        .flow-step {
+            background: var(--ms-gray-10);
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .flow-step.trigger {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            border: none;
+        }
+
+        .step-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-icon {
+            font-size: 32px;
+        }
+
+        .step-info {
+            flex: 1;
+        }
+
+        .step-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .step-detail {
+            font-size: 14px;
+            color: var(--ms-gray-90);
+        }
+
+        /* Apply to Each Container - THE STAR OF THE SHOW */
+        .apply-to-each-container {
+            border: 4px solid var(--ms-orange);
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+            margin: 30px 0;
+            position: relative;
+            min-height: 400px;
+            transition: all 0.3s;
+        }
+
+        .apply-to-each-container.drag-over {
+            border-color: var(--ms-blue);
+            background: linear-gradient(135deg, rgba(0, 120, 212, 0.1) 0%, rgba(0, 120, 212, 0.05) 100%);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,120,212,0.3);
+        }
+
+        .loop-header {
+            background: var(--ms-orange);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loop-title {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loop-counter {
+            background: white;
+            color: var(--ms-orange);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loop-counter input {
+            width: 60px;
+            padding: 5px;
+            border: 2px solid var(--ms-orange);
+            border-radius: 4px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Drop Zone Inside Loop */
+        .inside-loop-dropzone {
+            min-height: 250px;
+            padding: 30px;
+            position: relative;
+            background: white;
+            margin: 20px;
+            border: 3px dashed var(--ms-orange);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .inside-loop-dropzone.drag-over {
+            background: rgba(0, 120, 212, 0.05);
+            border-color: var(--ms-blue);
+            border-width: 4px;
+        }
+
+        .drop-instructions {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--ms-gray-90);
+        }
+
+        .drop-instructions h3 {
+            font-size: 24px;
+            color: var(--ms-orange);
+            margin-bottom: 10px;
+        }
+
+        .drop-instructions p {
+            font-size: 16px;
+        }
+
+        .inside-badge {
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: var(--ms-red);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        /* Action Inside Loop */
+        .action-inside-loop {
+            background: white;
+            border: 3px solid var(--ms-red);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            animation: slideIn 0.5s ease;
+            box-shadow: 0 5px 15px rgba(209, 52, 56, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .multiplication-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: var(--ms-red);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 16px;
+            box-shadow: 0 3px 10px rgba(209, 52, 56, 0.5);
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .action-inside-icon {
+            font-size: 28px;
+        }
+
+        .action-inside-details {
+            flex: 1;
+        }
+
+        .action-inside-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--ms-gray-130);
+        }
+
+        .action-inside-impact {
+            color: var(--ms-red);
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .remove-btn {
+            background: var(--ms-red);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Connector Arrow */
+        .connector-arrow {
+            text-align: center;
+            font-size: 30px;
+            color: var(--ms-gray-90);
+            margin: 20px 0;
+        }
+
+        /* Impact Panel */
+        .impact-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .impact-header {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--ms-gray-130);
+        }
+
+        /* Big Number Display */
+        .big-impact-number {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .big-impact-number::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .impact-label {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+            opacity: 0.95;
+        }
+
+        .impact-number {
+            color: white;
+            font-size: 84px;
+            font-weight: 900;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .impact-formula {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+
+        /* Visual Breakdown */
+        .visual-breakdown {
+            background: var(--ms-gray-10);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 2px solid var(--ms-gray-30);
+        }
+
+        .breakdown-label {
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            font-size: 16px;
+        }
+
+        .breakdown-value {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--ms-blue-dark);
+        }
+
+        .breakdown-row.total {
+            border-bottom: none;
+            border-top: 3px solid var(--ms-orange);
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+
+        .breakdown-row.total .breakdown-value {
+            color: var(--ms-red);
+            font-size: 28px;
+        }
+
+        /* Warning Message */
+        .impact-warning {
+            background: var(--ms-red);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .impact-warning strong {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Clear button */
+        .clear-all-btn {
+            background: var(--ms-gray-90);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .clear-all-btn:hover {
+            background: var(--ms-gray-130);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎯 DRAG Actions INTO Apply to Each - See The Multiplication!</h1>
+            <p style="font-size: 18px; color: var(--ms-gray-90); margin-top: 10px;">
+                Physically drag actions into the loop and watch the API calls explode!
+            </p>
+            <div class="warning-banner">
+                ⚠️ Every action you put INSIDE the loop runs FOR EVERY ITEM!
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Action Palette -->
+            <div class="action-palette">
+                <h3 class="palette-title">📦 DRAG These Actions</h3>
+                
+                <div class="draggable-action" draggable="true" data-action="get-user" data-icon="👤" data-api="1">
+                    <span class="drag-me-badge">DRAG ME!</span>
+                    <span class="action-icon">👤</span>
+                    <div class="action-details">
+                        <div class="action-name">Get user profile</div>
+                        <div class="action-api">1 API call each time</div>
+                    </div>
+                </div>
+
+                <div class="draggable-action" draggable="true" data-action="send-email" data-icon="📧" data-api="1">
+                    <span class="drag-me-badge">DRAG ME!</span>
+                    <span class="action-icon">📧</span>
+                    <div class="action-details">
+                        <div class="action-name">Send an email</div>
+                        <div class="action-api">1 API call each time</div>
+                    </div>
+                </div>
+
+                <div class="draggable-action" draggable="true" data-action="update-item" data-icon="✏️" data-api="1">
+                    <span class="drag-me-badge">DRAG ME!</span>
+                    <span class="action-icon">✏️</span>
+                    <div class="action-details">
+                        <div class="action-name">Update item</div>
+                        <div class="action-api">1 API call each time</div>
+                    </div>
+                </div>
+
+                <div class="draggable-action" draggable="true" data-action="get-file" data-icon="📁" data-api="1">
+                    <span class="drag-me-badge">DRAG ME!</span>
+                    <span class="action-icon">📁</span>
+                    <div class="action-details">
+                        <div class="action-name">Get file content</div>
+                        <div class="action-api">1 API call each time</div>
+                    </div>
+                </div>
+
+                <div class="draggable-action" draggable="true" data-action="create-task" data-icon="✅" data-api="1">
+                    <span class="drag-me-badge">DRAG ME!</span>
+                    <span class="action-icon">✅</span>
+                    <div class="action-details">
+                        <div class="action-name">Create task</div>
+                        <div class="action-api">1 API call each time</div>
+                    </div>
+                </div>
+
+                <div class="draggable-action" draggable="true" data-action="post-teams" data-icon="💬" data-api="1">
+                    <span class="drag-me-badge">DRAG ME!</span>
+                    <span class="action-icon">💬</span>
+                    <div class="action-details">
+                        <div class="action-name">Post to Teams</div>
+                        <div class="action-api">1 API call each time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flow Canvas -->
+            <div class="flow-canvas">
+                <div class="canvas-header">
+                    <h2 class="canvas-title">Build Your Flow</h2>
+                    <button class="clear-all-btn" onclick="clearAll()" style="width: auto;">Reset Flow</button>
+                </div>
+
+                <!-- Trigger -->
+                <div class="flow-step trigger">
+                    <div class="step-content">
+                        <span class="step-icon">⚡</span>
+                        <div class="step-info">
+                            <div class="step-name">When an item is created</div>
+                            <div class="step-detail">Triggers when new invoice arrives in SharePoint</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector-arrow">↓</div>
+
+                <!-- Get Items -->
+                <div class="flow-step">
+                    <div class="step-content">
+                        <span class="step-icon">📋</span>
+                        <div class="step-info">
+                            <div class="step-name">Get items from SharePoint</div>
+                            <div class="step-detail">Returns 100 customer records • 1 API call</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector-arrow">↓</div>
+
+                <!-- APPLY TO EACH - THE BIG ONE -->
+                <div class="apply-to-each-container" id="applyToEachContainer">
+                    <div class="loop-header">
+                        <div class="loop-title">
+                            <span>🔁</span>
+                            <span>APPLY TO EACH</span>
+                        </div>
+                        <div class="loop-counter">
+                            Processing
+                            <input type="number" id="loopCount" value="100" min="1" max="1000" onchange="updateCalculations()">
+                            items
+                        </div>
+                    </div>
+
+                    <div class="inside-loop-dropzone" id="dropZone">
+                        <span class="inside-badge">INSIDE THE LOOP - MULTIPLIES!</span>
+                        
+                        <div class="drop-instructions" id="dropInstructions">
+                            <h3>👇 DRAG ACTIONS HERE!</h3>
+                            <p>Whatever you drop here will run <strong>100 times</strong></p>
+                            <p style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
+                                Each action = 100 API calls!
+                            </p>
+                        </div>
+
+                        <div id="actionsContainer"></div>
+                    </div>
+                </div>
+
+                <div class="connector-arrow">↓</div>
+
+                <!-- Complete -->
+                <div class="flow-step">
+                    <div class="step-content">
+                        <span class="step-icon">✅</span>
+                        <div class="step-info">
+                            <div class="step-name">Flow complete</div>
+                            <div class="step-detail">All items processed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impact Panel -->
+            <div class="impact-panel">
+                <h3 class="impact-header">💥 REAL-TIME IMPACT</h3>
+
+                <!-- Big Number -->
+                <div class="big-impact-number">
+                    <div class="impact-label">TOTAL API CALLS</div>
+                    <div class="impact-number" id="totalAPICalls">1</div>
+                    <div class="impact-formula" id="formula">Just 1 (Get items)</div>
+                </div>
+
+                <!-- Visual Breakdown -->
+                <div class="visual-breakdown">
+                    <div class="breakdown-row">
+                        <span class="breakdown-label">Outside loop (Get items):</span>
+                        <span class="breakdown-value">1 call</span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span class="breakdown-label">Loop runs:</span>
+                        <span class="breakdown-value" id="loopRuns">100 times</span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span class="breakdown-label">Actions inside loop:</span>
+                        <span class="breakdown-value" id="actionsCount">0 actions</span>
+                    </div>
+                    <div class="breakdown-row total">
+                        <span class="breakdown-label">Calls from loop:</span>
+                        <span class="breakdown-value" id="loopCalls">0 calls</span>
+                    </div>
+                </div>
+
+                <!-- Warning -->
+                <div class="impact-warning" id="warningMessage" style="display: none;">
+                    <strong>🚨 YOUR FLOW WILL FAIL!</strong>
+                    Too many API calls will cause throttling. Your flow will be blocked!
+                    <br><br>
+                    <strong>Solution:</strong> Filter BEFORE the loop or use batch operations!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let actionsInLoop = [];
+        let draggedElement = null;
+        let draggedData = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDragAndDrop();
+            updateCalculations();
+        });
+
+        function setupDragAndDrop() {
+            // Setup draggable actions
+            const draggables = document.querySelectorAll('.draggable-action');
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', handleDragStart);
+                draggable.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Setup drop zones
+            const dropZone = document.getElementById('dropZone');
+            const container = document.getElementById('applyToEachContainer');
+            
+            // Drop zone events
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('drop', handleDrop);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+            
+            // Container events for visual feedback
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                container.classList.add('drag-over');
+            });
+            
+            container.addEventListener('dragleave', (e) => {
+                if (e.target === container) {
+                    container.classList.remove('drag-over');
+                }
+            });
+            
+            container.addEventListener('drop', (e) => {
+                container.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            draggedData = {
+                action: e.target.getAttribute('data-action'),
+                icon: e.target.getAttribute('data-icon'),
+                api: parseInt(e.target.getAttribute('data-api')),
+                name: e.target.querySelector('.action-name').textContent
+            };
+            
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+            
+            // Visual feedback
+            document.getElementById('dropZone').classList.add('ready-for-drop');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.getElementById('dropZone').classList.remove('ready-for-drop');
+            document.getElementById('applyToEachContainer').classList.remove('drag-over');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.add('drag-over');
+            
+            // Update instructions
+            const instructions = document.getElementById('dropInstructions');
+            if (actionsInLoop.length === 0) {
+                instructions.innerHTML = `
+                    <h3 style="color: var(--ms-blue);">✋ DROP IT HERE!</h3>
+                    <p style="font-size: 18px;">It will run <strong style="color: var(--ms-red);">100 times!</strong></p>
+                `;
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (e.target.id === 'dropZone') {
+                e.target.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.remove('drag-over');
+            document.getElementById('applyToEachContainer').classList.remove('drag-over');
+            
+            if (draggedData) {
+                addActionToLoop(draggedData);
+                draggedData = null;
+            }
+        }
+
+        function addActionToLoop(data) {
+            actionsInLoop.push(data);
+            renderActionsInLoop();
+            updateCalculations();
+            
+            // Visual feedback
+            const container = document.getElementById('applyToEachContainer');
+            container.style.animation = 'none';
+            setTimeout(() => {
+                container.style.animation = 'pulse 0.5s ease';
+            }, 10);
+        }
+
+        function renderActionsInLoop() {
+            const container = document.getElementById('actionsContainer');
+            const instructions = document.getElementById('dropInstructions');
+            const loopCount = parseInt(document.getElementById('loopCount').value) || 100;
+            
+            if (actionsInLoop.length === 0) {
+                instructions.style.display = 'block';
+                container.innerHTML = '';
+                return;
+            }
+            
+            instructions.style.display = 'none';
+            
+            container.innerHTML = actionsInLoop.map((action, index) => `
+                <div class="action-inside-loop">
+                    <span class="multiplication-badge">×${loopCount}</span>
+                    <span class="action-inside-icon">${action.icon}</span>
+                    <div class="action-inside-details">
+                        <div class="action-inside-name">${action.name}</div>
+                        <div class="action-inside-impact">
+                            Runs ${loopCount} times = ${loopCount * action.api} API calls!
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeAction(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeAction(index) {
+            actionsInLoop.splice(index, 1);
+            renderActionsInLoop();
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            const loopCount = parseInt(document.getElementById('loopCount').value) || 100;
+            const totalActionsInLoop = actionsInLoop.reduce((sum, action) => sum + action.api, 0);
+            const loopApiCalls = totalActionsInLoop * loopCount;
+            const totalApiCalls = 1 + loopApiCalls; // 1 for Get items + loop calls
+            
+            // Update displays
+            document.getElementById('totalAPICalls').textContent = totalApiCalls.toLocaleString();
+            document.getElementById('loopRuns').textContent = `${loopCount} times`;
+            document.getElementById('actionsCount').textContent = `${actionsInLoop.length} action${actionsInLoop.length !== 1 ? 's' : ''}`;
+            document.getElementById('loopCalls').textContent = `${loopApiCalls.toLocaleString()} calls`;
+            
+            // Update formula
+            if (actionsInLoop.length > 0) {
+                document.getElementById('formula').textContent = 
+                    `1 + (${loopCount} × ${totalActionsInLoop}) = ${totalApiCalls.toLocaleString()}`;
+            } else {
+                document.getElementById('formula').textContent = 'Just 1 (Get items)';
+            }
+            
+            // Update multiplier badges
+            document.querySelectorAll('.multiplication-badge').forEach(badge => {
+                badge.textContent = `×${loopCount}`;
+            });
+            
+            // Update impact text in each action
+            document.querySelectorAll('.action-inside-impact').forEach((impact, index) => {
+                if (actionsInLoop[index]) {
+                    impact.textContent = `Runs ${loopCount} times = ${loopCount * actionsInLoop[index].api} API calls!`;
+                }
+            });
+            
+            // Show warning if needed
+            const warning = document.getElementById('warningMessage');
+            if (totalApiCalls > 500) {
+                warning.style.display = 'block';
+                document.querySelector('.big-impact-number').style.background = 
+                    'linear-gradient(135deg, #ff0000 0%, #ff6b6b 100%)';
+            } else {
+                warning.style.display = 'none';
+                document.querySelector('.big-impact-number').style.background = 
+                    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+            }
+        }
+
+        function clearAll() {
+            actionsInLoop = [];
+            document.getElementById('loopCount').value = 100;
+            renderActionsInLoop();
+            updateCalculations();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 Power Platform Ultimate Planner v3.0 - Flows, Agents & AI</title>
+  <style>
+    /* CSS Variables for Enterprise Theming */
+    :root {
+      --primary: #0078d4;
+      --secondary: #40e0d0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --copilot: #8b5cf6;
+      --ai-builder: #ec4899;
+      --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --card-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      --hover-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background: var(--background);
+      min-height: 100vh;
+      padding: 8px;
+      color: #1f2937;
+    }
+    
+    .container { 
+      max-width: 1400px; 
+      margin: 0 auto;
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .header {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--copilot), var(--ai-builder));
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .version-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--copilot), var(--ai-builder));
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      margin-left: 12px;
+      font-weight: 600;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    /* Wizard Progress Bar */
+    .wizard-progress {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .wizard-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .wizard-step::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: -50%;
+      width: 100%;
+      height: 2px;
+      background: #e5e7eb;
+      z-index: -1;
+    }
+    
+    .wizard-step:last-child::after { display: none; }
+    
+    .wizard-step.active::after { background: var(--primary); }
+    
+    .wizard-step-circle {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 8px;
+      background: #e5e7eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    .wizard-step.active .wizard-step-circle {
+      background: var(--primary);
+      color: white;
+      transform: scale(1.1);
+    }
+    
+    .wizard-step.completed .wizard-step-circle {
+      background: var(--success);
+      color: white;
+    }
+    
+    .wizard-step-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
+    .wizard-step.active .wizard-step-label {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    /* Enforcement Warning */
+    .enforcement-warning {
+      background: linear-gradient(135deg, #fef3c7, #fed7aa);
+      border: 2px solid var(--warning);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: warningPulse 3s infinite;
+    }
+    
+    @keyframes warningPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 20px 10px rgba(245, 158, 11, 0.2); }
+    }
+    
+    .enforcement-warning .icon {
+      font-size: 2rem;
+      animation: shake 2s infinite;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 8px;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow-x: auto;
+    }
+    
+    .tab {
+      padding: 12px 24px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      position: relative;
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+    }
+    
+    .tab:hover:not(.active) {
+      background: #e5e7eb;
+      transform: translateY(-1px);
+    }
+    
+    .tab .badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--danger);
+      color: white;
+      font-size: 0.625rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .card:hover {
+      box-shadow: var(--hover-shadow);
+      transform: translateY(-2px);
+    }
+    
+    .card.hidden { display: none; }
+    
+    .card.highlight {
+      border: 2px solid var(--primary);
+      background: linear-gradient(135deg, #ffffff, #f0f9ff);
+    }
+    
+    .card.ai-card {
+      border-left: 4px solid var(--ai-builder);
+      background: linear-gradient(135deg, #ffffff, #fdf4ff);
+    }
+    
+    .card.copilot-card {
+      border-left: 4px solid var(--copilot);
+      background: linear-gradient(135deg, #ffffff, #f5f3ff);
+    }
+    
+    /* Headers */
+    h1 { 
+      font-size: 2rem; 
+      font-weight: bold; 
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--copilot));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    h2 { 
+      font-size: 1.5rem; 
+      font-weight: 600; 
+      margin-bottom: 16px;
+      color: #1f2937;
+    }
+    
+    h3 { 
+      font-size: 1.125rem; 
+      font-weight: 600; 
+      margin-bottom: 12px;
+      color: #374151;
+    }
+    
+    /* Grid Layout */
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    
+    @media (max-width: 1024px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+    
+    /* Form Elements */
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      background: white;
+      transition: all 0.2s ease;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    input.invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      animation: shake 0.5s;
+    }
+    
+    .validation-message {
+      color: var(--danger);
+      font-size: 0.75rem;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* Buttons */
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
+    }
+    
+    button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    button:hover {
+      background: #106ebe;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 120, 212, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+    
+    .btn-success {
+      background: var(--success);
+    }
+    
+    .btn-success:hover {
+      background: #059669;
+    }
+    
+    .btn-ai {
+      background: linear-gradient(135deg, var(--ai-builder), var(--copilot));
+    }
+    
+    .btn-ai:hover {
+      background: linear-gradient(135deg, #d946ef, #7c3aed);
+    }
+    
+    .preset-btn {
+      background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+      color: #1e40af;
+      padding: 10px 16px;
+      margin: 0 8px 8px 0;
+      width: auto;
+      font-size: 0.875rem;
+      border: 1px solid #93c5fd;
+    }
+    
+    .preset-btn:hover {
+      background: linear-gradient(135deg, #bfdbfe, #c7d2fe);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+    
+    /* Token Calculator Specific */
+    .token-display {
+      background: linear-gradient(135deg, #f0f9ff, #f5f3ff);
+      border: 2px solid var(--copilot);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+      position: relative;
+    }
+    
+    .token-meter {
+      width: 100%;
+      height: 30px;
+      background: #e5e7eb;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 12px 0;
+      position: relative;
+    }
+    
+    .token-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), var(--copilot));
+      transition: width 0.5s ease;
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .token-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmerToken 2s infinite;
+    }
+    
+    @keyframes shimmerToken {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .token-fill.warning {
+      background: linear-gradient(90deg, var(--warning), #f97316);
+    }
+    
+    .token-fill.danger {
+      background: linear-gradient(90deg, var(--danger), #dc2626);
+    }
+    
+    /* Best Practice Cards */
+    .best-practice-card {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 2px solid var(--success);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 12px 0;
+      transition: all 0.3s ease;
+    }
+    
+    .best-practice-card:hover {
+      transform: translateX(8px);
+      box-shadow: -4px 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    
+    .best-practice-card h4 {
+      color: var(--success);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Resource Links */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    
+    .resource-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .resource-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 20px rgba(0, 120, 212, 0.15);
+      transform: translateY(-4px);
+    }
+    
+    .resource-card .icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    
+    .resource-card .title {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .resource-card .description {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
+    /* Interactive Help */
+    .help-bubble {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--copilot));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .help-bubble:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .help-panel {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 350px;
+      max-height: 500px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: none;
+      overflow-y: auto;
+      z-index: 999;
+    }
+    
+    .help-panel.active {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Tooltips */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      color: var(--info);
+      font-weight: bold;
+      margin-left: 6px;
+      font-size: 0.875rem;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 250px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 8px;
+      padding: 12px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -125px;
+      font-weight: normal;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Comparison Table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 20px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .comparison-table thead {
+      background: linear-gradient(135deg, var(--primary), var(--copilot));
+      color: white;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .comparison-table tbody tr {
+      background: white;
+      transition: all 0.2s ease;
+    }
+    
+    .comparison-table tbody tr:hover {
+      background: #f9fafb;
+      transform: translateX(4px);
+    }
+    
+    .comparison-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* Status Indicators */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    .status-indicator.success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-indicator.warning {
+      background: #fed7aa;
+      color: #92400e;
+    }
+    
+    .status-indicator.danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .status-indicator.info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 8px;
+      }
+      
+      .wizard-progress {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .wizard-step::after {
+        display: none;
+      }
+      
+      .tabs {
+        flex-wrap: wrap;
+      }
+      
+      .help-panel {
+        width: calc(100vw - 40px);
+        right: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      h2 {
+        font-size: 1.25rem;
+      }
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+      }
+      
+      .tabs, .help-bubble, .wizard-progress {
+        display: none;
+      }
+      
+      .card {
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>⚙️ Power Platform Ultimate Planner <span class="version-badge">v3.0 AI-Powered</span></h1>
+      <p style="margin-top: 8px; color: #6b7280;">Complete planning for Power Automate flows, Copilot Studio agents, and AI Builder scenarios</p>
+      
+      <div class="enforcement-warning">
+        <span class="icon">⚠️</span>
+        <div>
+          <strong>Critical Dates:</strong><br>
+          • April 1, 2025: Premium connector enforcement begins<br>
+          • AI Builder credits now required for prompts in flows<br>
+          • Copilot Studio messages replace credits for agents
+        </div>
+      </div>
+    </div>
+
+    <!-- Wizard Progress -->
+    <div class="wizard-progress">
+      <div class="wizard-step active" onclick="goToStep(1)">
+        <div class="wizard-step-circle">1</div>
+        <div class="wizard-step-label">Scenario Type</div>
+      </div>
+      <div class="wizard-step" onclick="goToStep(2)">
+        <div class="wizard-step-circle">2</div>
+        <div class="wizard-step-label">Configuration</div>
+      </div>
+      <div class="wizard-step" onclick="goToStep(3)">
+        <div class="wizard-step-circle">3</div>
+        <div class="wizard-step-label">AI & Tokens</div>
+      </div>
+      <div class="wizard-step" onclick="goToStep(4)">
+        <div class="wizard-step-circle">4</div>
+        <div class="wizard-step-label">Analysis</div>
+      </div>
+      <div class="wizard-step" onclick="goToStep(5)">
+        <div class="wizard-step-circle">5</div>
+        <div class="wizard-step-label">Recommendations</div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('planner')">
+        🎯 Smart Planner
+        <span class="badge">NEW</span>
+      </button>
+      <button class="tab" onclick="switchTab('flows')">💧 Power Automate</button>
+      <button class="tab" onclick="switchTab('copilot')">🤖 Copilot Studio</button>
+      <button class="tab" onclick="switchTab('aibuilder')">🧠 AI Builder</button>
+      <button class="tab" onclick="switchTab('comparison')">📊 Licensing</button>
+      <button class="tab" onclick="switchTab('bestpractices')">✨ Best Practices</button>
+      <button class="tab" onclick="switchTab('resources')">📚 Resources</button>
+      <button class="tab" onclick="switchTab('powerdocu')">📄 PowerDocu</button>
+    </div>
+
+    <!-- Smart Planner Tab (Wizard) -->
+    <div id="planner-tab" class="tab-content">
+      <!-- Step 1: Scenario Type -->
+      <div id="step-1" class="wizard-step-content">
+        <div class="card">
+          <h2>🎯 What are you building?</h2>
+          <p style="margin-bottom: 20px; color: #6b7280;">Select your scenario type to get tailored recommendations</p>
+          
+          <div class="grid grid-3">
+            <div class="resource-card" onclick="selectScenario('flow')" style="cursor: pointer;">
+              <div class="icon">💧</div>
+              <div class="title">Power Automate Flow</div>
+              <div class="description">Cloud flows, desktop flows, process automation</div>
+            </div>
+            
+            <div class="resource-card" onclick="selectScenario('agent')" style="cursor: pointer;">
+              <div class="icon">🤖</div>
+              <div class="title">Copilot Studio Agent</div>
+              <div class="description">Chatbots, virtual agents, conversational AI</div>
+            </div>
+            
+            <div class="resource-card" onclick="selectScenario('ai')" style="cursor: pointer;">
+              <div class="icon">🧠</div>
+              <div class="title">AI Builder Model</div>
+              <div class="description">Document processing, prediction, text analysis</div>
+            </div>
+            
+            <div class="resource-card" onclick="selectScenario('hybrid')" style="cursor: pointer;">
+              <div class="icon">🔄</div>
+              <div class="title">Hybrid Solution</div>
+              <div class="description">Combining flows, agents, and AI</div>
+            </div>
+            
+            <div class="resource-card" onclick="selectScenario('migration')" style="cursor: pointer;">
+              <div class="icon">📦</div>
+              <div class="title">Migration/Upgrade</div>
+              <div class="description">Moving from legacy systems</div>
+            </div>
+            
+            <div class="resource-card" onclick="selectScenario('governance')" style="cursor: pointer;">
+              <div class="icon">🛡️</div>
+              <div class="title">Governance Assessment</div>
+              <div class="description">Compliance and control evaluation</div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button onclick="nextStep()" class="btn-success">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Configuration -->
+      <div id="step-2" class="wizard-step-content" style="display: none;">
+        <div class="card">
+          <h2>📋 Configuration Details</h2>
+          
+          <div class="grid grid-3">
+            <div>
+              <label>Scenario Name
+                <span class="tooltip">?<span class="tooltiptext">Give your scenario a memorable name for saving and sharing</span></span>
+              </label>
+              <input type="text" id="scenarioName" value="My Solution" oninput="updateCalculations()">
+            </div>
+            
+            <div>
+              <label>Organization Size
+                <span class="tooltip">?<span class="tooltiptext">Helps determine appropriate licensing tier</span></span>
+              </label>
+              <select id="orgSize" onchange="updateCalculations()">
+                <option value="small">Small (1-50 users)</option>
+                <option value="medium">Medium (51-500 users)</option>
+                <option value="large">Large (501-5000 users)</option>
+                <option value="enterprise">Enterprise (5000+ users)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label>Industry
+                <span class="tooltip">?<span class="tooltiptext">Industry-specific compliance requirements</span></span>
+              </label>
+              <select id="industry" onchange="updateCalculations()">
+                <option value="general">General Business</option>
+                <option value="finance">Finance & Banking</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="education">Education</option>
+                <option value="government">Government</option>
+                <option value="manufacturing">Manufacturing</option>
+                <option value="retail">Retail</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="flow-config" class="config-section">
+            <h3>💧 Flow Configuration</h3>
+            <div class="grid grid-3">
+              <div>
+                <label>Items to Process</label>
+                <input type="number" id="items" value="1000" min="1" max="1000000" oninput="updateCalculations()">
+              </div>
+              <div>
+                <label>Actions per Item</label>
+                <input type="number" id="actionsPerItem" value="3" min="1" max="100" oninput="updateCalculations()">
+              </div>
+              <div>
+                <label>Runs per Day</label>
+                <input type="number" id="runsPerDay" value="10" min="1" max="1440" oninput="updateCalculations()">
+              </div>
+            </div>
+          </div>
+          
+          <div id="agent-config" class="config-section" style="display: none;">
+            <h3>🤖 Agent Configuration</h3>
+            <div class="grid grid-3">
+              <div>
+                <label>Expected Conversations/Day</label>
+                <input type="number" id="conversations" value="100" min="1" max="10000" oninput="updateCalculations()">
+              </div>
+              <div>
+                <label>Avg Messages per Conversation</label>
+                <input type="number" id="messagesPerConv" value="5" min="1" max="50" oninput="updateCalculations()">
+              </div>
+              <div>
+                <label>Use Generative AI?</label>
+                <select id="useGenAI" onchange="updateCalculations()">
+                  <option value="yes">Yes (2x messages)</option>
+                  <option value="no">No (1x messages)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button onclick="previousStep()" class="btn-secondary">← Back</button>
+            <button onclick="nextStep()" class="btn-success">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: AI & Tokens -->
+      <div id="step-3" class="wizard-step-content" style="display: none;">
+        <div class="card ai-card">
+          <h2>🧠 AI & Token Configuration</h2>
+          
+          <div class="token-display">
+            <h3>Token Calculator</h3>
+            
+            <div class="grid grid-2">
+              <div>
+                <label>AI Model
+                  <span class="tooltip">?<span class="tooltiptext">Different models have different token costs and capabilities</span></span>
+                </label>
+                <select id="aiModel" onchange="calculateTokens()">
+                  <option value="gpt-4o-mini">GPT-4o mini (Basic - 1 credit/1K tokens)</option>
+                  <option value="gpt-4">GPT-4 (Standard - 10 credits/1K tokens)</option>
+                  <option value="gpt-4-turbo">GPT-4 Turbo (Premium - 20 credits/1K tokens)</option>
+                  <option value="custom">Custom Model</option>
+                </select>
+              </div>
+              
+              <div>
+                <label>Prompt Type</label>
+                <select id="promptType" onchange="calculateTokens()">
+                  <option value="simple">Simple (< 500 tokens)</option>
+                  <option value="moderate">Moderate (500-2000 tokens)</option>
+                  <option value="complex">Complex (2000-4000 tokens)</option>
+                  <option value="extensive">Extensive (4000+ tokens)</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="grid grid-3" style="margin-top: 16px;">
+              <div>
+                <label>Input Tokens (avg)</label>
+                <input type="number" id="inputTokens" value="500" min="1" max="32000" oninput="calculateTokens()">
+              </div>
+              <div>
+                <label>Output Tokens (avg)</label>
+                <input type="number" id="outputTokens" value="200" min="1" max="4000" oninput="calculateTokens()">
+              </div>
+              <div>
+                <label>Calls per Day</label>
+                <input type="number" id="aiCallsPerDay" value="100" min="1" max="100000" oninput="calculateTokens()">
+              </div>
+            </div>
+            
+            <div class="token-meter">
+              <div class="token-fill" id="tokenMeter" style="width: 30%;"></div>
+            </div>
+            
+            <div class="grid grid-3" style="margin-top: 16px;">
+              <div class="status-indicator info">
+                <span>Daily Tokens:</span>
+                <strong id="dailyTokens">70,000</strong>
+              </div>
+              <div class="status-indicator warning">
+                <span>Monthly Credits:</span>
+                <strong id="monthlyCredits">2,100</strong>
+              </div>
+              <div class="status-indicator success">
+                <span>Est. Cost:</span>
+                <strong id="tokenCost">£84/mo</strong>
+              </div>
+            </div>
+          </div>
+          
+          <div class="best-practice-card" style="margin-top: 20px;">
+            <h4>💡 Token Optimization Tips</h4>
+            <ul>
+              <li>Use system prompts efficiently - they count towards every call</li>
+              <li>Implement caching for repeated queries</li>
+              <li>Consider GPT-4o mini for non-critical tasks</li>
+              <li>Batch similar requests when possible</li>
+              <li>Monitor token usage in Azure OpenAI Studio</li>
+            </ul>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button onclick="previousStep()" class="btn-secondary">← Back</button>
+            <button onclick="nextStep()" class="btn-success">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Analysis -->
+      <div id="step-4" class="wizard-step-content" style="display: none;">
+        <div class="card">
+          <h2>📊 Comprehensive Analysis</h2>
+          
+          <div class="grid grid-2">
+            <div>
+              <h3>Cost Breakdown</h3>
+              <div id="costAnalysis"></div>
+            </div>
+            
+            <div>
+              <h3>Risk Assessment</h3>
+              <div id="riskAnalysis"></div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <h3>Performance Metrics</h3>
+            <div id="performanceMetrics"></div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button onclick="previousStep()" class="btn-secondary">← Back</button>
+            <button onclick="nextStep()" class="btn-success">View Recommendations →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Recommendations -->
+      <div id="step-5" class="wizard-step-content" style="display: none;">
+        <div class="card highlight">
+          <h2>🎯 Personalized Recommendations</h2>
+          
+          <div id="recommendations"></div>
+          
+          <div style="margin-top: 20px;">
+            <button onclick="exportReport()" class="btn-ai">📄 Export Report</button>
+            <button onclick="shareConfiguration()" class="btn-success">🔗 Share Configuration</button>
+            <button onclick="startOver()" class="btn-secondary">🔄 Start Over</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Power Automate Tab -->
+    <div id="flows-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>💧 Power Automate Cost Calculator</h2>
+        <!-- Include existing flow calculator content here -->
+      </div>
+    </div>
+
+    <!-- Copilot Studio Tab -->
+    <div id="copilot-tab" class="tab-content hidden">
+      <div class="card copilot-card">
+        <h2>🤖 Copilot Studio Message Calculator</h2>
+        
+        <div class="grid grid-3">
+          <div>
+            <label>Message Packs Owned</label>
+            <input type="number" id="messagePacks" value="1" min="0" max="100" oninput="calculateMessages()">
+            <small>1 pack = 25,000 messages/month @ £200</small>
+          </div>
+          
+          <div>
+            <label>Expected Conversations/Day</label>
+            <input type="number" id="dailyConversations" value="100" min="1" max="10000" oninput="calculateMessages()">
+          </div>
+          
+          <div>
+            <label>Messages per Conversation</label>
+            <input type="number" id="messagesPerChat" value="5" min="1" max="50" oninput="calculateMessages()">
+          </div>
+        </div>
+        
+        <div class="token-display" style="margin-top: 20px;">
+          <h3>Message Consumption Analysis</h3>
+          <div class="token-meter">
+            <div class="token-fill" id="messageMeter" style="width: 60%;"></div>
+          </div>
+          
+          <div class="grid grid-4" style="margin-top: 16px;">
+            <div class="status-indicator info">
+              <span>Daily:</span>
+              <strong id="dailyMessages">500</strong>
+            </div>
+            <div class="status-indicator info">
+              <span>Monthly:</span>
+              <strong id="monthlyMessages">15,000</strong>
+            </div>
+            <div class="status-indicator success">
+              <span>Capacity:</span>
+              <strong id="messageCapacity">25,000</strong>
+            </div>
+            <div class="status-indicator warning">
+              <span>Usage:</span>
+              <strong id="messageUsage">60%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Builder Tab -->
+    <div id="aibuilder-tab" class="tab-content hidden">
+      <div class="card ai-card">
+        <h2>🧠 AI Builder Credit Calculator</h2>
+        
+        <div class="grid grid-2">
+          <div>
+            <h3>Select AI Models</h3>
+            <div style="margin: 16px 0;">
+              <label>
+                <input type="checkbox" id="docProcessing" onchange="calculateAICredits()">
+                Document Processing (1 credit/page)
+              </label>
+            </div>
+            <div style="margin: 16px 0;">
+              <label>
+                <input type="checkbox" id="textRecognition" onchange="calculateAICredits()">
+                Text Recognition (1 credit/page)
+              </label>
+            </div>
+            <div style="margin: 16px 0;">
+              <label>
+                <input type="checkbox" id="sentimentAnalysis" onchange="calculateAICredits()">
+                Sentiment Analysis (1 credit/1K chars)
+              </label>
+            </div>
+            <div style="margin: 16px 0;">
+              <label>
+                <input type="checkbox" id="prediction" onchange="calculateAICredits()">
+                Prediction Model (1 credit/5 rows)
+              </label>
+            </div>
+          </div>
+          
+          <div>
+            <h3>Usage Volume</h3>
+            <div>
+              <label>Pages/Documents per Day</label>
+              <input type="number" id="pagesPerDay" value="100" min="1" max="10000" oninput="calculateAICredits()">
+            </div>
+            <div style="margin-top: 16px;">
+              <label>Text Characters per Day (thousands)</label>
+              <input type="number" id="textCharsPerDay" value="50" min="1" max="1000" oninput="calculateAICredits()">
+            </div>
+            <div style="margin-top: 16px;">
+              <label>Prediction Rows per Day</label>
+              <input type="number" id="predictionRows" value="500" min="1" max="100000" oninput="calculateAICredits()">
+            </div>
+          </div>
+        </div>
+        
+        <div class="token-display" style="margin-top: 20px;">
+          <h3>AI Builder Credit Analysis</h3>
+          <div class="grid grid-3">
+            <div class="status-indicator info">
+              <span>Daily Credits:</span>
+              <strong id="dailyAICredits">200</strong>
+            </div>
+            <div class="status-indicator warning">
+              <span>Monthly Credits:</span>
+              <strong id="monthlyAICredits">6,000</strong>
+            </div>
+            <div class="status-indicator danger">
+              <span>Add-ons Needed:</span>
+              <strong id="aiAddonsNeeded">2</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resources Tab -->
+    <div id="resources-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>📚 Essential Resources & Expert Links</h2>
+        
+        <h3>🎓 Microsoft Learn</h3>
+        <div class="resource-grid">
+          <a href="https://learn.microsoft.com/en-us/power-automate/" target="_blank" class="resource-card">
+            <div class="icon">📖</div>
+            <div class="title">Power Automate Documentation</div>
+            <div class="description">Official docs and tutorials</div>
+          </a>
+          
+          <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/" target="_blank" class="resource-card">
+            <div class="icon">🤖</div>
+            <div class="title">Copilot Studio Docs</div>
+            <div class="description">Build intelligent agents</div>
+          </a>
+          
+          <a href="https://learn.microsoft.com/en-us/ai-builder/" target="_blank" class="resource-card">
+            <div class="icon">🧠</div>
+            <div class="title">AI Builder Guide</div>
+            <div class="description">AI models and capabilities</div>
+          </a>
+          
+          <a href="https://learn.microsoft.com/en-us/power-platform/admin/pricing-billing-skus" target="_blank" class="resource-card">
+            <div class="icon">💰</div>
+            <div class="title">Licensing Guide</div>
+            <div class="description">Complete pricing details</div>
+          </a>
+        </div>
+        
+        <h3 style="margin-top: 24px;">🌟 Community Experts & MVPs</h3>
+        <div class="resource-grid">
+          <a href="https://www.youtube.com/@RezaDorrani" target="_blank" class="resource-card">
+            <div class="icon">🎥</div>
+            <div class="title">Reza Dorrani</div>
+            <div class="description">Power Platform MVP - Video tutorials</div>
+          </a>
+          
+          <a href="https://www.youtube.com/@AprilDunnam" target="_blank" class="resource-card">
+            <div class="icon">🎬</div>
+            <div class="title">April Dunnam</div>
+            <div class="description">Power Platform expert content</div>
+          </a>
+          
+          <a href="https://www.youtube.com/@ShaneYoungCloud" target="_blank" class="resource-card">
+            <div class="icon">☁️</div>
+            <div class="title">Shane Young</div>
+            <div class="description">PowerApps911 tutorials</div>
+          </a>
+          
+          <a href="https://github.com/modery/PowerDocu" target="_blank" class="resource-card">
+            <div class="icon">📄</div>
+            <div class="title">PowerDocu Tool</div>
+            <div class="description">Auto-generate documentation</div>
+          </a>
+        </div>
+        
+        <h3 style="margin-top: 24px;">🛠️ Tools & Utilities</h3>
+        <div class="resource-grid">
+          <a href="https://make.powerautomate.com" target="_blank" class="resource-card">
+            <div class="icon">⚡</div>
+            <div class="title">Power Automate Portal</div>
+            <div class="description">Create and manage flows</div>
+          </a>
+          
+          <a href="https://copilotstudio.microsoft.com" target="_blank" class="resource-card">
+            <div class="icon">🤖</div>
+            <div class="title">Copilot Studio</div>
+            <div class="description">Build conversational agents</div>
+          </a>
+          
+          <a href="https://admin.powerplatform.microsoft.com" target="_blank" class="resource-card">
+            <div class="icon">⚙️</div>
+            <div class="title">Admin Center</div>
+            <div class="description">Manage environments</div>
+          </a>
+          
+          <a href="https://powerusers.microsoft.com" target="_blank" class="resource-card">
+            <div class="icon">👥</div>
+            <div class="title">Power Users Community</div>
+            <div class="description">Forums and discussions</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Best Practices Tab -->
+    <div id="bestpractices-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>✨ Comprehensive Best Practices</h2>
+        
+        <div class="best-practice-card">
+          <h4>🎯 Performance Optimization</h4>
+          <ul>
+            <li><strong>Concurrency:</strong> Set to 4-8 for optimal balance</li>
+            <li><strong>Batching:</strong> Process in chunks of 250-500 items</li>
+            <li><strong>Delegation:</strong> Filter on indexed columns first</li>
+            <li><strong>Caching:</strong> Store frequently used data in variables</li>
+            <li><strong>Throttling:</strong> Implement exponential backoff</li>
+          </ul>
+        </div>
+        
+        <div class="best-practice-card">
+          <h4>💰 Cost Optimization</h4>
+          <ul>
+            <li><strong>License Stacking:</strong> Multiple Process licenses = more PPR</li>
+            <li><strong>Flow Association:</strong> Link up to 25 child flows</li>
+            <li><strong>Token Management:</strong> Use GPT-4o mini when possible</li>
+            <li><strong>Message Optimization:</strong> Batch conversations in Copilot Studio</li>
+            <li><strong>Credit Pooling:</strong> Share AI Builder credits across environments</li>
+          </ul>
+        </div>
+        
+        <div class="best-practice-card">
+          <h4>🔒 Security & Governance</h4>
+          <ul>
+            <li><strong>DLP Policies:</strong> Implement before April 1, 2025</li>
+            <li><strong>Environment Strategy:</strong> Dev → Test → UAT → Prod</li>
+            <li><strong>Key Vault:</strong> Never embed credentials in flows</li>
+            <li><strong>Audit Logging:</strong> Enable for all production assets</li>
+            <li><strong>RBAC:</strong> Implement role-based access control</li>
+          </ul>
+        </div>
+        
+        <div class="best-practice-card">
+          <h4>🤖 AI & Agent Development</h4>
+          <ul>
+            <li><strong>Prompt Engineering:</strong> Keep system prompts concise</li>
+            <li><strong>Context Windows:</strong> Monitor token limits (4K, 8K, 32K)</li>
+            <li><strong>Fallback Handling:</strong> Always have non-AI alternatives</li>
+            <li><strong>Testing:</strong> Use prompt builder for free testing</li>
+            <li><strong>Monitoring:</strong> Track token usage and costs daily</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Tab -->
+    <div id="comparison-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>📊 Complete Licensing Comparison</h2>
+        
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Free/M365</th>
+              <th>Premium User</th>
+              <th>Process</th>
+              <th>Hosted Process</th>
+              <th>Copilot Studio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Price (UK)</strong></td>
+              <td>£0</td>
+              <td>£12.20/user</td>
+              <td>£81.90/flow</td>
+              <td>£118.60/flow</td>
+              <td>£200/25K msg</td>
+            </tr>
+            <tr>
+              <td><strong>PPR Daily Limit</strong></td>
+              <td>2,000</td>
+              <td>40,000</td>
+              <td>250,000</td>
+              <td>250,000</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td><strong>Premium Connectors</strong></td>
+              <td>❌</td>
+              <td>✅</td>
+              <td>✅</td>
+              <td>✅</td>
+              <td>✅</td>
+            </tr>
+            <tr>
+              <td><strong>AI Builder Credits</strong></td>
+              <td>0</td>
+              <td>5,000/mo</td>
+              <td>5,000/mo</td>
+              <td>5,000/mo</td>
+              <td>Via messages</td>
+            </tr>
+            <tr>
+              <td><strong>Attended RPA</strong></td>
+              <td>❌</td>
+              <td>✅</td>
+              <td>❌</td>
+              <td>❌</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td><strong>Unattended RPA</strong></td>
+              <td>❌</td>
+              <td>❌</td>
+              <td>✅</td>
+              <td>✅</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td><strong>Hosted Machine</strong></td>
+              <td>❌</td>
+              <td>❌</td>
+              <td>❌</td>
+              <td>✅</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td><strong>Process Mining</strong></td>
+              <td>❌</td>
+              <td>✅</td>
+              <td>❌</td>
+              <td>❌</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td><strong>Flow Association</strong></td>
+              <td>N/A</td>
+              <td>N/A</td>
+              <td>25 flows</td>
+              <td>25 flows</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td><strong>Dataverse Storage</strong></td>
+              <td>0</td>
+              <td>250 MB</td>
+              <td>50 MB</td>
+              <td>50 MB</td>
+              <td>5 GB</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="best-practice-card" style="margin-top: 20px;">
+          <h4>💡 Quick Decision Guide</h4>
+          <ul>
+            <li><strong>Individual makers:</strong> Premium User license</li>
+            <li><strong>High-volume automation:</strong> Process license (stackable!)</li>
+            <li><strong>RPA with no infrastructure:</strong> Hosted Process</li>
+            <li><strong>Conversational AI:</strong> Copilot Studio messages</li>
+            <li><strong>AI models in flows:</strong> AI Builder add-on credits</li>
+            <li><strong>Citizen developers:</strong> M365 + pay-as-you-go</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PowerDocu Tab -->
+    <div id="powerdocu-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>📄 PowerDocu Integration</h2>
+        
+        <div class="grid grid-2">
+          <div>
+            <h3>What is PowerDocu?</h3>
+            <p>PowerDocu automatically generates technical documentation for:</p>
+            <ul>
+              <li>Power Automate Flows</li>
+              <li>Power Apps</li>
+              <li>Solutions</li>
+              <li>Connectors and dependencies</li>
+            </ul>
+            
+            <div style="margin-top: 20px;">
+              <a href="https://github.com/modery/PowerDocu/releases" target="_blank">
+                <button>📥 Download PowerDocu</button>
+              </a>
+            </div>
+          </div>
+          
+          <div>
+            <h3>Integration Workflow</h3>
+            <ol>
+              <li>Run PowerDocu on your flows/apps</li>
+              <li>Extract metrics:
+                <ul>
+                  <li>Action counts</li>
+                  <li>Connector usage</li>
+                  <li>Complexity scores</li>
+                </ul>
+              </li>
+              <li>Input metrics into this planner</li>
+              <li>Get accurate cost analysis</li>
+              <li>Optimize based on recommendations</li>
+            </ol>
+          </div>
+        </div>
+        
+        <div class="best-practice-card" style="margin-top: 20px;">
+          <h4>📊 Mapping PowerDocu to Planner</h4>
+          <ul>
+            <li><strong>Total Actions</strong> → Actions per Item</li>
+            <li><strong>Connector List</strong> → Premium Connectors count</li>
+            <li><strong>Loop Detection</strong> → Flow Pattern selection</li>
+            <li><strong>Error Handlers</strong> → Error Rate estimate</li>
+            <li><strong>Parallel Branches</strong> → Concurrency level</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Bubble -->
+  <div class="help-bubble" onclick="toggleHelp()">
+    <span>?</span>
+  </div>
+  
+  <!-- Help Panel -->
+  <div class="help-panel" id="helpPanel">
+    <div style="padding: 20px;">
+      <h3>🚀 Quick Help</h3>
+      
+      <div style="margin-top: 16px;">
+        <h4>Getting Started</h4>
+        <ol>
+          <li>Select your scenario type</li>
+          <li>Configure basic settings</li>
+          <li>Add AI/token requirements</li>
+          <li>Review analysis</li>
+          <li>Get recommendations</li>
+        </ol>
+      </div>
+      
+      <div style="margin-top: 16px;">
+        <h4>Key Terms</h4>
+        <ul>
+          <li><strong>PPR:</strong> Power Platform Requests</li>
+          <li><strong>Messages:</strong> Copilot Studio currency</li>
+          <li><strong>Credits:</strong> AI Builder currency</li>
+          <li><strong>Tokens:</strong> AI model text units</li>
+        </ul>
+      </div>
+      
+      <div style="margin-top: 16px;">
+        <h4>Need More Help?</h4>
+        <p>Contact your Microsoft account team or visit the Power Platform community forums.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let currentStep = 1;
+    let scenarioType = 'flow';
+    let configuration = {};
+    
+    // Licensing data
+    const LICENSES = {
+      premium: {
+        price: 12.20,
+        name: "Power Automate Premium",
+        pprLimit: 40000,
+        aiCredits: 5000
+      },
+      process: {
+        price: 81.90,
+        name: "Power Automate Process",
+        pprLimit: 250000,
+        aiCredits: 5000,
+        stackable: true,
+        associatedFlows: 25
+      },
+      hosted: {
+        price: 118.60,
+        name: "Power Automate Hosted Process",
+        pprLimit: 250000,
+        aiCredits: 5000,
+        hostedMachine: true
+      },
+      copilotStudio: {
+        price: 200,
+        name: "Copilot Studio Message Pack",
+        messages: 25000
+      }
+    };
+    
+    // AI Model costs
+    const AI_MODELS = {
+      'gpt-4o-mini': { creditsPerKTokens: 1, name: 'GPT-4o mini' },
+      'gpt-4': { creditsPerKTokens: 10, name: 'GPT-4' },
+      'gpt-4-turbo': { creditsPerKTokens: 20, name: 'GPT-4 Turbo' }
+    };
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      checkUrlParameters();
+      updateWizardProgress();
+    });
+    
+    // Check for URL parameters
+    function checkUrlParameters() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('config')) {
+        try {
+          const config = JSON.parse(atob(params.get('config')));
+          loadConfiguration(config);
+        } catch (e) {
+          console.error('Invalid configuration in URL');
+        }
+      }
+    }
+    
+    // Wizard navigation
+    function goToStep(step) {
+      currentStep = step;
+      updateWizardProgress();
+      showStep(step);
+    }
+    
+    function nextStep() {
+      if (currentStep < 5) {
+        currentStep++;
+        updateWizardProgress();
+        showStep(currentStep);
+      }
+    }
+    
+    function previousStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateWizardProgress();
+        showStep(currentStep);
+      }
+    }
+    
+    function showStep(step) {
+      // Hide all steps
+      for (let i = 1; i <= 5; i++) {
+        const stepElement = document.getElementById(`step-${i}`);
+        if (stepElement) {
+          stepElement.style.display = 'none';
+        }
+      }
+      
+      // Show current step
+      const currentStepElement = document.getElementById(`step-${step}`);
+      if (currentStepElement) {
+        currentStepElement.style.display = 'block';
+      }
+      
+      // Run step-specific logic
+      if (step === 4) {
+        performAnalysis();
+      } else if (step === 5) {
+        generateRecommendations();
+      }
+    }
+    
+    function updateWizardProgress() {
+      const steps = document.querySelectorAll('.wizard-step');
+      steps.forEach((step, index) => {
+        if (index < currentStep - 1) {
+          step.classList.add('completed');
+          step.classList.remove('active');
+        } else if (index === currentStep - 1) {
+          step.classList.add('active');
+          step.classList.remove('completed');
+        } else {
+          step.classList.remove('active', 'completed');
+        }
+      });
+    }
+    
+    // Scenario selection
+    function selectScenario(type) {
+      scenarioType = type;
+      
+      // Show/hide relevant configuration sections
+      document.getElementById('flow-config').style.display = 
+        (type === 'flow' || type === 'hybrid' || type === 'migration') ? 'block' : 'none';
+      document.getElementById('agent-config').style.display = 
+        (type === 'agent' || type === 'hybrid') ? 'block' : 'none';
+      
+      // Visual feedback
+      document.querySelectorAll('.resource-card').forEach(card => {
+        card.style.border = '2px solid #e5e7eb';
+      });
+      event.currentTarget.style.border = '2px solid var(--primary)';
+      
+      nextStep();
+    }
+    
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+      });
+      
+      // Remove active class from all tab buttons
+      document.querySelectorAll('.tab').forEach(button => {
+        button.classList.remove('active');
+      });
+      
+      // Show selected tab
+      const tabElement = document.getElementById(`${tabName}-tab`);
+      if (tabElement) {
+        tabElement.classList.remove('hidden');
+      }
+      
+      // Add active class to clicked button
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+    }
+    
+    // Calculations
+    function updateCalculations() {
+      // Gather all inputs
+      gatherConfiguration();
+      
+      // Update displays based on current tab
+      if (!document.getElementById('copilot-tab').classList.contains('hidden')) {
+        calculateMessages();
+      }
+      if (!document.getElementById('aibuilder-tab').classList.contains('hidden')) {
+        calculateAICredits();
+      }
+    }
+    
+    function gatherConfiguration() {
+      configuration = {
+        scenarioName: document.getElementById('scenarioName')?.value || 'My Solution',
+        orgSize: document.getElementById('orgSize')?.value || 'medium',
+        industry: document.getElementById('industry')?.value || 'general',
+        items: parseInt(document.getElementById('items')?.value) || 1000,
+        actionsPerItem: parseInt(document.getElementById('actionsPerItem')?.value) || 3,
+        runsPerDay: parseInt(document.getElementById('runsPerDay')?.value) || 10,
+        conversations: parseInt(document.getElementById('conversations')?.value) || 100,
+        messagesPerConv: parseInt(document.getElementById('messagesPerConv')?.value) || 5,
+        useGenAI: document.getElementById('useGenAI')?.value || 'yes'
+      };
+    }
+    
+    function calculateTokens() {
+      const model = document.getElementById('aiModel').value;
+      const inputTokens = parseInt(document.getElementById('inputTokens').value) || 500;
+      const outputTokens = parseInt(document.getElementById('outputTokens').value) || 200;
+      const callsPerDay = parseInt(document.getElementById('aiCallsPerDay').value) || 100;
+      
+      const totalTokensPerCall = inputTokens + outputTokens;
+      const dailyTokens = totalTokensPerCall * callsPerDay;
+      const monthlyTokens = dailyTokens * 30;
+      
+      const modelConfig = AI_MODELS[model] || AI_MODELS['gpt-4o-mini'];
+      const monthlyCredits = (monthlyTokens / 1000) * modelConfig.creditsPerKTokens;
+      const monthlyCost = (monthlyCredits / 5000) * 40; // Assuming £40 per 5000 credits
+      
+      // Update display
+      document.getElementById('dailyTokens').textContent = dailyTokens.toLocaleString();
+      document.getElementById('monthlyCredits').textContent = Math.round(monthlyCredits).toLocaleString();
+      document.getElementById('tokenCost').textContent = `£${monthlyCost.toFixed(2)}/mo`;
+      
+      // Update meter
+      const usagePercent = Math.min((monthlyCredits / 5000) * 100, 100);
+      const meter = document.getElementById('tokenMeter');
+      if (meter) {
+        meter.style.width = `${usagePercent}%`;
+        meter.className = 'token-fill';
+        if (usagePercent > 80) meter.classList.add('danger');
+        else if (usagePercent > 60) meter.classList.add('warning');
+      }
+    }
+    
+    function calculateMessages() {
+      const packs = parseInt(document.getElementById('messagePacks').value) || 1;
+      const conversations = parseInt(document.getElementById('dailyConversations').value) || 100;
+      const messagesPerChat = parseInt(document.getElementById('messagesPerChat').value) || 5;
+      
+      const dailyMessages = conversations * messagesPerChat;
+      const monthlyMessages = dailyMessages * 30;
+      const capacity = packs * 25000;
+      const usage = (monthlyMessages / capacity) * 100;
+      
+      // Update display
+      document.getElementById('dailyMessages').textContent = dailyMessages.toLocaleString();
+      document.getElementById('monthlyMessages').textContent = monthlyMessages.toLocaleString();
+      document.getElementById('messageCapacity').textContent = capacity.toLocaleString();
+      document.getElementById('messageUsage').textContent = `${usage.toFixed(1)}%`;
+      
+      // Update meter
+      const meter = document.getElementById('messageMeter');
+      if (meter) {
+        meter.style.width = `${Math.min(usage, 100)}%`;
+        meter.className = 'token-fill';
+        if (usage > 90) meter.classList.add('danger');
+        else if (usage > 75) meter.classList.add('warning');
+      }
+    }
+    
+    function calculateAICredits() {
+      let dailyCredits = 0;
+      
+      const pagesPerDay = parseInt(document.getElementById('pagesPerDay').value) || 100;
+      const textChars = parseInt(document.getElementById('textCharsPerDay').value) || 50;
+      const rows = parseInt(document.getElementById('predictionRows').value) || 500;
+      
+      if (document.getElementById('docProcessing').checked) {
+        dailyCredits += pagesPerDay; // 1 credit per page
+      }
+      if (document.getElementById('textRecognition').checked) {
+        dailyCredits += pagesPerDay; // 1 credit per page
+      }
+      if (document.getElementById('sentimentAnalysis').checked) {
+        dailyCredits += textChars; // 1 credit per 1K chars
+      }
+      if (document.getElementById('prediction').checked) {
+        dailyCredits += rows / 5; // 1 credit per 5 rows
+      }
+      
+      const monthlyCredits = dailyCredits * 30;
+      const addonsNeeded = Math.ceil(monthlyCredits / 5000);
+      
+      // Update display
+      document.getElementById('dailyAICredits').textContent = Math.round(dailyCredits).toLocaleString();
+      document.getElementById('monthlyAICredits').textContent = Math.round(monthlyCredits).toLocaleString();
+      document.getElementById('aiAddonsNeeded').textContent = addonsNeeded;
+    }
+    
+    function performAnalysis() {
+      gatherConfiguration();
+      
+      // Cost analysis
+      const costHTML = `
+        <div class="status-indicator info">
+          <span>Power Automate:</span>
+          <strong>£${calculateFlowCost()}/mo</strong>
+        </div>
+        <div class="status-indicator info">
+          <span>Copilot Studio:</span>
+          <strong>£${calculateAgentCost()}/mo</strong>
+        </div>
+        <div class="status-indicator info">
+          <span>AI Builder:</span>
+          <strong>£${calculateAICost()}/mo</strong>
+        </div>
+        <div class="status-indicator warning">
+          <span>Total Est. Cost:</span>
+          <strong>£${calculateTotalCost()}/mo</strong>
+        </div>
+      `;
+      document.getElementById('costAnalysis').innerHTML = costHTML;
+      
+      // Risk analysis
+      const risks = analyzeRisks();
+      let riskHTML = '<ul>';
+      risks.forEach(risk => {
+        riskHTML += `<li class="status-indicator ${risk.level}">${risk.message}</li>`;
+      });
+      riskHTML += '</ul>';
+      document.getElementById('riskAnalysis').innerHTML = riskHTML;
+      
+      // Performance metrics
+      const perfHTML = `
+        <div class="grid grid-3">
+          <div class="status-indicator success">
+            <span>Daily PPR:</span>
+            <strong>${calculateDailyPPR()}</strong>
+          </div>
+          <div class="status-indicator info">
+            <span>Messages/Day:</span>
+            <strong>${calculateDailyMessages()}</strong>
+          </div>
+          <div class="status-indicator warning">
+            <span>AI Credits/Day:</span>
+            <strong>${calculateDailyCredits()}</strong>
+          </div>
+        </div>
+      `;
+      document.getElementById('performanceMetrics').innerHTML = perfHTML;
+    }
+    
+    function generateRecommendations() {
+      const recommendations = [];
+      
+      // Analyze scenario and provide recommendations
+      if (scenarioType === 'flow' || scenarioType === 'hybrid') {
+        const dailyPPR = calculateDailyPPR();
+        if (dailyPPR > 40000) {
+          recommendations.push({
+            type: 'license',
+            priority: 'high',
+            title: 'Process License Recommended',
+            description: 'Your daily PPR exceeds Premium user limits. Consider Process license for 250K PPR/day.',
+            action: 'Purchase Process license at £81.90/month'
+          });
+        }
+      }
+      
+      if (scenarioType === 'agent' || scenarioType === 'hybrid') {
+        const dailyMessages = calculateDailyMessages();
+        if (dailyMessages > 833) { // 25K/30 days
+          recommendations.push({
+            type: 'license',
+            priority: 'high',
+            title: 'Additional Message Packs Needed',
+            description: 'Your message consumption exceeds one pack. Consider additional packs or pay-as-you-go.',
+            action: 'Add message packs at £200 each'
+          });
+        }
+      }
+      
+      // Add best practices
+      recommendations.push({
+        type: 'optimization',
+        priority: 'medium',
+        title: 'Implement Caching',
+        description: 'Cache frequently used AI responses to reduce token consumption.',
+        action: 'Add caching layer for common queries'
+      });
+      
+      recommendations.push({
+        type: 'governance',
+        priority: 'high',
+        title: 'DLP Policy Required',
+        description: 'Implement DLP policies before April 1, 2025 enforcement.',
+        action: 'Configure data loss prevention policies'
+      });
+      
+      // Display recommendations
+      let recoHTML = '<div class="grid grid-2" style="gap: 20px;">';
+      recommendations.forEach(rec => {
+        const priorityClass = rec.priority === 'high' ? 'danger' : rec.priority === 'medium' ? 'warning' : 'info';
+        recoHTML += `
+          <div class="best-practice-card">
+            <h4>
+              <span class="status-indicator ${priorityClass}">${rec.priority.toUpperCase()}</span>
+              ${rec.title}
+            </h4>
+            <p>${rec.description}</p>
+            <strong>Action:</strong> ${rec.action}
+          </div>
+        `;
+      });
+      recoHTML += '</div>';
+      
+      document.getElementById('recommendations').innerHTML = recoHTML;
+    }
+    
+    // Calculation helpers
+    function calculateFlowCost() {
+      const dailyPPR = calculateDailyPPR();
+      if (dailyPPR <= 2000) return 0; // Free tier
+      if (dailyPPR <= 40000) return 12.20; // Premium user
+      const processLicenses = Math.ceil(dailyPPR / 250000);
+      return processLicenses * 81.90;
+    }
+    
+    function calculateAgentCost() {
+      if (scenarioType !== 'agent' && scenarioType !== 'hybrid') return 0;
+      const monthlyMessages = calculateDailyMessages() * 30;
+      const packs = Math.ceil(monthlyMessages / 25000);
+      return packs * 200;
+    }
+    
+    function calculateAICost() {
+      // Simplified calculation
+      return 40; // Base AI Builder add-on
+    }
+    
+    function calculateTotalCost() {
+      return calculateFlowCost() + calculateAgentCost() + calculateAICost();
+    }
+    
+    function calculateDailyPPR() {
+      return configuration.items * configuration.actionsPerItem * configuration.runsPerDay;
+    }
+    
+    function calculateDailyMessages() {
+      const base = configuration.conversations * configuration.messagesPerConv;
+      return configuration.useGenAI === 'yes' ? base * 2 : base;
+    }
+    
+    function calculateDailyCredits() {
+      // Simplified calculation
+      return 500;
+    }
+    
+    function analyzeRisks() {
+      const risks = [];
+      
+      if (calculateDailyPPR() > 250000) {
+        risks.push({
+          level: 'danger',
+          message: 'Extreme PPR usage - requires multiple Process licenses'
+        });
+      }
+      
+      if (configuration.industry === 'healthcare' || configuration.industry === 'finance') {
+        risks.push({
+          level: 'warning',
+          message: 'Regulated industry - ensure compliance requirements'
+        });
+      }
+      
+      if (!configuration.governanceLevel || configuration.governanceLevel === 'none') {
+        risks.push({
+          level: 'danger',
+          message: 'No governance controls - high compliance risk'
+        });
+      }
+      
+      return risks;
+    }
+    
+    // Export and sharing
+    function exportReport() {
+      const report = {
+        configuration: configuration,
+        analysis: {
+          dailyPPR: calculateDailyPPR(),
+          dailyMessages: calculateDailyMessages(),
+          monthlyCost: calculateTotalCost()
+        },
+        timestamp: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(report, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', `power-platform-report-${Date.now()}.json`);
+      linkElement.click();
+    }
+    
+    function shareConfiguration() {
+      const config = btoa(JSON.stringify(configuration));
+      const url = new URL(window.location);
+      url.searchParams.set('config', config);
+      
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        alert('Configuration URL copied to clipboard!');
+      });
+    }
+    
+    function startOver() {
+      currentStep = 1;
+      configuration = {};
+      updateWizardProgress();
+      showStep(1);
+    }
+    
+    // Help panel
+    function toggleHelp() {
+      const panel = document.getElementById('helpPanel');
+      panel.classList.toggle('active');
+    }
+    
+    // Load configuration
+    function loadConfiguration(config) {
+      configuration = config;
+      // Apply to form fields
+      Object.keys(config).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+          element.value = config[key];
+        }
+      });
+    }
+  </script>
+</body>
+</html>

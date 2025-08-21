@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Power Automate Community Repository - GitHub Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        /* GitHub Style Header */
+        .github-header {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .github-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .github-search {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 32px;
+        }
+
+        .github-search input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .github-search input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
+        .github-user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        /* Repository Info */
+        .repo-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .repo-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .repo-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        .repo-badge {
+            padding: 2px 8px;
+            background: #1f6feb;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .repo-description {
+            color: #8b949e;
+            margin-bottom: 16px;
+        }
+
+        .repo-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .repo-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .repo-stat:hover {
+            color: #58a6ff;
+            cursor: pointer;
+        }
+
+        /* Tabs */
+        .repo-tabs {
+            padding: 0 32px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            gap: 32px;
+        }
+
+        .tab {
+            padding: 16px 0;
+            color: #8b949e;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active {
+            color: #c9d1d9;
+            border-bottom-color: #f78166;
+        }
+
+        .tab-count {
+            padding: 2px 6px;
+            background: #30363d;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .repo-content {
+            display: flex;
+            gap: 32px;
+            padding: 24px 32px;
+        }
+
+        .content-main {
+            flex: 1;
+        }
+
+        .content-sidebar {
+            width: 300px;
+        }
+
+        /* File List */
+        .file-list {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .file-header {
+            padding: 12px 16px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .branch-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            cursor: pointer;
+        }
+
+        .file-item {
+            padding: 8px 16px;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .file-item:hover {
+            background: #161b22;
+        }
+
+        .file-icon {
+            color: #8b949e;
+        }
+
+        .file-name {
+            flex: 1;
+            color: #58a6ff;
+        }
+
+        .file-message {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .file-time {
+            color: #8b949e;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        /* README Section */
+        .readme-section {
+            margin-top: 24px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+        }
+
+        .readme-header {
+            padding: 12px 16px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+        }
+
+        .readme-content {
+            padding: 32px;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+
+        .readme-content h1, .readme-content h2, .readme-content h3 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .readme-content code {
+            padding: 2px 6px;
+            background: #161b22;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .readme-content pre {
+            background: #161b22;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        /* Sidebar */
+        .sidebar-section {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-item {
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-label {
+            color: #8b949e;
+        }
+
+        .sidebar-value {
+            font-weight: 600;
+        }
+
+        .clone-button {
+            width: 100%;
+            padding: 8px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .clone-button:hover {
+            background: #2ea043;
+        }
+
+        .clone-url {
+            padding: 8px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        /* Contributors */
+        .contributors-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .contributor {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+        }
+
+        /* Upload Modal */
+        .upload-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+
+        .upload-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-content {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .upload-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .upload-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 8px;
+        }
+
+        .form-label {
+            color: #c9d1d9;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            padding: 8px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #238636;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2ea043;
+        }
+
+        .btn-secondary {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+
+        .btn-secondary:hover {
+            background: #30363d;
+        }
+    </style>
+</head>
+<body>
+    <!-- GitHub Header -->
+    <div class="github-header">
+        <div class="github-logo">
+            <svg height="32" viewBox="0 0 16 16" width="32" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+            </svg>
+            Power Automate Community
+        </div>
+        <div class="github-search">
+            <input type="text" placeholder="Search flows, templates, patterns...">
+        </div>
+        <div class="github-user">
+            <button class="btn btn-primary" onclick="showUploadModal()">
+                + New Flow
+            </button>
+            <div class="avatar"></div>
+        </div>
+    </div>
+
+    <!-- Repository Header -->
+    <div class="repo-header">
+        <div class="repo-title">
+            <span class="repo-name">PowerAutomate-Community/flow-library</span>
+            <span class="repo-badge">Public</span>
+        </div>
+        <div class="repo-description">
+            🚀 Community-driven repository of optimized Power Automate flows, templates, and best practices
+        </div>
+        <div class="repo-stats">
+            <div class="repo-stat">
+                ⭐ 3,456 stars
+            </div>
+            <div class="repo-stat">
+                🔀 1,234 forks
+            </div>
+            <div class="repo-stat">
+                👁️ 567 watching
+            </div>
+            <div class="repo-stat">
+                📦 12,847 flows
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="repo-tabs">
+        <div class="tab active">
+            📁 Code
+        </div>
+        <div class="tab">
+            🚨 Issues <span class="tab-count">42</span>
+        </div>
+        <div class="tab">
+            🔀 Pull requests <span class="tab-count">17</span>
+        </div>
+        <div class="tab">
+            💬 Discussions
+        </div>
+        <div class="tab">
+            📊 Insights
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="repo-content">
+        <div class="content-main">
+            <!-- File List -->
+            <div class="file-list">
+                <div class="file-header">
+                    <div class="branch-selector">
+                        🌿 main ▼
+                    </div>
+                    <button class="btn btn-primary" onclick="showUploadModal()">
+                        Upload Flow
+                    </button>
+                </div>
+                
+                <!-- Folders -->
+                <div class="file-item">
+                    <span class="file-icon">📁</span>
+                    <span class="file-name">templates</span>
+                    <span class="file-message">Add 5 new SharePoint templates</span>
+                    <span class="file-time">2 hours ago</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-icon">📁</span>
+                    <span class="file-name">connectors</span>
+                    <span class="file-message">Update Dataverse connector patterns</span>
+                    <span class="file-time">5 hours ago</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-icon">📁</span>
+                    <span class="file-name">optimizations</span>
+                    <span class="file-message">New OData filtering examples</span>
+                    <span class="file-time">1 day ago</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-icon">📁</span>
+                    <span class="file-name">child-flows</span>
+                    <span class="file-message">Child flow licensing guide</span>
+                    <span class="file-time">2 days ago</span>
+                </div>
+                
+                <!-- Files -->
+                <div class="file-item">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">README.md</span>
+                    <span class="file-message">Update contribution guidelines</span>
+                    <span class="file-time">3 days ago</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-icon">📊</span>
+                    <span class="file-name">METRICS.json</span>
+                    <span class="file-message">Update success metrics</span>
+                    <span class="file-time">1 week ago</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-icon">⚙️</span>
+                    <span class="file-name">.github/workflows</span>
+                    <span class="file-message">Add flow validation CI/CD</span>
+                    <span class="file-time">2 weeks ago</span>
+                </div>
+            </div>
+
+            <!-- README -->
+            <div class="readme-section">
+                <div class="readme-header">
+                    📖 README.md
+                </div>
+                <div class="readme-content">
+                    <h1>🚀 Power Automate Community Flow Library</h1>
+                    
+                    <p>Welcome to the largest community-driven repository of optimized Power Automate flows! This repository contains over 12,000 tested and optimized flows that save the community millions in licensing costs.</p>
+                    
+                    <h2>📊 Community Impact</h2>
+                    <ul>
+                        <li>💰 <strong>£2.4M</strong> saved monthly in licensing costs</li>
+                        <li>⚡ <strong>12x</strong> average performance improvement</li>
+                        <li>✅ <strong>98.7%</strong> success rate across all flows</li>
+                        <li>👥 <strong>45,678</strong> active contributors</li>
+                    </ul>
+                    
+                    <h2>🎯 Quick Start</h2>
+                    
+                    <pre><code># Clone the repository
+git clone https://github.com/PowerAutomate-Community/flow-library.git
+
+# Browse templates
+cd templates/
+
+# Import to Power Automate
+1. Open Power Automate
+2. Go to My flows > Import
+3. Upload the JSON file
+4. Configure connections
+5. Save and test</code></pre>
+                    
+                    <h2>📁 Repository Structure</h2>
+                    
+                    <pre><code>flow-library/
+├── templates/          # Ready-to-use flow templates
+│   ├── sharepoint/    # SharePoint patterns
+│   ├── dataverse/     # Dataverse integrations
+│   ├── approvals/     # Approval workflows
+│   └── automation/    # General automation
+├── connectors/        # Connector-specific patterns
+├── optimizations/     # Performance optimizations
+├── child-flows/       # Child flow patterns
+└── best-practices/    # Guidelines and tips</code></pre>
+                    
+                    <h2>🤝 Contributing</h2>
+                    
+                    <p>We welcome contributions! Please read our <a href="#" style="color: #58a6ff;">contribution guidelines</a> before submitting a flow.</p>
+                    
+                    <ol>
+                        <li>Fork the repository</li>
+                        <li>Create your feature branch</li>
+                        <li>Test your flow thoroughly</li>
+                        <li>Submit a pull request</li>
+                    </ol>
+                    
+                    <h2>⭐ Top Contributors</h2>
+                    
+                    <p>Special thanks to our MVPs and top contributors who make this community possible!</p>
+                    
+                    <h2>📜 License</h2>
+                    
+                    <p>MIT License - Feel free to use these flows in your projects!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="content-sidebar">
+            <!-- About -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">About</div>
+                <p style="color: #8b949e; margin-bottom: 16px;">
+                    The largest collection of optimized Power Automate flows. Save time, money, and build better flows with community-tested patterns.
+                </p>
+                <div class="sidebar-item">
+                    <span class="sidebar-label">⭐ Stars</span>
+                    <span class="sidebar-value">3,456</span>
+                </div>
+                <div class="sidebar-item">
+                    <span class="sidebar-label">👁️ Watching</span>
+                    <span class="sidebar-value">567</span>
+                </div>
+                <div class="sidebar-item">
+                    <span class="sidebar-label">🔀 Forks</span>
+                    <span class="sidebar-value">1,234</span>
+                </div>
+            </div>
+
+            <!-- Clone -->
+            <div class="sidebar-section">
+                <button class="clone-button">
+                    ⬇️ Clone repository
+                </button>
+                <div class="clone-url">
+                    https://github.com/PowerAutomate-Community/flow-library.git
+                </div>
+            </div>
+
+            <!-- Contributors -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Contributors (1,234)</div>
+                <div class="contributors-grid">
+                    <div class="contributor" title="John Liu - MVP"></div>
+                    <div class="contributor" title="David Wyatt"></div>
+                    <div class="contributor" title="April Dunnam"></div>
+                    <div class="contributor" title="Shane Young"></div>
+                    <div class="contributor" title="Daniel Laskewitz"></div>
+                    <div class="contributor" title="Reza Dorrani"></div>
+                    <div class="contributor" title="Laura Rogers"></div>
+                    <div class="contributor" title="Cat Schneider"></div>
+                    <div class="contributor" title="Matt Collins-Jones"></div>
+                    <div class="contributor" title="Paul O'Flaherty"></div>
+                </div>
+            </div>
+
+            <!-- Languages -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Flow Types</div>
+                <div style="background: #161b22; height: 8px; border-radius: 4px; overflow: hidden; margin: 12px 0;">
+                    <div style="display: flex; height: 100%;">
+                        <div style="width: 40%; background: #3fb950;"></div>
+                        <div style="width: 30%; background: #58a6ff;"></div>
+                        <div style="width: 20%; background: #f85149;"></div>
+                        <div style="width: 10%; background: #d29922;"></div>
+                    </div>
+                </div>
+                <div class="sidebar-item">
+                    <span class="sidebar-label">🟢 Automated</span>
+                    <span class="sidebar-value">40%</span>
+                </div>
+                <div class="sidebar-item">
+                    <span class="sidebar-label">🔵 Instant</span>
+                    <span class="sidebar-value">30%</span>
+                </div>
+                <div class="sidebar-item">
+                    <span class="sidebar-label">🔴 Scheduled</span>
+                    <span class="sidebar-value">20%</span>
+                </div>
+                <div class="sidebar-item">
+                    <span class="sidebar-label">🟡 Business Process</span>
+                    <span class="sidebar-value">10%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-content">
+            <div class="upload-title">📤 Share Your Optimized Flow</div>
+            
+            <form class="upload-form">
+                <div class="form-group">
+                    <label class="form-label">Flow Name *</label>
+                    <input type="text" class="form-input" placeholder="e.g., SharePoint Document Approval">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description *</label>
+                    <textarea class="form-textarea" placeholder="Describe what your flow does and how it's optimized..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select class="form-select">
+                        <option>SharePoint</option>
+                        <option>Dataverse</option>
+                        <option>Approvals</option>
+                        <option>Email Automation</option>
+                        <option>Teams Integration</option>
+                        <option>Custom Connector</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Performance Metrics</label>
+                    <input type="text" class="form-input" placeholder="e.g., Processes 10K items in 2 minutes">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Monthly Cost</label>
+                    <input type="text" class="form-input" placeholder="e.g., £0 (Standard connectors only)">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Flow JSON *</label>
+                    <textarea class="form-textarea" placeholder="Paste your Power Automate JSON here..." style="min-height: 200px; font-family: monospace;"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideUploadModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Flow</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function hideUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        // Handle form submission
+        document.querySelector('.upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('✅ Flow submitted! Our community will review it within 24 hours. Thank you for contributing!');
+            hideUploadModal();
+        });
+
+        // Simulate GitHub activity
+        setInterval(() => {
+            const stars = document.querySelectorAll('.sidebar-value')[0];
+            const currentStars = parseInt(stars.textContent.replace(',', ''));
+            stars.textContent = (currentStars + Math.floor(Math.random() * 3)).toLocaleString();
+        }, 10000);
+    </script>
+</body>
+</html>

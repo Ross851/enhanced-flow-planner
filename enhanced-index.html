@@ -1,0 +1,1741 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Power Automate Ultimate Cost & License Planner v2.0</title>
+  <style>
+    /* CSS Variables for theming */
+    :root {
+      --primary: #0078d4;
+      --secondary: #40e0d0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --card-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      min-height: 100vh;
+      padding: 8px;
+      color: #1f2937;
+    }
+    
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    .header {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      text-align: center;
+    }
+    
+    .version-badge {
+      display: inline-block;
+      background: var(--success);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-left: 8px;
+    }
+    
+    .enforcement-warning {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .enforcement-warning .icon {
+      font-size: 1.5rem;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      background: white;
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .tab:hover:not(.active) {
+      background: #e5e7eb;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .card.hidden {
+      display: none;
+    }
+    
+    h1 { font-size: 1.75rem; font-weight: bold; margin-bottom: 4px; }
+    h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
+    h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    
+    .grid { display: grid; gap: 12px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+    
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: white;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+    }
+    
+    input.invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    }
+    
+    .validation-message {
+      color: var(--danger);
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+    
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    button:hover { background: #106ebe; }
+    
+    .preset-btn {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 8px 12px;
+      margin: 0 8px 8px 0;
+      width: auto;
+      font-size: 0.75rem;
+    }
+    
+    .preset-btn:hover { background: #bfdbfe; }
+    
+    .best-practice-card {
+      background: #f0fdf4;
+      border: 1px solid var(--success);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 8px 0;
+    }
+    
+    .best-practice-card h4 {
+      color: var(--success);
+      margin-bottom: 8px;
+    }
+    
+    .governance-risk {
+      background: #fef2f2;
+      border: 1px solid var(--danger);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 8px 0;
+    }
+    
+    .governance-risk h4 {
+      color: var(--danger);
+      margin-bottom: 8px;
+    }
+    
+    .analysis {
+      border-left: 4px solid var(--success);
+      padding-left: 16px;
+    }
+    
+    .analysis.medium { border-left-color: var(--warning); }
+    .analysis.high { border-left-color: var(--danger); }
+    
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .metric:last-child { border-bottom: none; }
+    
+    .metric-label { font-size: 0.875rem; color: #6b7280; }
+    .metric-value { font-weight: 600; font-size: 1rem; }
+    
+    .license-option {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 12px;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .license-option:hover { background: #f3f4f6; }
+    
+    .license-option.best {
+      background: #d1fae5;
+      border-color: var(--success);
+    }
+    
+    .license-option.process {
+      background: #dbeafe;
+      border-color: var(--info);
+    }
+    
+    .license-option.hosted {
+      background: #e9d5ff;
+      border-color: #9333ea;
+    }
+    
+    .license-title { font-weight: 600; margin-bottom: 4px; }
+    .license-price { font-size: 1.125rem; font-weight: bold; color: #1f2937; }
+    
+    .share-section {
+      background: #f3f4f6;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 16px;
+    }
+    
+    .share-url {
+      background: white;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.875rem;
+      word-break: break-all;
+      margin: 8px 0;
+    }
+    
+    .copy-btn {
+      background: var(--secondary);
+      color: #1f2937;
+      padding: 8px 16px;
+      font-size: 0.875rem;
+    }
+    
+    .copy-btn:hover {
+      background: #30c0b0;
+    }
+    
+    .powerdocu-section {
+      background: #eff6ff;
+      border: 1px solid var(--info);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 12px 0;
+    }
+    
+    .powerdocu-section h4 {
+      color: var(--info);
+      margin-bottom: 8px;
+    }
+    
+    /* Progress indicator */
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--success);
+      transition: width 0.3s ease;
+    }
+    
+    .progress-fill.warning {
+      background: var(--warning);
+    }
+    
+    .progress-fill.danger {
+      background: var(--danger);
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      color: var(--info);
+      font-weight: bold;
+      margin-left: 4px;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      font-weight: normal;
+      font-size: 0.75rem;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>⚙️ Power Automate Ultimate Planner <span class="version-badge">v2.0</span></h1>
+      <p>Advanced cost estimation, licensing optimization, and best practices guidance</p>
+      
+      <div class="enforcement-warning">
+        <span class="icon">⚠️</span>
+        <div>
+          <strong>Premium Connector Enforcement: April 1, 2025</strong><br>
+          Organizations must have appropriate licenses for premium connectors by this date or flows will stop working.
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('calculator')">💰 Cost Calculator</button>
+      <button class="tab" onclick="switchTab('bestpractices')">✨ Best Practices</button>
+      <button class="tab" onclick="switchTab('governance')">🛡️ Governance Check</button>
+      <button class="tab" onclick="switchTab('powerdocu')">📄 PowerDocu Integration</button>
+      <button class="tab" onclick="switchTab('comparison')">📊 License Comparison</button>
+    </div>
+
+    <!-- Calculator Tab -->
+    <div id="calculator-tab" class="tab-content">
+      <!-- Quick Templates -->
+      <div class="card">
+        <h2>🚀 Quick Start Templates</h2>
+        <div>
+          <button class="preset-btn" onclick="loadPreset('small')">Small Automation (500 items)</button>
+          <button class="preset-btn" onclick="loadPreset('medium')">Daily Processing (5K items)</button>
+          <button class="preset-btn" onclick="loadPreset('large')">Enterprise Sync (25K items)</button>
+          <button class="preset-btn" onclick="loadPreset('massive')">Data Migration (100K items)</button>
+          <button class="preset-btn" onclick="loadPreset('governance')">Governance Flow (2.5K flows)</button>
+          <button class="preset-btn" onclick="loadPreset('kaplan')">Kaplan Scenario (60 flows)</button>
+        </div>
+      </div>
+
+      <!-- Basic Configuration -->
+      <div class="card">
+        <h2>📋 Flow Configuration</h2>
+        
+        <div class="grid grid-3">
+          <div>
+            <label for="scenarioName">Scenario Name <span class="tooltip">?<span class="tooltiptext">Give your scenario a memorable name for saving/sharing</span></span></label>
+            <input type="text" id="scenarioName" value="My Flow" oninput="calculate()">
+          </div>
+          <div>
+            <label for="items">Items to Process <span class="tooltip">?<span class="tooltiptext">Total number of records/items your flow will process per run</span></span></label>
+            <input type="number" id="items" value="1000" min="1" max="1000000" oninput="validateAndCalculate(this)">
+            <div id="items-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="actionsPerItem">Actions per Item <span class="tooltip">?<span class="tooltiptext">Average number of actions executed for each item (e.g., Get, Update, Condition)</span></span></label>
+            <input type="number" id="actionsPerItem" value="3" min="1" max="100" oninput="validateAndCalculate(this)">
+            <div id="actionsPerItem-validation" class="validation-message"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-3">
+          <div>
+            <label for="avgMs">Avg Time per Action (ms) <span class="tooltip">?<span class="tooltiptext">Average execution time for each action in milliseconds</span></span></label>
+            <input type="number" id="avgMs" value="500" min="10" max="10000" oninput="validateAndCalculate(this)">
+            <div id="avgMs-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="concurrency">Concurrency Level <span class="tooltip">?<span class="tooltiptext">Number of parallel threads (1-50, Apply to Each max is 20)</span></span></label>
+            <input type="number" id="concurrency" value="4" min="1" max="50" oninput="validateAndCalculate(this)">
+            <div id="concurrency-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="connector">Primary Connector</label>
+            <select id="connector" onchange="calculate()">
+              <option value="SharePoint">SharePoint (600 RPM)</option>
+              <option value="GraphAPI">Graph API (150 RPM)</option>
+              <option value="Teams">Teams (120 RPM)</option>
+              <option value="SQL">SQL Server (300 RPM) - Premium</option>
+              <option value="CustomHTTP">Custom HTTP (60 RPM) - Premium</option>
+              <option value="Dataverse">Dataverse (6000 RPM)</option>
+              <option value="OneDrive">OneDrive (2000 RPM)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-3">
+          <div>
+            <label for="executions">Runs per Day <span class="tooltip">?<span class="tooltiptext">How many times this flow will execute per day</span></span></label>
+            <input type="number" id="executions" value="1" min="1" max="1440" oninput="validateAndCalculate(this)">
+            <div id="executions-validation" class="validation-message"></div>
+          </div>
+          <div>
+            <label for="premiumConnectors">Premium Connectors Used</label>
+            <input type="number" id="premiumConnectors" value="0" min="0" max="50" oninput="validateAndCalculate(this)">
+          </div>
+          <div>
+            <label for="errorRate">Expected Error Rate (%)</label>
+            <input type="number" id="errorRate" value="5" min="0" max="100" oninput="validateAndCalculate(this)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Settings -->
+      <div class="card">
+        <h2>⚙️ Advanced Settings</h2>
+        <button onclick="toggleAdvanced()" id="advancedToggle">Show Advanced Settings</button>
+        
+        <div id="advancedSettings" style="display: none; margin-top: 16px;">
+          <div class="grid grid-3">
+            <div>
+              <label for="flowPattern">Flow Pattern</label>
+              <select id="flowPattern" onchange="calculate()">
+                <option value="simple">Simple Sequential</option>
+                <option value="apply_to_each">Apply to Each</option>
+                <option value="nested_apply">Nested Apply to Each</option>
+                <option value="parallel_branches">Parallel Branches</option>
+                <option value="child_flows">Child Flows</option>
+              </select>
+            </div>
+            <div>
+              <label for="dataOperations">Data Operations</label>
+              <select id="dataOperations" onchange="calculate()">
+                <option value="none">None</option>
+                <option value="filter">Filter</option>
+                <option value="select">Select</option>
+                <option value="compose">Compose</option>
+                <option value="parse_json">Parse JSON</option>
+                <option value="multiple">Multiple Operations</option>
+              </select>
+            </div>
+            <div>
+              <label for="batchSize">Batch Size</label>
+              <input type="number" id="batchSize" value="250" min="1" max="5000" oninput="validateAndCalculate(this)">
+            </div>
+          </div>
+
+          <div class="grid grid-3">
+            <div>
+              <label for="retryAttempts">Retry Attempts</label>
+              <input type="number" id="retryAttempts" value="3" min="0" max="10" oninput="validateAndCalculate(this)">
+            </div>
+            <div>
+              <label for="retryInterval">Retry Strategy</label>
+              <select id="retryInterval" onchange="calculate()">
+                <option value="fixed">Fixed Interval</option>
+                <option value="exponential">Exponential Backoff</option>
+                <option value="linear">Linear Increase</option>
+              </select>
+            </div>
+            <div>
+              <label for="timeoutMinutes">Timeout (minutes)</label>
+              <input type="number" id="timeoutMinutes" value="30" min="1" max="120" oninput="validateAndCalculate(this)">
+            </div>
+          </div>
+
+          <div class="grid grid-3">
+            <div>
+              <label for="throttleHandling">Throttle Handling</label>
+              <select id="throttleHandling" onchange="calculate()">
+                <option value="fail">Fail on Throttle</option>
+                <option value="retry">Retry with Delay</option>
+                <option value="queue">Queue for Later</option>
+              </select>
+            </div>
+            <div>
+              <label for="networkLatency">Network Latency (ms)</label>
+              <input type="number" id="networkLatency" value="50" min="0" max="5000" oninput="validateAndCalculate(this)">
+            </div>
+            <div>
+              <label for="governanceLevel">Governance Level</label>
+              <select id="governanceLevel" onchange="calculate()">
+                <option value="none">None (Risk!)</option>
+                <option value="basic">Basic DLP</option>
+                <option value="standard">Standard Controls</option>
+                <option value="strict">Strict Governance</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Licenses -->
+      <div class="card">
+        <h2>🎫 Your Current Licenses</h2>
+        <div class="grid grid-3">
+          <div>
+            <label for="clientType">User Type</label>
+            <select id="clientType" onchange="calculate()">
+              <option value="internal">Internal IT Team</option>
+              <option value="consultant">External Consultant</option>
+              <option value="partner">Microsoft Partner</option>
+              <option value="enterprise">Enterprise Customer</option>
+            </select>
+          </div>
+          <div>
+            <label for="clientUsers">Number of Users</label>
+            <input type="number" id="clientUsers" value="10" min="1" max="100000" oninput="validateAndCalculate(this)">
+          </div>
+          <div>
+            <label for="currentPremium">Current Premium Licenses</label>
+            <input type="number" id="currentPremium" value="0" min="0" max="10000" oninput="validateAndCalculate(this)">
+          </div>
+        </div>
+
+        <div class="grid grid-3">
+          <div>
+            <label for="currentProcess">Current Process Licenses</label>
+            <input type="number" id="currentProcess" value="0" min="0" max="1000" oninput="validateAndCalculate(this)">
+          </div>
+          <div>
+            <label for="currentHosted">Current Hosted Process</label>
+            <input type="number" id="currentHosted" value="0" min="0" max="1000" oninput="validateAndCalculate(this)">
+          </div>
+          <div>
+            <label for="m365Licenses">Microsoft 365 Licenses</label>
+            <input type="number" id="m365Licenses" value="0" min="0" max="100000" oninput="validateAndCalculate(this)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Results -->
+      <div class="card">
+        <h2>📊 Analysis Results</h2>
+        
+        <div class="grid grid-2">
+          <div class="analysis" id="riskAnalysis">
+            <h3>Risk Assessment</h3>
+            <div id="riskDetails"></div>
+          </div>
+          
+          <div>
+            <h3>Key Metrics</h3>
+            <div class="metric">
+              <span class="metric-label">Total Actions per Run</span>
+              <span class="metric-value" id="totalActions">0</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Monthly Actions (PPR)</span>
+              <span class="metric-value" id="monthlyActions">0</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Runtime per Run</span>
+              <span class="metric-value" id="runtime">0 min</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">RPM (vs Limit)</span>
+              <span class="metric-value" id="rpm">0 / 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="costBreakdown" class="cost-breakdown"></div>
+      </div>
+
+      <!-- License Recommendations -->
+      <div class="card">
+        <h2>💡 License Recommendations</h2>
+        <div id="licenseOptions"></div>
+      </div>
+
+      <!-- Best Practices for this Flow -->
+      <div class="card">
+        <h2>✨ Specific Best Practices for Your Flow</h2>
+        <div id="flowBestPractices"></div>
+      </div>
+
+      <!-- Share Configuration -->
+      <div class="card">
+        <h2>🔗 Share This Configuration</h2>
+        <div class="share-section">
+          <p>Share this configuration with your team using the URL below:</p>
+          <div class="share-url" id="shareUrl"></div>
+          <button class="copy-btn" onclick="copyShareUrl()">📋 Copy URL</button>
+          <button class="copy-btn" onclick="exportConfig()">💾 Export JSON</button>
+          <button class="copy-btn" onclick="importConfig()">📥 Import JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Best Practices Tab -->
+    <div id="bestpractices-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>✨ Power Automate Best Practices Library</h2>
+        
+        <div class="best-practice-card">
+          <h4>🎯 Performance Optimization</h4>
+          <ul>
+            <li><strong>Delegation:</strong> Always filter on indexed columns first to avoid delegation warnings</li>
+            <li><strong>Concurrency:</strong> Use 4-8 threads for optimal performance without overwhelming connectors</li>
+            <li><strong>Batching:</strong> Process items in batches of 250-500 for large datasets</li>
+            <li><strong>Caching:</strong> Use variables to store frequently accessed data</li>
+            <li><strong>Lazy Loading:</strong> Load data OnVisible instead of OnStart in Power Apps</li>
+          </ul>
+        </div>
+
+        <div class="best-practice-card">
+          <h4>💰 Cost Optimization</h4>
+          <ul>
+            <li><strong>Process License Stacking:</strong> Multiple Process licenses can be allocated to a single flow for 250k PPR each</li>
+            <li><strong>Flow Association:</strong> One Process flow can cover up to 25 associated child flows</li>
+            <li><strong>Premium User vs Process:</strong> Use Premium for user-triggered flows, Process for automated/scheduled</li>
+            <li><strong>M365 Licenses:</strong> Leverage existing M365 licenses for standard connector flows</li>
+            <li><strong>Hosted Process:</strong> Consider for RPA scenarios to avoid infrastructure costs</li>
+          </ul>
+        </div>
+
+        <div class="best-practice-card">
+          <h4>🔒 Security & Governance</h4>
+          <ul>
+            <li><strong>DLP Policies:</strong> Implement data loss prevention policies before April 1, 2025</li>
+            <li><strong>Environment Strategy:</strong> Dev → Test → UAT → Prod with automated promotion</li>
+            <li><strong>Service Accounts:</strong> Never embed credentials, use Azure Key Vault</li>
+            <li><strong>Audit Logging:</strong> Enable on all production apps and flows</li>
+            <li><strong>Row-Level Security:</strong> Implement in Dataverse, not in app formulas</li>
+          </ul>
+        </div>
+
+        <div class="best-practice-card">
+          <h4>🛠️ Error Handling</h4>
+          <ul>
+            <li><strong>Try-Catch-Finally:</strong> Implement in all flows for proper error handling</li>
+            <li><strong>Exponential Backoff:</strong> Use for retry policies to avoid overwhelming services</li>
+            <li><strong>Error Notifications:</strong> Set up alerts for flow failures</li>
+            <li><strong>Logging:</strong> Log errors to SharePoint or Dataverse for analysis</li>
+            <li><strong>Graceful Degradation:</strong> Design flows to handle partial failures</li>
+          </ul>
+        </div>
+
+        <div class="best-practice-card">
+          <h4>📝 Documentation & Maintenance</h4>
+          <ul>
+            <li><strong>Naming Convention:</strong> Use consistent prefixes (var_, col_, gbl_)</li>
+            <li><strong>Comments:</strong> Document WHY, not WHAT the code does</li>
+            <li><strong>Solution Layering:</strong> Base → Business → Integration → UI</li>
+            <li><strong>Version Control:</strong> Use solutions and maintain change logs</li>
+            <li><strong>PowerDocu:</strong> Generate documentation automatically for complex flows</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Governance Tab -->
+    <div id="governance-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>🛡️ Governance Risk Assessment</h2>
+        
+        <div class="governance-risk">
+          <h4>⚠️ Critical Governance Checks</h4>
+          <div id="governanceChecks">
+            <div class="metric">
+              <span class="metric-label">DLP Policies Configured</span>
+              <span class="metric-value" id="dlpStatus">❌ Not Checked</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Environment Isolation</span>
+              <span class="metric-value" id="envStatus">❌ Not Checked</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Flow Monitoring</span>
+              <span class="metric-value" id="monitorStatus">❌ Not Checked</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Maker Training</span>
+              <span class="metric-value" id="trainingStatus">❌ Not Checked</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Center of Excellence</span>
+              <span class="metric-value" id="coeStatus">❌ Not Checked</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📊 Kaplan Case Study Reference</h3>
+          <p>Based on the Kaplan assessment with 2,490 flows and ZERO governance:</p>
+          <ul>
+            <li>🔴 <strong>£17.5M+ potential GDPR fines</strong> for unprotected student data</li>
+            <li>🔴 <strong>95% audit failure probability</strong> without DLP policies</li>
+            <li>🔴 <strong>£200K+ annual licensing waste</strong> from inefficiencies</li>
+            <li>🔴 <strong>60+ student data flows</strong> completely unprotected</li>
+          </ul>
+          
+          <div class="progress-bar">
+            <div class="progress-fill danger" style="width: 95%;"></div>
+          </div>
+          <p>Risk Level: CRITICAL</p>
+        </div>
+
+        <div class="card">
+          <h3>✅ Governance Implementation Roadmap</h3>
+          <ol>
+            <li><strong>Week 1-2:</strong> Deploy baseline DLP policies</li>
+            <li><strong>Week 3-4:</strong> Set up environment strategy</li>
+            <li><strong>Week 5-6:</strong> Implement monitoring and analytics</li>
+            <li><strong>Week 7-8:</strong> Launch maker training program</li>
+            <li><strong>Week 9-12:</strong> Establish Center of Excellence</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- PowerDocu Tab -->
+    <div id="powerdocu-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>📄 PowerDocu Integration Guide</h2>
+        
+        <div class="powerdocu-section">
+          <h4>🔗 What is PowerDocu?</h4>
+          <p>PowerDocu is an open-source tool that automatically generates technical documentation for your Power Automate flows, Power Apps, and Solutions.</p>
+          
+          <h3>Key Features:</h3>
+          <ul>
+            <li>📊 Automatic flow diagram generation (PNG/SVG)</li>
+            <li>📝 Detailed documentation in Word or Markdown</li>
+            <li>🔌 Connector and action inventory</li>
+            <li>⚡ Trigger analysis and dependencies</li>
+            <li>📈 Complexity assessment</li>
+          </ul>
+        </div>
+
+        <div class="powerdocu-section">
+          <h4>🚀 How to Use with This Planner</h4>
+          <ol>
+            <li><strong>Document Your Flows:</strong> Run PowerDocu on your existing flows</li>
+            <li><strong>Extract Metrics:</strong> Note the number of actions, connectors, and complexity</li>
+            <li><strong>Input Here:</strong> Use the extracted metrics in this planner</li>
+            <li><strong>Cost Analysis:</strong> Get accurate cost estimates based on actual flow structure</li>
+            <li><strong>Optimize:</strong> Use recommendations to refactor expensive operations</li>
+          </ol>
+        </div>
+
+        <div class="powerdocu-section">
+          <h4>💡 Integration Ideas</h4>
+          <ul>
+            <li>🔄 <strong>Automated Import:</strong> Future feature to import PowerDocu JSON output</li>
+            <li>📊 <strong>Bulk Analysis:</strong> Analyze multiple flows from PowerDocu export</li>
+            <li>💰 <strong>Cost Attribution:</strong> Map costs to specific departments/projects</li>
+            <li>📈 <strong>Trend Analysis:</strong> Track flow complexity growth over time</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>📥 Download PowerDocu</h3>
+          <p>Get the latest version from GitHub:</p>
+          <a href="https://github.com/modery/PowerDocu" target="_blank">
+            <button>🔗 Visit PowerDocu on GitHub</button>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- License Comparison Tab -->
+    <div id="comparison-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>📊 Power Automate License Comparison (2024)</h2>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f3f4f6;">
+              <th style="padding: 12px; text-align: left;">Feature</th>
+              <th style="padding: 12px;">Free</th>
+              <th style="padding: 12px;">Premium</th>
+              <th style="padding: 12px;">Process</th>
+              <th style="padding: 12px;">Hosted Process</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 12px; font-weight: 600;">Price (UK)</td>
+              <td style="padding: 12px; text-align: center;">£0</td>
+              <td style="padding: 12px; text-align: center;">£12.20/user</td>
+              <td style="padding: 12px; text-align: center;">£81.90/flow</td>
+              <td style="padding: 12px; text-align: center;">£118.60/flow</td>
+            </tr>
+            <tr style="background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Daily PPR Limit</td>
+              <td style="padding: 12px; text-align: center;">2,000</td>
+              <td style="padding: 12px; text-align: center;">40,000</td>
+              <td style="padding: 12px; text-align: center;">250,000</td>
+              <td style="padding: 12px; text-align: center;">250,000</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: 600;">Premium Connectors</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+            </tr>
+            <tr style="background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Attended RPA</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: 600;">Unattended RPA</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+            </tr>
+            <tr style="background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Hosted Machine</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: 600;">Process Mining</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">✅</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+              <td style="padding: 12px; text-align: center;">❌</td>
+            </tr>
+            <tr style="background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">AI Builder Credits</td>
+              <td style="padding: 12px; text-align: center;">0</td>
+              <td style="padding: 12px; text-align: center;">5,000/mo</td>
+              <td style="padding: 12px; text-align: center;">5,000/mo</td>
+              <td style="padding: 12px; text-align: center;">5,000/mo</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: 600;">Dataverse Storage</td>
+              <td style="padding: 12px; text-align: center;">0</td>
+              <td style="padding: 12px; text-align: center;">250 MB</td>
+              <td style="padding: 12px; text-align: center;">50 MB</td>
+              <td style="padding: 12px; text-align: center;">50 MB</td>
+            </tr>
+            <tr style="background: #f9fafb;">
+              <td style="padding: 12px; font-weight: 600;">Flow Association</td>
+              <td style="padding: 12px; text-align: center;">N/A</td>
+              <td style="padding: 12px; text-align: center;">N/A</td>
+              <td style="padding: 12px; text-align: center;">Up to 25 flows</td>
+              <td style="padding: 12px; text-align: center;">Up to 25 flows</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="enforcement-warning" style="margin-top: 16px;">
+          <span class="icon">💡</span>
+          <div>
+            <strong>Key Licensing Insights:</strong><br>
+            • Process licenses can be stacked for additional PPR capacity<br>
+            • One Process license can cover up to 25 associated child flows<br>
+            • M365 licenses provide standard connector access but no premium<br>
+            • Pay-as-you-go: £4 per 10,000 PPR blocks
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced license definitions with 2024 updates
+    const LICENSES = {
+      premium: {
+        price: 12.20,
+        name: "Power Automate Premium",
+        description: "Per user, includes attended RPA and process mining",
+        pprLimit: 40000, // PPR/day
+        features: ['Premium connectors', 'Attended RPA', 'Process mining', 'AI Builder 5000']
+      },
+      process: {
+        price: 81.90,
+        name: "Power Automate Process",
+        description: "Per flow, unlimited users, unattended RPA",
+        pprLimit: 250000, // PPR/day
+        stackable: true,
+        associatedFlows: 25,
+        features: ['Premium connectors', 'Unattended RPA', 'Flow association', 'AI Builder 5000']
+      },
+      hosted: {
+        price: 118.60,
+        name: "Power Automate Hosted Process",
+        description: "Process license + hosted machine",
+        pprLimit: 250000, // PPR/day
+        stackable: true,
+        associatedFlows: 25,
+        features: ['Everything in Process', 'Hosted machine', 'Zero infrastructure']
+      },
+      free: {
+        price: 0,
+        name: "Power Automate Free",
+        description: "Standard connectors only",
+        pprLimit: 2000 // PPR/day
+      },
+      m365: {
+        price: 0, // Included with M365
+        name: "Microsoft 365",
+        description: "Standard connectors, limited features",
+        pprLimit: 6000 // PPR/day
+      }
+    };
+
+    // Connector definitions with rate limits
+    const CONNECTORS = {
+      SharePoint: { rpm: 600, premium: false, throttleDelay: 60 },
+      GraphAPI: { rpm: 150, premium: false, throttleDelay: 300 },
+      Teams: { rpm: 120, premium: false, throttleDelay: 60 },
+      SQL: { rpm: 300, premium: true, throttleDelay: 30 },
+      CustomHTTP: { rpm: 60, premium: true, throttleDelay: 120 },
+      Dataverse: { rpm: 6000, premium: false, throttleDelay: 10 },
+      OneDrive: { rpm: 2000, premium: false, throttleDelay: 30 }
+    };
+
+    // Enhanced preset scenarios including governance examples
+    const PRESET_SCENARIOS = {
+      small: { 
+        scenarioName: 'Small Automation', 
+        items: 500, 
+        actionsPerItem: 2, 
+        avgMs: 300, 
+        concurrency: 2, 
+        executions: 1, 
+        flowPattern: 'simple', 
+        dataOperations: 'none', 
+        errorRate: 2, 
+        premiumConnectors: 0,
+        governanceLevel: 'basic'
+      },
+      medium: { 
+        scenarioName: 'Daily Processing', 
+        items: 5000, 
+        actionsPerItem: 3, 
+        avgMs: 500, 
+        concurrency: 4, 
+        executions: 1, 
+        flowPattern: 'apply_to_each', 
+        dataOperations: 'filter', 
+        errorRate: 5, 
+        premiumConnectors: 0,
+        governanceLevel: 'standard'
+      },
+      large: { 
+        scenarioName: 'Enterprise Sync', 
+        items: 25000, 
+        actionsPerItem: 4, 
+        avgMs: 800, 
+        concurrency: 6, 
+        executions: 1, 
+        flowPattern: 'child_flows', 
+        dataOperations: 'select', 
+        errorRate: 8, 
+        premiumConnectors: 1,
+        governanceLevel: 'standard'
+      },
+      massive: { 
+        scenarioName: 'Data Migration', 
+        items: 100000, 
+        actionsPerItem: 2, 
+        avgMs: 400, 
+        concurrency: 8, 
+        executions: 1, 
+        flowPattern: 'nested_apply', 
+        dataOperations: 'parse_json', 
+        errorRate: 10, 
+        premiumConnectors: 2,
+        governanceLevel: 'strict'
+      },
+      governance: {
+        scenarioName: 'Governance Assessment',
+        items: 2490, // Kaplan flow count
+        actionsPerItem: 5,
+        avgMs: 600,
+        concurrency: 4,
+        executions: 10,
+        flowPattern: 'apply_to_each',
+        dataOperations: 'multiple',
+        errorRate: 15,
+        premiumConnectors: 3,
+        governanceLevel: 'none'
+      },
+      kaplan: {
+        scenarioName: 'Kaplan Student Flow',
+        items: 60,
+        actionsPerItem: 8, // Student data processing
+        avgMs: 1000,
+        concurrency: 2,
+        executions: 50,
+        flowPattern: 'child_flows',
+        dataOperations: 'multiple',
+        errorRate: 5,
+        premiumConnectors: 2,
+        governanceLevel: 'none'
+      }
+    };
+
+    // Best practices from vault
+    const BEST_PRACTICES = {
+      performance: [
+        "Use Concurrent() for parallel data loads",
+        "Cache reference data in collections OnStart",
+        "Filter on indexed columns to avoid delegation",
+        "Batch large datasets in chunks of 250-500",
+        "Use server-side filtering when possible"
+      ],
+      cost: [
+        "Leverage existing M365 licenses for standard connectors",
+        "Consider Process licenses for high-volume scenarios",
+        "Stack Process licenses for additional PPR capacity",
+        "Associate child flows to a Process flow (up to 25)",
+        "Monitor PPR consumption regularly"
+      ],
+      governance: [
+        "Implement DLP policies before April 1, 2025",
+        "Use environment strategy: Dev → Test → UAT → Prod",
+        "Enable audit logging on all production flows",
+        "Never embed credentials - use Azure Key Vault",
+        "Document flows with PowerDocu"
+      ],
+      errorHandling: [
+        "Implement try-catch-finally pattern in all flows",
+        "Use exponential backoff for retries",
+        "Set up email alerts for flow failures",
+        "Log errors to SharePoint or Dataverse",
+        "Design for graceful degradation"
+      ]
+    };
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check for URL parameters
+      loadFromUrlParams();
+      
+      // Initial calculation
+      calculate();
+      
+      // Set up auto-save
+      setInterval(saveToLocalStorage, 5000);
+    });
+
+    // Load configuration from URL parameters
+    function loadFromUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      
+      if (params.has('config')) {
+        try {
+          const config = JSON.parse(atob(params.get('config')));
+          applyConfiguration(config);
+        } catch (e) {
+          console.error('Invalid configuration in URL', e);
+        }
+      } else {
+        // Check individual parameters
+        const fields = ['items', 'actionsPerItem', 'avgMs', 'concurrency', 'executions', 
+                       'errorRate', 'premiumConnectors', 'scenarioName'];
+        
+        fields.forEach(field => {
+          if (params.has(field)) {
+            const element = document.getElementById(field);
+            if (element) {
+              element.value = params.get(field);
+            }
+          }
+        });
+      }
+    }
+
+    // Apply configuration object to form
+    function applyConfiguration(config) {
+      Object.keys(config).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+          element.value = config[key];
+        }
+      });
+      calculate();
+    }
+
+    // Generate shareable URL
+    function generateShareUrl() {
+      const config = getCurrentConfiguration();
+      const encoded = btoa(JSON.stringify(config));
+      const url = new URL(window.location);
+      url.searchParams.set('config', encoded);
+      return url.toString();
+    }
+
+    // Get current configuration
+    function getCurrentConfiguration() {
+      const fields = ['scenarioName', 'items', 'actionsPerItem', 'avgMs', 'concurrency', 
+                     'connector', 'executions', 'errorRate', 'premiumConnectors',
+                     'flowPattern', 'dataOperations', 'batchSize', 'retryAttempts',
+                     'retryInterval', 'timeoutMinutes', 'throttleHandling', 
+                     'networkLatency', 'governanceLevel', 'clientType', 'clientUsers',
+                     'currentPremium', 'currentProcess', 'currentHosted', 'm365Licenses'];
+      
+      const config = {};
+      fields.forEach(field => {
+        const element = document.getElementById(field);
+        if (element) {
+          config[field] = element.value;
+        }
+      });
+      return config;
+    }
+
+    // Copy share URL to clipboard
+    function copyShareUrl() {
+      const url = generateShareUrl();
+      document.getElementById('shareUrl').textContent = url;
+      
+      navigator.clipboard.writeText(url).then(() => {
+        alert('URL copied to clipboard!');
+      });
+    }
+
+    // Export configuration as JSON
+    function exportConfig() {
+      const config = getCurrentConfiguration();
+      const dataStr = JSON.stringify(config, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `power-automate-config-${Date.now()}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    }
+
+    // Import configuration from JSON
+    function importConfig() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = event => {
+          try {
+            const config = JSON.parse(event.target.result);
+            applyConfiguration(config);
+            alert('Configuration imported successfully!');
+          } catch (error) {
+            alert('Invalid configuration file');
+          }
+        };
+        
+        reader.readAsText(file);
+      };
+      
+      input.click();
+    }
+
+    // Save to local storage
+    function saveToLocalStorage() {
+      const config = getCurrentConfiguration();
+      localStorage.setItem('powerAutomateConfig', JSON.stringify(config));
+    }
+
+    // Load from local storage
+    function loadFromLocalStorage() {
+      const saved = localStorage.getItem('powerAutomateConfig');
+      if (saved) {
+        try {
+          const config = JSON.parse(saved);
+          applyConfiguration(config);
+        } catch (e) {
+          console.error('Error loading saved configuration', e);
+        }
+      }
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+      });
+      
+      // Remove active class from all tab buttons
+      document.querySelectorAll('.tab').forEach(button => {
+        button.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+      
+      // Add active class to clicked button
+      event.target.classList.add('active');
+    }
+
+    // Toggle advanced settings
+    function toggleAdvanced() {
+      const settings = document.getElementById('advancedSettings');
+      const button = document.getElementById('advancedToggle');
+      
+      if (settings.style.display === 'none') {
+        settings.style.display = 'block';
+        button.textContent = 'Hide Advanced Settings';
+      } else {
+        settings.style.display = 'none';
+        button.textContent = 'Show Advanced Settings';
+      }
+    }
+
+    // Load preset scenario
+    function loadPreset(presetName) {
+      const preset = PRESET_SCENARIOS[presetName];
+      if (preset) {
+        applyConfiguration(preset);
+      }
+    }
+
+    // Validate input
+    function validateInput(inputElement) {
+      const value = parseFloat(inputElement.value);
+      const min = parseFloat(inputElement.min);
+      const max = parseFloat(inputElement.max);
+      const validationElement = document.getElementById(`${inputElement.id}-validation`);
+      
+      let isValid = true;
+      let message = '';
+      
+      if (isNaN(value)) {
+        isValid = false;
+        message = 'Please enter a valid number';
+      } else if (min !== undefined && value < min) {
+        isValid = false;
+        message = `Minimum value is ${min}`;
+      } else if (max !== undefined && value > max) {
+        isValid = false;
+        message = `Maximum value is ${max}`;
+      }
+      
+      if (isValid) {
+        inputElement.classList.remove('invalid');
+        if (validationElement) validationElement.textContent = '';
+      } else {
+        inputElement.classList.add('invalid');
+        if (validationElement) validationElement.textContent = message;
+      }
+      
+      return isValid;
+    }
+
+    // Validate and calculate
+    function validateAndCalculate(inputElement) {
+      if (validateInput(inputElement)) {
+        calculate();
+      }
+    }
+
+    // Calculate retry multiplier
+    function calculateRetryMultiplier(errorRate, retryAttempts) {
+      if (errorRate === 0 || retryAttempts === 0) return 1;
+      
+      const errorRateDecimal = errorRate / 100;
+      let multiplier = 1;
+      
+      for (let i = 1; i <= retryAttempts; i++) {
+        multiplier += Math.pow(errorRateDecimal, i);
+      }
+      
+      return multiplier;
+    }
+
+    // Calculate throttling impact
+    function calculateThrottlingImpact(actualRPM, limitRPM, throttleDelay, handling) {
+      if (actualRPM <= limitRPM) {
+        return { delayMinutes: 0, severity: 'none' };
+      }
+      
+      const ratio = actualRPM / limitRPM;
+      let delayMinutes = 0;
+      let severity = 'low';
+      
+      if (ratio > 10) {
+        severity = 'critical';
+        delayMinutes = throttleDelay * ratio / 60;
+      } else if (ratio > 5) {
+        severity = 'high';
+        delayMinutes = throttleDelay * ratio / 120;
+      } else if (ratio > 2) {
+        severity = 'medium';
+        delayMinutes = throttleDelay * ratio / 240;
+      } else {
+        severity = 'low';
+        delayMinutes = throttleDelay * ratio / 480;
+      }
+      
+      if (handling === 'fail') {
+        delayMinutes = 0; // Flow will fail instead of delay
+      } else if (handling === 'queue') {
+        delayMinutes *= 0.5; // Queue reduces impact
+      }
+      
+      return { delayMinutes, severity };
+    }
+
+    // Main calculation function
+    function calculate() {
+      // Get all inputs
+      const items = parseInt(document.getElementById('items').value) || 0;
+      const actionsPerItem = parseInt(document.getElementById('actionsPerItem').value) || 0;
+      const avgMs = parseInt(document.getElementById('avgMs').value) || 0;
+      const concurrency = parseInt(document.getElementById('concurrency').value) || 1;
+      const connector = document.getElementById('connector').value;
+      const executions = parseInt(document.getElementById('executions').value) || 0;
+      const scenarioName = document.getElementById('scenarioName').value || 'Unnamed';
+      const errorRate = parseInt(document.getElementById('errorRate').value) || 0;
+      const premiumConnectors = parseInt(document.getElementById('premiumConnectors').value) || 0;
+      const clientUsers = parseInt(document.getElementById('clientUsers').value) || 1;
+      const currentPremium = parseInt(document.getElementById('currentPremium').value) || 0;
+      const currentProcess = parseInt(document.getElementById('currentProcess').value) || 0;
+      const currentHosted = parseInt(document.getElementById('currentHosted').value) || 0;
+      const m365Licenses = parseInt(document.getElementById('m365Licenses').value) || 0;
+      const governanceLevel = document.getElementById('governanceLevel').value || 'none';
+      
+      // Advanced settings
+      const retryAttempts = parseInt(document.getElementById('retryAttempts').value) || 0;
+      const retryInterval = document.getElementById('retryInterval').value || 'fixed';
+      const timeoutMinutes = parseInt(document.getElementById('timeoutMinutes').value) || 30;
+      const throttleHandling = document.getElementById('throttleHandling').value || 'retry';
+      const networkLatency = parseInt(document.getElementById('networkLatency').value) || 50;
+      const flowPattern = document.getElementById('flowPattern').value || 'simple';
+      const dataOperations = document.getElementById('dataOperations').value || 'none';
+      const batchSize = parseInt(document.getElementById('batchSize').value) || 250;
+      
+      // Basic calculations
+      const baseActions = items * actionsPerItem;
+      const connectorData = CONNECTORS[connector];
+      const hasPremiumConnectors = connectorData.premium || premiumConnectors > 0;
+      
+      // Pattern and data operation multipliers
+      const patternMultipliers = {
+        simple: 1.0,
+        apply_to_each: 1.1,
+        nested_apply: 1.4,
+        parallel_branches: 0.9,
+        child_flows: 1.1
+      };
+      
+      const dataOperationOverhead = {
+        none: 1.0,
+        filter: 1.05,
+        select: 1.08,
+        compose: 1.03,
+        parse_json: 1.1,
+        multiple: 1.15
+      };
+      
+      const patternAdjustedActions = baseActions * patternMultipliers[flowPattern];
+      const dataAdjustedActions = patternAdjustedActions * dataOperationOverhead[dataOperations];
+      
+      // Retry overhead
+      const retryMultiplier = calculateRetryMultiplier(errorRate, retryAttempts);
+      const totalActionsWithRetries = Math.round(dataAdjustedActions * retryMultiplier);
+      
+      // Runtime calculation
+      let effectiveConcurrency = Math.min(concurrency, 20);
+      if (flowPattern === 'simple' || flowPattern === 'child_flows') {
+        effectiveConcurrency = 1;
+      }
+      if (flowPattern === 'parallel_branches') {
+        effectiveConcurrency = Math.min(concurrency, 10);
+      }
+      
+      const timePerActionUnitMs = avgMs + networkLatency;
+      const totalSequentialProcessingMs = totalActionsWithRetries * timePerActionUnitMs;
+      const baseRuntimeMinutes = (totalSequentialProcessingMs / (effectiveConcurrency * 1000 * 60));
+      
+      // RPM calculation
+      const actionsPerSecond = effectiveConcurrency / (timePerActionUnitMs / 1000);
+      const actualRPM = actionsPerSecond * 60;
+      
+      // Throttling impact
+      const throttlingImpact = calculateThrottlingImpact(actualRPM, connectorData.rpm, 
+                                                        connectorData.throttleDelay, throttleHandling);
+      const adjustedRuntime = baseRuntimeMinutes + throttlingImpact.delayMinutes;
+      
+      // Monthly calculations
+      const monthlyActions = totalActionsWithRetries * executions * 30;
+      const dailyPPR = totalActionsWithRetries * executions;
+      
+      // Risk assessment
+      let riskScore = 0;
+      let riskFactors = [];
+      let criticalIssues = [];
+      let bestPractices = [];
+      
+      // Governance risk
+      if (governanceLevel === 'none') {
+        riskScore += 40;
+        criticalIssues.push('🔴 NO GOVERNANCE: Critical compliance risk');
+        bestPractices.push('Implement DLP policies immediately');
+      }
+      
+      // PPR limits
+      if (dailyPPR > LICENSES.process.pprLimit) {
+        riskScore += 30;
+        criticalIssues.push(`🔴 EXTREME PPR: ${dailyPPR.toLocaleString()}/day`);
+        bestPractices.push('Consider multiple Process licenses or redesign');
+      } else if (dailyPPR > LICENSES.premium.pprLimit) {
+        riskScore += 20;
+        riskFactors.push(`⚠️ High PPR: ${dailyPPR.toLocaleString()}/day`);
+        bestPractices.push('Process license recommended');
+      }
+      
+      // Flow pattern risks
+      if (flowPattern === 'nested_apply' && items > 1000) {
+        riskScore += 25;
+        criticalIssues.push('🔴 NESTED LOOPS: Performance degradation');
+        bestPractices.push('Flatten nested loops or use child flows');
+      }
+      
+      // Timeout risk
+      if (adjustedRuntime > timeoutMinutes) {
+        riskScore += 20;
+        riskFactors.push(`⚠️ Timeout risk: ${adjustedRuntime.toFixed(1)} min runtime`);
+        bestPractices.push('Implement batching or reduce processing time');
+      }
+      
+      // Throttling risk
+      if (throttlingImpact.severity === 'critical') {
+        riskScore += 30;
+        criticalIssues.push('🔴 SEVERE THROTTLING: Flow will fail');
+        bestPractices.push('Add delays or reduce concurrency');
+      } else if (throttlingImpact.severity === 'high') {
+        riskScore += 20;
+        riskFactors.push('⚠️ High throttling risk');
+        bestPractices.push('Consider implementing exponential backoff');
+      }
+      
+      // Error rate risk
+      if (errorRate > 20) {
+        riskScore += 15;
+        riskFactors.push(`⚠️ High error rate: ${errorRate}%`);
+        bestPractices.push('Investigate root cause of failures');
+      }
+      
+      // Premium connector enforcement
+      if (hasPremiumConnectors && currentPremium === 0 && currentProcess === 0) {
+        riskScore += 35;
+        criticalIssues.push('🔴 APRIL 2025: Flows will stop without premium licenses');
+        bestPractices.push('Purchase Premium or Process licenses before April 1, 2025');
+      }
+      
+      // Determine risk level
+      let riskLevel = 'low';
+      let riskClass = '';
+      if (riskScore >= 60) {
+        riskLevel = 'critical';
+        riskClass = 'high';
+      } else if (riskScore >= 40) {
+        riskLevel = 'high';
+        riskClass = 'high';
+      } else if (riskScore >= 20) {
+        riskLevel = 'medium';
+        riskClass = 'medium';
+      }
+      
+      // License recommendations
+      const licenseOptions = calculateLicenseOptions(dailyPPR, hasPremiumConnectors, 
+                                                     currentPremium, currentProcess, 
+                                                     currentHosted, m365Licenses, clientUsers);
+      
+      // Update display
+      updateDisplay({
+        scenarioName,
+        totalActionsWithRetries,
+        monthlyActions,
+        adjustedRuntime,
+        actualRPM,
+        connectorData,
+        baseActions,
+        retryMultiplier,
+        throttlingImpact,
+        riskLevel,
+        riskClass,
+        riskScore,
+        criticalIssues,
+        riskFactors,
+        bestPractices,
+        licenseOptions,
+        dailyPPR,
+        hasPremiumConnectors
+      });
+      
+      // Update share URL
+      document.getElementById('shareUrl').textContent = generateShareUrl();
+    }
+
+    // Calculate license options
+    function calculateLicenseOptions(dailyPPR, hasPremiumConnectors, currentPremium, 
+                                    currentProcess, currentHosted, m365Licenses, clientUsers) {
+      const options = [];
+      
+      // Check existing licenses
+      const existingPremiumPPR = currentPremium * LICENSES.premium.pprLimit;
+      const existingProcessPPR = currentProcess * LICENSES.process.pprLimit;
+      const existingHostedPPR = currentHosted * LICENSES.hosted.pprLimit;
+      const existingM365PPR = m365Licenses * LICENSES.m365.pprLimit;
+      
+      const totalExistingPPR = existingPremiumPPR + existingProcessPPR + 
+                               existingHostedPPR + (hasPremiumConnectors ? 0 : existingM365PPR);
+      
+      // Option 1: Use existing licenses
+      if (totalExistingPPR >= dailyPPR && (!hasPremiumConnectors || currentPremium > 0 || currentProcess > 0)) {
+        options.push({
+          type: 'existing',
+          name: 'Use Existing Licenses',
+          cost: 0,
+          description: `Current capacity: ${totalExistingPPR.toLocaleString()} PPR/day`,
+          covered: true,
+          bestValue: true
+        });
+      }
+      
+      // Option 2: Add Premium licenses
+      if (hasPremiumConnectors || dailyPPR > LICENSES.free.pprLimit) {
+        const premiumNeeded = Math.ceil((dailyPPR - totalExistingPPR) / LICENSES.premium.pprLimit);
+        if (premiumNeeded > 0) {
+          options.push({
+            type: 'premium',
+            name: `Add ${premiumNeeded} Premium License${premiumNeeded > 1 ? 's' : ''}`,
+            cost: premiumNeeded * LICENSES.premium.price,
+            description: `£${(premiumNeeded * LICENSES.premium.price).toFixed(2)}/month`,
+            covered: true
+          });
+        }
+      }
+      
+      // Option 3: Add Process license(s)
+      const processNeeded = Math.ceil((dailyPPR - totalExistingPPR) / LICENSES.process.pprLimit);
+      if (processNeeded > 0) {
+        options.push({
+          type: 'process',
+          name: `Add ${processNeeded} Process License${processNeeded > 1 ? 's' : ''}`,
+          cost: processNeeded * LICENSES.process.price,
+          description: `£${(processNeeded * LICENSES.process.price).toFixed(2)}/month (stackable)`,
+          covered: true,
+          recommended: dailyPPR > LICENSES.premium.pprLimit * 2
+        });
+      }
+      
+      // Option 4: Hosted Process for RPA
+      if (flowPattern === 'child_flows' || items > 10000) {
+        const hostedNeeded = Math.ceil((dailyPPR - totalExistingPPR) / LICENSES.hosted.pprLimit);
+        if (hostedNeeded > 0) {
+          options.push({
+            type: 'hosted',
+            name: `Add ${hostedNeeded} Hosted Process License${hostedNeeded > 1 ? 's' : ''}`,
+            cost: hostedNeeded * LICENSES.hosted.price,
+            description: `£${(hostedNeeded * LICENSES.hosted.price).toFixed(2)}/month (includes infrastructure)`,
+            covered: true
+          });
+        }
+      }
+      
+      // Option 5: Pay-as-you-go
+      const pprBlocks = Math.ceil(dailyPPR * 30 / 10000);
+      options.push({
+        type: 'paygo',
+        name: 'Pay-as-you-go',
+        cost: pprBlocks * 4,
+        description: `£${(pprBlocks * 4).toFixed(2)}/month (${pprBlocks} blocks)`,
+        covered: true
+      });
+      
+      // Find best value
+      let bestOption = options[0];
+      options.forEach(opt => {
+        if (opt.covered && opt.cost < bestOption.cost) {
+          bestOption = opt;
+        }
+      });
+      
+      options.forEach(opt => {
+        opt.bestValue = (opt === bestOption);
+      });
+      
+      return options;
+    }
+
+    // Update display
+    function updateDisplay(data) {
+      // Update metrics
+      document.getElementById('totalActions').textContent = data.totalActionsWithRetries.toLocaleString();
+      document.getElementById('monthlyActions').textContent = data.monthlyActions.toLocaleString();
+      document.getElementById('runtime').textContent = `${data.adjustedRuntime.toFixed(1)} min`;
+      document.getElementById('rpm').textContent = `${data.actualRPM.toFixed(0)} / ${data.connectorData.rpm}`;
+      
+      // Update risk analysis
+      const riskAnalysis = document.getElementById('riskAnalysis');
+      riskAnalysis.className = `analysis ${data.riskClass}`;
+      
+      const riskDetails = document.getElementById('riskDetails');
+      let riskHTML = `<p><strong>Risk Level: ${data.riskLevel.toUpperCase()}</strong></p>`;
+      riskHTML += `<p>Risk Score: ${data.riskScore}/100</p>`;
+      
+      if (data.criticalIssues.length > 0) {
+        riskHTML += '<h4>Critical Issues:</h4><ul>';
+        data.criticalIssues.forEach(issue => {
+          riskHTML += `<li>${issue}</li>`;
+        });
+        riskHTML += '</ul>';
+      }
+      
+      if (data.riskFactors.length > 0) {
+        riskHTML += '<h4>Risk Factors:</h4><ul>';
+        data.riskFactors.forEach(factor => {
+          riskHTML += `<li>${factor}</li>`;
+        });
+        riskHTML += '</ul>';
+      }
+      
+      riskDetails.innerHTML = riskHTML;
+      
+      // Update cost breakdown
+      const costBreakdown = document.getElementById('costBreakdown');
+      costBreakdown.innerHTML = `
+        <h3>PPR Analysis</h3>
+        <div class="metric">
+          <span class="metric-label">Daily PPR</span>
+          <span class="metric-value">${data.dailyPPR.toLocaleString()}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Monthly PPR</span>
+          <span class="metric-value">${data.monthlyActions.toLocaleString()}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Premium Connectors</span>
+          <span class="metric-value">${data.hasPremiumConnectors ? '✅ Yes' : '❌ No'}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Retry Overhead</span>
+          <span class="metric-value">+${((data.retryMultiplier - 1) * 100).toFixed(1)}%</span>
+        </div>
+        ${data.throttlingImpact.delayMinutes > 0 ? `
+        <div class="metric">
+          <span class="metric-label">Throttling Delay</span>
+          <span class="metric-value">+${data.throttlingImpact.delayMinutes.toFixed(1)} min</span>
+        </div>` : ''}
+      `;
+      
+      // Update license options
+      const licenseOptionsDiv = document.getElementById('licenseOptions');
+      let optionsHTML = '';
+      
+      data.licenseOptions.forEach(option => {
+        const optionClass = option.bestValue ? 'best' : 
+                          option.type === 'process' ? 'process' :
+                          option.type === 'hosted' ? 'hosted' : '';
+        
+        optionsHTML += `
+          <div class="license-option ${optionClass}">
+            <div class="license-title">${option.name}</div>
+            <div class="license-price">£${option.cost.toFixed(2)}/month</div>
+            <p>${option.description}</p>
+            ${option.bestValue ? '<p>✅ <strong>Best Value</strong></p>' : ''}
+            ${option.recommended ? '<p>⭐ <strong>Recommended</strong></p>' : ''}
+          </div>
+        `;
+      });
+      
+      licenseOptionsDiv.innerHTML = optionsHTML;
+      
+      // Update flow best practices
+      const flowBestPractices = document.getElementById('flowBestPractices');
+      let practicesHTML = '<ul>';
+      
+      data.bestPractices.forEach(practice => {
+        practicesHTML += `<li>${practice}</li>`;
+      });
+      
+      // Add specific recommendations based on configuration
+      if (data.dailyPPR > LICENSES.premium.pprLimit) {
+        practicesHTML += '<li>Consider breaking this flow into smaller, more manageable flows</li>';
+      }
+      
+      if (data.throttlingImpact.severity !== 'none') {
+        practicesHTML += '<li>Implement exponential backoff retry policy</li>';
+      }
+      
+      if (flowPattern === 'nested_apply') {
+        practicesHTML += '<li>Refactor nested Apply to Each loops to improve performance</li>';
+      }
+      
+      practicesHTML += '</ul>';
+      flowBestPractices.innerHTML = practicesHTML;
+    }
+  </script>
+</body>
+</html>

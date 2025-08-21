@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Visual Flow Designer & Cost Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #005a9e;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-teal: #008272;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-40: #e1dfdd;
+            --ms-gray-60: #c8c6c4;
+            --ms-gray-90: #605e5c;
+            --ms-gray-110: #323130;
+            --ms-gray-130: #201f1e;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--ms-gray-20);
+            color: var(--ms-gray-130);
+            overflow: hidden;
+        }
+
+        .app-header {
+            background: white;
+            border-bottom: 1px solid var(--ms-gray-30);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header-metrics {
+            display: flex;
+            gap: 24px;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ms-gray-110);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--ms-gray-90);
+            text-transform: uppercase;
+        }
+
+        .app-layout {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+
+        .sidebar-left {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--ms-gray-30);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .action-palette {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .palette-section {
+            margin-bottom: 24px;
+        }
+
+        .palette-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .action-item {
+            background: var(--ms-gray-10);
+            border: 1px solid var(--ms-gray-30);
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+        .action-item:hover {
+            background: var(--ms-gray-20);
+            border-color: var(--ms-blue);
+            transform: translateX(4px);
+        }
+
+        .action-item.dragging {
+            opacity: 0.5;
+        }
+
+        .action-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .icon-trigger { background: var(--ms-green); }
+        .icon-action { background: var(--ms-blue); }
+        .icon-condition { background: var(--ms-orange); }
+        .icon-loop { background: var(--ms-purple); }
+        .icon-connector { background: var(--ms-teal); }
+        .icon-ai { background: var(--ms-red); }
+
+        .canvas-area {
+            flex: 1;
+            background: #fafafa;
+            position: relative;
+            overflow: auto;
+        }
+
+        .flow-canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-image: 
+                linear-gradient(var(--ms-gray-30) 1px, transparent 1px),
+                linear-gradient(90deg, var(--ms-gray-30) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .flow-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 800px;
+            min-height: 600px;
+        }
+
+        .flow-node {
+            position: absolute;
+            background: white;
+            border: 2px solid var(--ms-gray-40);
+            border-radius: 8px;
+            padding: 12px;
+            min-width: 200px;
+            cursor: move;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .flow-node:hover {
+            border-color: var(--ms-blue);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .flow-node.selected {
+            border-color: var(--ms-blue);
+            box-shadow: 0 0 0 3px rgba(0,120,212,0.2);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .node-body {
+            font-size: 12px;
+            color: var(--ms-gray-90);
+        }
+
+        .node-ports {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .port {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 2px solid var(--ms-blue);
+            border-radius: 50%;
+            pointer-events: all;
+            cursor: crosshair;
+        }
+
+        .port-input {
+            top: 50%;
+            left: -6px;
+            transform: translateY(-50%);
+        }
+
+        .port-output {
+            top: 50%;
+            right: -6px;
+            transform: translateY(-50%);
+        }
+
+        .connection {
+            stroke: var(--ms-blue);
+            stroke-width: 3;
+            fill: none;
+            pointer-events: stroke;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .connection:hover {
+            stroke: var(--ms-blue-dark);
+            stroke-width: 4;
+        }
+
+        .connection.synchronous {
+            stroke: var(--ms-orange);
+            stroke-dasharray: none;
+        }
+
+        .connection.asynchronous {
+            stroke: var(--ms-green);
+            stroke-dasharray: 5, 5;
+        }
+
+        .connection-arrow {
+            fill: var(--ms-blue);
+        }
+
+        .connection-label {
+            fill: var(--ms-gray-90);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-right {
+            width: 320px;
+            background: white;
+            border-left: 1px solid var(--ms-gray-30);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hints-panel {
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+            padding: 12px;
+            margin: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--ms-blue);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .hint-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 3px solid var(--ms-green);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hint-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .hint-item.warning {
+            border-left-color: var(--ms-orange);
+        }
+
+        .hint-item.critical {
+            border-left-color: var(--ms-red);
+        }
+
+        .hint-title {
+            font-weight: 600;
+            color: var(--ms-gray-110);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hint-description {
+            color: var(--ms-gray-90);
+            line-height: 1.4;
+        }
+
+        .hint-action {
+            color: var(--ms-blue);
+            text-decoration: underline;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .templates-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .templates-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: auto;
+            padding: 24px;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .template-card {
+            border: 1px solid var(--ms-gray-30);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .template-card:hover {
+            border-color: var(--ms-blue);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .template-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .template-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--ms-gray-110);
+            margin-bottom: 4px;
+        }
+
+        .template-description {
+            font-size: 11px;
+            color: var(--ms-gray-90);
+        }
+
+        .best-practice-badge {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            background: var(--ms-green);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .properties-panel {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .property-section {
+            margin-bottom: 24px;
+        }
+
+        .property-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .property-field {
+            margin-bottom: 12px;
+        }
+
+        .property-label {
+            font-size: 12px;
+            color: var(--ms-gray-90);
+            margin-bottom: 4px;
+        }
+
+        .property-input {
+            width: 100%;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--ms-gray-60);
+            border-radius: 2px;
+            font-size: 13px;
+        }
+
+        .property-select {
+            width: 100%;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--ms-gray-60);
+            border-radius: 2px;
+            font-size: 13px;
+            background: white;
+        }
+
+        .cost-summary {
+            background: var(--ms-gray-10);
+            padding: 16px;
+            border-top: 1px solid var(--ms-gray-30);
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .cost-total {
+            font-weight: 600;
+            font-size: 14px;
+            padding-top: 8px;
+            border-top: 1px solid var(--ms-gray-30);
+        }
+
+        .toolbar {
+            background: var(--ms-gray-10);
+            border-bottom: 1px solid var(--ms-gray-30);
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .tool-btn {
+            height: 32px;
+            padding: 0 16px;
+            border: 1px solid var(--ms-gray-60);
+            border-radius: 2px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-btn:hover {
+            background: var(--ms-gray-20);
+        }
+
+        .tool-btn.active {
+            background: var(--ms-blue);
+            color: white;
+            border-color: var(--ms-blue);
+        }
+
+        .drop-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 200px;
+            border: 2px dashed var(--ms-gray-60);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ms-gray-90);
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--ms-blue);
+            background: rgba(0,120,212,0.05);
+        }
+
+        .flow-stats {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 12px;
+        }
+
+        .stat-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--ms-gray-90);
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .issue-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            background: var(--ms-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .zoom-btn:hover {
+            background: var(--ms-gray-20);
+        }
+
+        .zoom-btn:first-child {
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="header-title">
+            <span style="font-size: 20px;">⚡</span>
+            Power Automate Visual Flow Designer
+        </div>
+        <div class="header-metrics">
+            <div class="metric">
+                <div class="metric-value" id="total-actions">0</div>
+                <div class="metric-label">Actions</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="total-ppr">0</div>
+                <div class="metric-label">PPR/Day</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="monthly-cost">£0</div>
+                <div class="metric-label">Monthly Cost</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="runtime-est">0s</div>
+                <div class="metric-label">Runtime</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-layout">
+        <div class="sidebar-left">
+            <div class="toolbar">
+                <button class="tool-btn active" onclick="setMode('design')">
+                    <span>✏️</span> Design
+                </button>
+                <button class="tool-btn" onclick="setMode('analyze')">
+                    <span>📊</span> Analyze
+                </button>
+                <button class="tool-btn" onclick="clearCanvas()">
+                    <span>🗑️</span> Clear
+                </button>
+                <button class="tool-btn" onclick="showTemplates()">
+                    <span>📚</span> Templates
+                </button>
+            </div>
+            
+            <div class="action-palette">
+                <div class="palette-section">
+                    <div class="palette-title">Triggers</div>
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="recurrence">
+                        <div class="action-icon icon-trigger">⏰</div>
+                        <span>Recurrence</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="when-item-created">
+                        <div class="action-icon icon-trigger">📝</div>
+                        <span>When item created</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="when-file-modified">
+                        <div class="action-icon icon-trigger">📁</div>
+                        <span>When file modified</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="trigger" data-action="http-request">
+                        <div class="action-icon icon-trigger">🌐</div>
+                        <span>HTTP Request</span>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <div class="palette-title">Actions</div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="get-items">
+                        <div class="action-icon icon-action">📋</div>
+                        <span>Get items</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="create-item">
+                        <div class="action-icon icon-action">➕</div>
+                        <span>Create item</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="update-item">
+                        <div class="action-icon icon-action">✏️</div>
+                        <span>Update item</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="send-email">
+                        <div class="action-icon icon-action">📧</div>
+                        <span>Send email</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="post-message">
+                        <div class="action-icon icon-action">💬</div>
+                        <span>Post message</span>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <div class="palette-title">Dataverse Actions</div>
+                    <div class="action-item" draggable="true" data-type="dataverse" data-action="list-rows">
+                        <div class="action-icon icon-action">🗃️</div>
+                        <span>List rows</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="dataverse" data-action="get-row">
+                        <div class="action-icon icon-action">🔍</div>
+                        <span>Get row by ID</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="dataverse" data-action="add-row">
+                        <div class="action-icon icon-action">➕</div>
+                        <span>Add new row</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="dataverse" data-action="update-row">
+                        <div class="action-icon icon-action">🔄</div>
+                        <span>Update row</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="dataverse" data-action="perform-bound-action">
+                        <div class="action-icon icon-action">⚡</div>
+                        <span>Perform bound action</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="dataverse" data-action="changeset">
+                        <div class="action-icon icon-action">📦</div>
+                        <span>Batch/Changeset</span>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <div class="palette-title">Control</div>
+                    <div class="action-item" draggable="true" data-type="control" data-action="apply-to-each">
+                        <div class="action-icon icon-loop">🔄</div>
+                        <span>Apply to each</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="control" data-action="condition">
+                        <div class="action-icon icon-condition">❓</div>
+                        <span>Condition</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="control" data-action="parallel-branch">
+                        <div class="action-icon icon-condition">⚡</div>
+                        <span>Parallel branch</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="control" data-action="scope">
+                        <div class="action-icon icon-condition">📦</div>
+                        <span>Scope</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="control" data-action="delay">
+                        <div class="action-icon icon-condition">⏱️</div>
+                        <span>Delay</span>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <div class="palette-title">Premium Connectors</div>
+                    <div class="action-item" draggable="true" data-type="premium" data-action="sql-query">
+                        <div class="action-icon icon-connector">🗄️</div>
+                        <span>SQL Query</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="premium" data-action="http-action">
+                        <div class="action-icon icon-connector">🔌</div>
+                        <span>HTTP Action</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="premium" data-action="sap-call">
+                        <div class="action-icon icon-connector">🏢</div>
+                        <span>SAP Call</span>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <div class="palette-title">AI Actions</div>
+                    <div class="action-item" draggable="true" data-type="ai" data-action="gpt-prompt">
+                        <div class="action-icon icon-ai">🤖</div>
+                        <span>GPT Prompt</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="ai" data-action="sentiment-analysis">
+                        <div class="action-icon icon-ai">😊</div>
+                        <span>Sentiment Analysis</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="ai" data-action="extract-info">
+                        <div class="action-icon icon-ai">📄</div>
+                        <span>Extract Information</span>
+                    </div>
+                    <div class="action-item" draggable="true" data-type="ai" data-action="copilot-action">
+                        <div class="action-icon icon-ai">✨</div>
+                        <span>Copilot Action</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-area">
+            <div class="flow-canvas" id="flow-canvas">
+                <svg class="svg-layer" id="svg-layer"></svg>
+                <div class="flow-container" id="flow-container">
+                    <div class="drop-zone" id="drop-zone">
+                        Drag actions here to start building your flow
+                    </div>
+                </div>
+                
+                <div class="flow-stats">
+                    <div class="stat-row">
+                        <span class="stat-label">Nodes:</span>
+                        <span class="stat-value" id="node-count">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Connections:</span>
+                        <span class="stat-value" id="connection-count">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Complexity:</span>
+                        <span class="stat-value" id="complexity">Simple</span>
+                    </div>
+                </div>
+
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <button class="zoom-btn" onclick="zoomOut()">-</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-right">
+            <div class="hints-panel" id="hints-panel">
+                <div class="hint-title">
+                    <span>💡</span> Smart Suggestions
+                </div>
+                <div id="hints-container">
+                    <div class="hint-item">
+                        <div class="hint-description">Start by adding a trigger to define when your flow runs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="properties-panel">
+                <div class="property-section">
+                    <div class="property-title">Selected Action Properties</div>
+                    <div id="selected-properties">
+                        <p style="color: var(--ms-gray-90); font-size: 13px;">Select an action to configure</p>
+                    </div>
+                </div>
+
+                <div class="property-section">
+                    <div class="property-title">Flow Configuration</div>
+                    <div class="property-field">
+                        <div class="property-label">Daily Executions</div>
+                        <input type="number" class="property-input" id="daily-runs" value="1" min="1" max="1440" onchange="updateCalculations()">
+                    </div>
+                    <div class="property-field">
+                        <div class="property-label">Items per Run</div>
+                        <input type="number" class="property-input" id="items-per-run" value="100" min="1" onchange="updateCalculations()">
+                    </div>
+                    <div class="property-field">
+                        <div class="property-label">Concurrency</div>
+                        <input type="number" class="property-input" id="concurrency" value="1" min="1" max="50" onchange="updateCalculations()">
+                    </div>
+                    <div class="property-field">
+                        <div class="property-label">Error Rate (%)</div>
+                        <input type="number" class="property-input" id="error-rate" value="5" min="0" max="100" onchange="updateCalculations()">
+                    </div>
+                </div>
+
+                <div class="property-section">
+                    <div class="property-title">Detected Issues</div>
+                    <div id="issues-list" style="font-size: 13px; color: var(--ms-gray-90);">
+                        No issues detected
+                    </div>
+                </div>
+
+                <div class="property-section">
+                    <div class="property-title">Pattern Analysis</div>
+                    <div id="pattern-analysis" style="font-size: 12px; color: var(--ms-gray-90);">
+                        <div style="padding: 8px; background: var(--ms-gray-10); border-radius: 4px;">
+                            <strong>Current Pattern:</strong> <span id="detected-pattern">None</span><br>
+                            <strong>Efficiency Score:</strong> <span id="efficiency-score">N/A</span><br>
+                            <strong>Recommended:</strong> <span id="recommended-pattern">Start building</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cost-summary">
+                <div class="cost-item">
+                    <span>Base License:</span>
+                    <span id="base-cost">£0</span>
+                </div>
+                <div class="cost-item">
+                    <span>Premium Connectors:</span>
+                    <span id="premium-cost">£0</span>
+                </div>
+                <div class="cost-item">
+                    <span>AI Credits:</span>
+                    <span id="ai-cost">£0</span>
+                </div>
+                <div class="cost-item cost-total">
+                    <span>Total Monthly:</span>
+                    <span id="total-cost">£0</span>
+                </div>
+                <div style="margin-top: 12px;">
+                    <button class="tool-btn" style="width: 100%;" onclick="exportFlow()">
+                        <span>💾</span> Export Flow Design
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div class="templates-modal" id="templates-modal">
+        <div class="templates-content">
+            <h2 style="margin-bottom: 8px;">Flow Templates - Best Practices</h2>
+            <p style="color: var(--ms-gray-90); font-size: 13px; margin-bottom: 20px;">Select a template based on Microsoft best practices</p>
+            
+            <div class="template-grid">
+                <div class="template-card" onclick="loadTemplate('approval')">
+                    <div class="template-icon">✅</div>
+                    <div class="template-name">Approval Workflow</div>
+                    <div class="template-description">Multi-stage approval with error handling</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('sync')">
+                    <div class="template-icon">🔄</div>
+                    <div class="template-name">Data Synchronization</div>
+                    <div class="template-description">Efficient batch processing with pagination</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('notification')">
+                    <div class="template-icon">📧</div>
+                    <div class="template-name">Smart Notifications</div>
+                    <div class="template-description">Conditional alerts with retry logic</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('etl')">
+                    <div class="template-icon">📊</div>
+                    <div class="template-name">ETL Pipeline</div>
+                    <div class="template-description">Extract, transform, load with validation</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('ai-processing')">
+                    <div class="template-icon">🤖</div>
+                    <div class="template-name">AI Document Processing</div>
+                    <div class="template-description">OCR + AI analysis with cost optimization</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('child-flows')">
+                    <div class="template-icon">🔗</div>
+                    <div class="template-name">Parent-Child Pattern</div>
+                    <div class="template-description">Modular design with shared Process license</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('filter-pattern')">
+                    <div class="template-icon">🎯</div>
+                    <div class="template-name">Efficient Filtering</div>
+                    <div class="template-description">OData filtering best practices</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('dataverse-sync')">
+                    <div class="template-icon">🔄</div>
+                    <div class="template-name">Dataverse Sync Pattern</div>
+                    <div class="template-description">Optimized for large-scale sync</div>
+                </div>
+                
+                <div class="template-card" onclick="loadTemplate('dataverse-bulk')">
+                    <div class="template-icon">📦</div>
+                    <div class="template-name">Dataverse Bulk Operations</div>
+                    <div class="template-description">Changeset for 1000+ records</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="tool-btn" onclick="closeTemplates()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let flowNodes = [];
+        let connections = [];
+        let selectedNode = null;
+        let nodeIdCounter = 0;
+        let connectionIdCounter = 0;
+        let currentMode = 'design';
+        let draggedElement = null;
+        let connectingFrom = null;
+        let zoomLevel = 1;
+        let currentPattern = 'none';
+        let hintsQueue = [];
+
+        // Best practice patterns
+        const BEST_PRACTICES = {
+            triggers: {
+                recurrence: 'Use for scheduled tasks. Best with off-peak hours (2-6 AM) to avoid throttling.',
+                item_created: 'Add filters early to reduce processing. Use trigger conditions when possible.',
+                http: 'Implement authentication and validate inputs to prevent abuse.'
+            },
+            patterns: {
+                sequential: { efficiency: 60, description: 'Good for simple workflows' },
+                parallel: { efficiency: 90, description: 'Optimal for independent operations' },
+                batch: { efficiency: 85, description: 'Best for large datasets' },
+                modular: { efficiency: 95, description: 'Excellent for reusability' }
+            },
+            optimizations: {
+                'use_select': 'Use Select action instead of Apply to Each when transforming arrays',
+                'filter_early': 'Filter data as early as possible to reduce processing',
+                'batch_api': 'Use batch API calls instead of individual requests',
+                'cache_results': 'Cache frequently accessed data in variables',
+                'error_scope': 'Wrap risky actions in Scope with error handling',
+                'pagination': 'Implement pagination for large datasets (>5000 items)',
+                'concurrency': 'Set concurrency between 5-20 for optimal performance',
+                'child_flows': 'Use child flows for reusable logic (share Process license)'
+            },
+            childFlowTriggers: {
+                actionCount: 15,  // More than 15 actions suggests modularization
+                reusableLogic: ['error handling', 'data transformation', 'approval process', 'notification'],
+                complexity: ['nested loops', 'multiple conditions', 'parallel branches'],
+                licensing: 'Up to 25 child flows can share ONE Process license (£81.90 total!)'
+            },
+            filtering: {
+                odata: {
+                    sharepoint: "Title eq 'Value' and Modified ge datetime'2024-01-01T00:00:00Z'",
+                    dataverse: "statuscode eq 1 and createdon ge 2024-01-01",
+                    tips: [
+                        "Use indexed columns for faster queries",
+                        "Limit results with $top parameter",
+                        "Select only needed fields with $select",
+                        "Filter at source, not in Power Automate"
+                    ]
+                },
+                performance: {
+                    before: "Get all items → Filter in Power Automate = Slow & expensive",
+                    after: "Get items with OData filter = Fast & efficient",
+                    savings: "90% reduction in processing time and API calls"
+                }
+            },
+            dataverse: {
+                synchronous: {
+                    description: "Real-time, immediate response required",
+                    useCases: ["UI updates", "Validation", "Quick lookups"],
+                    maxRecords: 5000,
+                    timeout: "2 minutes",
+                    bestFor: "User-triggered flows"
+                },
+                asynchronous: {
+                    description: "Background processing, no immediate response",
+                    useCases: ["Bulk updates", "Data migration", "Reports"],
+                    maxRecords: "Unlimited with pagination",
+                    timeout: "30 minutes per page",
+                    bestFor: "Scheduled flows, large datasets"
+                },
+                optimization: {
+                    useFetchXml: "Complex queries with aggregation",
+                    useChangeset: "Bulk operations (up to 1000 in transaction)",
+                    useSelect: "Only retrieve needed columns",
+                    useExpand: "Get related records in single call",
+                    usePageSize: "Default 5000, max 5000 per page",
+                    usePartitionId: "For multi-billion record tables",
+                    useAlternateKey: "Faster than GUID lookups"
+                },
+                limits: {
+                    apiCallsPerDay: 500000,
+                    apiCallsPer5Min: 60000,
+                    concurrentCalls: 52,
+                    executionTime: "2 min (sync), 30 min (async)",
+                    recordsPerCall: 5000
+                }
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragAndDrop();
+            setupCanvas();
+            updateCalculations();
+            showHint('👋 Welcome!', 'Start with a trigger from the left panel. Recurrence is best for scheduled tasks, while "When item created" works great for real-time processing.');
+        });
+
+        function setupDragAndDrop() {
+            // Setup draggable actions
+            document.querySelectorAll('.action-item').forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Setup drop zone
+            const canvas = document.getElementById('flow-canvas');
+            canvas.addEventListener('dragover', handleDragOver);
+            canvas.addEventListener('drop', handleDrop);
+        }
+
+        function handleDragStart(e) {
+            draggedElement = {
+                type: this.dataset.type,
+                action: this.dataset.action,
+                name: this.textContent.trim()
+            };
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            
+            const dropZone = document.getElementById('drop-zone');
+            if (dropZone) {
+                dropZone.classList.add('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            const dropZone = document.getElementById('drop-zone');
+            if (dropZone) {
+                dropZone.classList.remove('drag-over');
+                dropZone.style.display = 'none';
+            }
+
+            if (draggedElement) {
+                const canvas = document.getElementById('flow-canvas');
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                createNode(draggedElement, x, y);
+                updateCalculations();
+            }
+        }
+
+        function createNode(nodeData, x, y) {
+            const nodeId = `node-${nodeIdCounter++}`;
+            const container = document.getElementById('flow-container');
+            
+            const node = document.createElement('div');
+            node.className = 'flow-node';
+            node.id = nodeId;
+            node.style.left = x + 'px';
+            node.style.top = y + 'px';
+            
+            // Determine icon based on type
+            let icon = '📋';
+            let bgColor = '--ms-blue';
+            switch(nodeData.type) {
+                case 'trigger': icon = '⏰'; bgColor = '--ms-green'; break;
+                case 'control': icon = '🔄'; bgColor = '--ms-purple'; break;
+                case 'premium': icon = '🔌'; bgColor = '--ms-teal'; break;
+                case 'ai': icon = '🤖'; bgColor = '--ms-red'; break;
+                case 'dataverse': icon = '🗃️'; bgColor = '--ms-orange'; break;
+            }
+            
+            node.innerHTML = `
+                <div class="node-header">
+                    <span style="color: var(${bgColor})">${icon}</span>
+                    <span>${nodeData.name}</span>
+                </div>
+                <div class="node-body">
+                    ${nodeData.type === 'ai' ? 'Tokens: ~500' : 'Configure action'}
+                </div>
+                <div class="node-ports">
+                    <div class="port port-input" data-node="${nodeId}" data-type="input"></div>
+                    <div class="port port-output" data-node="${nodeId}" data-type="output"></div>
+                </div>
+                ${nodeData.type === 'premium' || nodeData.type === 'ai' ? '<div class="issue-indicator">!</div>' : ''}
+            `;
+            
+            container.appendChild(node);
+            
+            // Store node data
+            flowNodes.push({
+                id: nodeId,
+                type: nodeData.type,
+                action: nodeData.action,
+                name: nodeData.name,
+                x: x,
+                y: y,
+                element: node
+            });
+            
+            // Make node draggable
+            makeNodeDraggable(node);
+            
+            // Setup port connections
+            node.querySelectorAll('.port').forEach(port => {
+                port.addEventListener('click', handlePortClick);
+            });
+            
+            // Node selection
+            node.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('port')) {
+                    selectNode(nodeId);
+                }
+            });
+            
+            updateNodeCount();
+            analyzeFlowPattern();
+            provideContextualHints();
+        }
+
+        function makeNodeDraggable(node) {
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+            
+            node.addEventListener('mousedown', function(e) {
+                if (e.target.classList.contains('port')) return;
+                
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = node.offsetLeft;
+                initialY = node.offsetTop;
+                
+                node.style.zIndex = 1000;
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                node.style.left = (initialX + dx) + 'px';
+                node.style.top = (initialY + dy) + 'px';
+                
+                updateConnections();
+            });
+            
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    node.style.zIndex = '';
+                }
+            });
+        }
+
+        function handlePortClick(e) {
+            e.stopPropagation();
+            const port = e.target;
+            const nodeId = port.dataset.node;
+            const portType = port.dataset.type;
+            
+            if (portType === 'output') {
+                if (connectingFrom) {
+                    // Cancel previous connection
+                    connectingFrom = null;
+                } else {
+                    connectingFrom = { nodeId, port };
+                    port.style.background = 'var(--ms-orange)';
+                }
+            } else if (portType === 'input' && connectingFrom) {
+                // Create connection
+                createConnection(connectingFrom.nodeId, nodeId);
+                connectingFrom.port.style.background = '';
+                connectingFrom = null;
+                updateCalculations();
+            }
+        }
+
+        function createConnection(fromNodeId, toNodeId) {
+            const connectionId = `conn-${connectionIdCounter++}`;
+            
+            connections.push({
+                id: connectionId,
+                from: fromNodeId,
+                to: toNodeId
+            });
+            
+            drawConnections();
+            updateConnectionCount();
+        }
+
+        function drawConnections() {
+            const svg = document.getElementById('svg-layer');
+            svg.innerHTML = '';
+            
+            // Add arrow marker definition
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+            marker.setAttribute('id', 'arrowhead');
+            marker.setAttribute('markerWidth', '10');
+            marker.setAttribute('markerHeight', '7');
+            marker.setAttribute('refX', '9');
+            marker.setAttribute('refY', '3.5');
+            marker.setAttribute('orient', 'auto');
+            
+            const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
+            polygon.setAttribute('fill', 'var(--ms-blue)');
+            
+            marker.appendChild(polygon);
+            defs.appendChild(marker);
+            svg.appendChild(defs);
+            
+            connections.forEach((conn, index) => {
+                const fromNode = document.getElementById(conn.from);
+                const toNode = document.getElementById(conn.to);
+                
+                if (fromNode && toNode) {
+                    const fromRect = fromNode.getBoundingClientRect();
+                    const toRect = toNode.getBoundingClientRect();
+                    const canvasRect = svg.getBoundingClientRect();
+                    
+                    const x1 = fromRect.right - canvasRect.left;
+                    const y1 = fromRect.top + fromRect.height/2 - canvasRect.top;
+                    const x2 = toRect.left - canvasRect.left;
+                    const y2 = toRect.top + toRect.height/2 - canvasRect.top;
+                    
+                    // Create group for connection
+                    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    
+                    // Create path with better curve
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const midX = (x1 + x2) / 2;
+                    const controlOffset = Math.min(50, Math.abs(x2 - x1) / 3);
+                    
+                    // Smoother bezier curve
+                    path.setAttribute('d', `M ${x1} ${y1} C ${x1 + controlOffset} ${y1}, ${x2 - controlOffset} ${y2}, ${x2} ${y2}`);
+                    
+                    // Determine if synchronous or asynchronous
+                    const fromNodeData = flowNodes.find(n => n.id === conn.from);
+                    const toNodeData = flowNodes.find(n => n.id === conn.to);
+                    const isAsync = toNodeData?.type === 'dataverse' && fromNodeData?.action === 'recurrence';
+                    
+                    path.setAttribute('class', `connection ${isAsync ? 'asynchronous' : 'synchronous'}`);
+                    path.setAttribute('marker-end', 'url(#arrowhead)');
+                    
+                    // Add label for connection type
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', midX);
+                    text.setAttribute('y', (y1 + y2) / 2 - 5);
+                    text.setAttribute('class', 'connection-label');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.textContent = isAsync ? 'Async' : '';
+                    
+                    g.appendChild(path);
+                    if (isAsync) g.appendChild(text);
+                    
+                    // Add click handler
+                    g.addEventListener('click', () => {
+                        showConnectionDetails(conn, isAsync);
+                    });
+                    
+                    svg.appendChild(g);
+                }
+            });
+        }
+        
+        function showConnectionDetails(connection, isAsync) {
+            const type = isAsync ? 'Asynchronous' : 'Synchronous';
+            const details = isAsync ? 
+                'Best for: Background processing, large datasets\nTimeout: 30 minutes\nUser experience: Non-blocking' :
+                'Best for: Real-time updates\nTimeout: 2 minutes\nUser experience: Blocking';
+            
+            showHint(`${type} Connection`, details, 'info');
+        }
+
+        function updateConnections() {
+            drawConnections();
+        }
+
+        function selectNode(nodeId) {
+            // Clear previous selection
+            document.querySelectorAll('.flow-node').forEach(n => {
+                n.classList.remove('selected');
+            });
+            
+            const node = document.getElementById(nodeId);
+            node.classList.add('selected');
+            selectedNode = flowNodes.find(n => n.id === nodeId);
+            
+            // Update properties panel
+            updatePropertiesPanel();
+        }
+
+        function updatePropertiesPanel() {
+            const panel = document.getElementById('selected-properties');
+            
+            if (selectedNode) {
+                let propertiesHTML = `
+                    <div class="property-field">
+                        <div class="property-label">Action Type</div>
+                        <input type="text" class="property-input" value="${selectedNode.type}" readonly>
+                    </div>
+                    <div class="property-field">
+                        <div class="property-label">Action Name</div>
+                        <input type="text" class="property-input" value="${selectedNode.name}" onchange="updateNodeName('${selectedNode.id}', this.value)">
+                    </div>
+                `;
+                
+                if (selectedNode.type === 'ai') {
+                    propertiesHTML += `
+                        <div class="property-field">
+                            <div class="property-label">AI Model</div>
+                            <select class="property-select">
+                                <option>GPT-4o mini</option>
+                                <option>GPT-4</option>
+                                <option>GPT-4 Turbo</option>
+                            </select>
+                        </div>
+                        <div class="property-field">
+                            <div class="property-label">Tokens per Request</div>
+                            <input type="number" class="property-input" value="500" min="0">
+                        </div>
+                    `;
+                }
+                
+                if (selectedNode.type === 'control' && selectedNode.action === 'apply-to-each') {
+                    propertiesHTML += `
+                        <div class="property-field">
+                            <div class="property-label">Concurrency</div>
+                            <input type="number" class="property-input" value="1" min="1" max="50">
+                        </div>
+                    `;
+                }
+                
+                panel.innerHTML = propertiesHTML;
+            } else {
+                panel.innerHTML = '<p style="color: var(--ms-gray-90); font-size: 13px;">Select an action to configure</p>';
+            }
+        }
+
+        function updateCalculations() {
+            const dailyRuns = parseInt(document.getElementById('daily-runs').value) || 1;
+            const itemsPerRun = parseInt(document.getElementById('items-per-run').value) || 100;
+            const errorRate = parseInt(document.getElementById('error-rate').value) || 5;
+            
+            // Count node types
+            let triggers = 0, actions = 0, premium = 0, ai = 0, loops = 0;
+            
+            flowNodes.forEach(node => {
+                switch(node.type) {
+                    case 'trigger': triggers++; break;
+                    case 'action': actions++; break;
+                    case 'premium': premium++; break;
+                    case 'ai': ai++; break;
+                    case 'control': 
+                        if (node.action === 'apply-to-each') loops++;
+                        break;
+                }
+            });
+            
+            // Calculate total actions
+            let totalActions = flowNodes.length;
+            if (loops > 0) {
+                totalActions *= itemsPerRun; // Multiply by items for loops
+            }
+            
+            // Calculate PPR
+            const pprPerDay = totalActions * dailyRuns * (1 + errorRate/100);
+            const pprPerMonth = pprPerDay * 30;
+            
+            // Calculate costs
+            let baseCost = 0;
+            let premiumCost = 0;
+            let aiCost = 0;
+            
+            // Determine licensing needs
+            if (pprPerMonth > 1200000) { // Need Process license
+                baseCost = 81.90;
+            } else if (premium > 0 || ai > 0) { // Need Premium
+                baseCost = 12.20; // Per user - simplified
+            }
+            
+            // AI costs (simplified)
+            if (ai > 0) {
+                const tokensPerMonth = ai * 500 * itemsPerRun * dailyRuns * 30;
+                const creditsNeeded = Math.ceil(tokensPerMonth / 1000);
+                if (creditsNeeded > 5000) {
+                    aiCost = Math.ceil((creditsNeeded - 5000) / 5000) * 300;
+                }
+            }
+            
+            // Premium connector enforcement
+            if (premium > 0) {
+                premiumCost = premium * 10; // Simplified premium action cost
+            }
+            
+            // Update UI
+            document.getElementById('total-actions').textContent = totalActions;
+            document.getElementById('total-ppr').textContent = Math.round(pprPerDay).toLocaleString();
+            document.getElementById('monthly-cost').textContent = `£${(baseCost + premiumCost + aiCost).toFixed(2)}`;
+            document.getElementById('runtime-est').textContent = `${Math.round(totalActions * 0.5)}s`; // 500ms per action
+            
+            document.getElementById('base-cost').textContent = `£${baseCost.toFixed(2)}`;
+            document.getElementById('premium-cost').textContent = `£${premiumCost.toFixed(2)}`;
+            document.getElementById('ai-cost').textContent = `£${aiCost.toFixed(2)}`;
+            document.getElementById('total-cost').textContent = `£${(baseCost + premiumCost + aiCost).toFixed(2)}`;
+            
+            // Update complexity
+            let complexity = 'Simple';
+            if (loops > 0 || connections.length > 5) complexity = 'Medium';
+            if (loops > 1 || connections.length > 10 || ai > 0) complexity = 'Complex';
+            document.getElementById('complexity').textContent = complexity;
+            
+            // Check for issues
+            checkForIssues();
+            analyzeFlowPattern();
+        }
+
+        function analyzeFlowPattern() {
+            // Detect current pattern
+            const triggers = flowNodes.filter(n => n.type === 'trigger').length;
+            const loops = flowNodes.filter(n => n.action === 'apply-to-each').length;
+            const conditions = flowNodes.filter(n => n.action === 'condition').length;
+            const parallel = flowNodes.filter(n => n.action === 'parallel-branch').length;
+            const ai = flowNodes.filter(n => n.type === 'ai').length;
+            
+            let pattern = 'Sequential';
+            let efficiency = 60;
+            let recommendation = '';
+            
+            if (parallel > 0) {
+                pattern = 'Parallel Processing';
+                efficiency = 90;
+                recommendation = 'Excellent! Parallel branches optimize performance.';
+            } else if (loops > 1) {
+                pattern = 'Nested Loops';
+                efficiency = 30;
+                recommendation = '⚠️ Consider using Select/Filter instead of nested loops';
+                showHint('Performance Alert', 'Nested loops exponentially increase runtime. Use Select action for transformations or Filter for data reduction.', 'warning');
+            } else if (loops === 1 && flowNodes.length > 5) {
+                pattern = 'Batch Processing';
+                efficiency = 75;
+                recommendation = 'Good pattern. Enable concurrency for better performance.';
+            } else if (conditions > 2) {
+                pattern = 'Complex Branching';
+                efficiency = 65;
+                recommendation = 'Consider using Switch action for multiple conditions';
+            }
+            
+            if (ai > 0 && loops > 0) {
+                showHint('Cost Alert', 'AI actions inside loops multiply token costs. Process in batches or filter first.', 'critical');
+            }
+            
+            document.getElementById('detected-pattern').textContent = pattern;
+            document.getElementById('efficiency-score').textContent = `${efficiency}%`;
+            document.getElementById('efficiency-score').style.color = efficiency >= 70 ? 'var(--ms-green)' : efficiency >= 50 ? 'var(--ms-orange)' : 'var(--ms-red)';
+            document.getElementById('recommended-pattern').textContent = recommendation;
+        }
+
+        function provideContextualHints() {
+            const hints = [];
+            
+            // Check flow state
+            const triggers = flowNodes.filter(n => n.type === 'trigger');
+            const actions = flowNodes.filter(n => n.type === 'action');
+            const hasLoops = flowNodes.some(n => n.action === 'apply-to-each');
+            const hasPremium = flowNodes.some(n => n.type === 'premium');
+            const hasAI = flowNodes.some(n => n.type === 'ai');
+            const hasGetItems = flowNodes.some(n => n.action === 'get-items');
+            const hasDataverse = flowNodes.some(n => n.type === 'dataverse');
+            const dataverseActions = flowNodes.filter(n => n.type === 'dataverse');
+            const totalActions = flowNodes.filter(n => n.type === 'action' || n.type === 'premium' || n.type === 'ai' || n.type === 'dataverse').length;
+            
+            // Provide stage-appropriate hints
+            if (triggers.length === 0) {
+                hints.push({
+                    title: 'Add a Trigger',
+                    description: 'Every flow needs a trigger. Recurrence for scheduled tasks, or event-based triggers for real-time processing.',
+                    type: 'info'
+                });
+            } else if (triggers.length > 1) {
+                hints.push({
+                    title: 'Multiple Triggers',
+                    description: 'Consider using separate flows for different triggers to improve maintainability.',
+                    type: 'warning'
+                });
+            }
+            
+            if (actions.length > 10 && !hasLoops) {
+                hints.push({
+                    title: 'Consider Batching',
+                    description: 'With many sequential actions, consider using Apply to Each with concurrency for better performance.',
+                    type: 'info'
+                });
+            }
+            
+            if (hasLoops && flowNodes.length > 1) {
+                const concurrency = document.getElementById('concurrency').value;
+                if (concurrency == 1) {
+                    hints.push({
+                        title: 'Enable Concurrency',
+                        description: 'Set concurrency to 5-20 in Apply to Each for 5-20x faster processing.',
+                        type: 'success',
+                        action: () => {
+                            document.getElementById('concurrency').value = 10;
+                            updateCalculations();
+                        }
+                    });
+                }
+            }
+            
+            if (hasPremium) {
+                hints.push({
+                    title: 'Premium Connector',
+                    description: 'Premium connectors require licensing. Consider Process license (£81.90) for high-volume flows.',
+                    type: 'warning'
+                });
+            }
+            
+            if (hasAI) {
+                hints.push({
+                    title: 'AI Best Practice',
+                    description: 'Cache AI responses when possible. Batch multiple items into single prompts to reduce token costs.',
+                    type: 'info'
+                });
+            }
+            
+            // Child flow recommendations
+            if (totalActions >= 15) {
+                hints.push({
+                    title: '🔗 Break into Child Flows',
+                    description: `With ${totalActions} actions, consider child flows. Benefits: 1) Up to 25 child flows share ONE Process license (£81.90 total) 2) Reusable modules 3) Easier maintenance 4) Independent testing`,
+                    type: 'success',
+                    action: () => showChildFlowGuide()
+                });
+            }
+            
+            // Check for repeated patterns suggesting child flow
+            const emailActions = flowNodes.filter(n => n.action === 'send-email').length;
+            if (emailActions > 2) {
+                hints.push({
+                    title: '📧 Notification Child Flow',
+                    description: 'Multiple email actions detected. Create a reusable notification child flow to centralize email templates and error handling.',
+                    type: 'info'
+                });
+            }
+            
+            // Filtering best practices
+            if (hasGetItems && !hasFilteringOptimization()) {
+                hints.push({
+                    title: '⚡ Add OData Filtering',
+                    description: 'CRITICAL: Filter at source! Use OData query in Get Items: "$filter=Status eq \'Active\' and Modified ge \'2024-01-01\'" reduces data by 90%+',
+                    type: 'critical',
+                    action: () => showFilteringExamples()
+                });
+            }
+            
+            if (hasLoops && hasGetItems) {
+                hints.push({
+                    title: '🎯 Filter Before Loop',
+                    description: 'Processing all items then filtering = SLOW. Instead: 1) Use OData $filter in Get Items 2) Use $top to limit results 3) Use $select for only needed fields',
+                    type: 'warning'
+                });
+            }
+            
+            // Complex flow detection
+            const hasNestedLoops = detectNestedLoops();
+            const hasComplexConditions = flowNodes.filter(n => n.action === 'condition').length > 3;
+            
+            if (hasNestedLoops || hasComplexConditions) {
+                hints.push({
+                    title: '🏗️ Modularize Complex Logic',
+                    description: 'Complex pattern detected! Break into child flows: 1) Data validation flow 2) Processing flow 3) Error handling flow. Share single Process license!',
+                    type: 'warning'
+                });
+            }
+            
+            // License optimization with child flows
+            if (hasPremium && flowNodes.length > 10) {
+                const userCount = parseInt(document.getElementById('user-count')?.value || 10);
+                hints.push({
+                    title: '💰 License Optimization',
+                    description: `Premium connectors + complex flow = Perfect for Process license with child flows. Cost: £81.90 TOTAL for up to 25 flows vs £12.20 PER USER x ${userCount} users = £${(12.20 * userCount).toFixed(2)}/month!`,
+                    type: 'success'
+                });
+            }
+            
+            // Dataverse-specific optimizations
+            if (hasDataverse) {
+                // Check for synchronous vs asynchronous pattern
+                const triggerType = triggers[0]?.action;
+                const isUserTriggered = triggerType && (triggerType.includes('button') || triggerType.includes('http'));
+                
+                if (isUserTriggered && dataverseActions.length > 3) {
+                    hints.push({
+                        title: '⚠️ Synchronous Timeout Risk',
+                        description: 'User-triggered flows with Dataverse have 2-minute timeout. Consider: 1) Async pattern with callback 2) Pagination for large datasets 3) Use FetchXML for complex queries',
+                        type: 'warning'
+                    });
+                }
+                
+                // Check for bulk operations
+                const hasMultipleUpdates = flowNodes.filter(n => n.action === 'update-row' || n.action === 'add-row').length > 5;
+                if (hasMultipleUpdates) {
+                    hints.push({
+                        title: '📦 Use Dataverse Changeset',
+                        description: 'Multiple create/update detected! Use Changeset for up to 1000 operations in single transaction. Benefits: Atomic, 100x faster, single API call',
+                        type: 'success'
+                    });
+                }
+                
+                // List rows optimization
+                const hasListRows = flowNodes.some(n => n.action === 'list-rows');
+                if (hasListRows) {
+                    hints.push({
+                        title: '🎯 Dataverse Query Tips',
+                        description: 'List Rows best practices: 1) Use $select for columns 2) $filter with indexed columns 3) $top max 5000 4) Use FetchXML for joins/aggregates 5) Consider Partition ID for huge tables',
+                        type: 'info'
+                    });
+                }
+                
+                // Performance tips
+                if (dataverseActions.length > 10) {
+                    hints.push({
+                        title: '🚀 Dataverse Performance',
+                        description: 'With 500K API calls/day limit, optimize: 1) Use $expand for related data 2) Alternate keys instead of GUIDs 3) Batch operations 4) Cache frequently accessed data',
+                        type: 'info'
+                    });
+                }
+            }
+            
+            // Pattern-specific hints
+            if (connections.length === 0 && flowNodes.length > 1) {
+                hints.push({
+                    title: 'Connect Your Actions',
+                    description: 'Click output port → input port to connect actions in sequence.',
+                    type: 'info'
+                });
+            }
+            
+            // Analyze for modularization opportunities
+            const duplicateActions = findDuplicateActionTypes();
+            if (duplicateActions.length > 0) {
+                hints.push({
+                    title: '♻️ Duplicate Logic Detected',
+                    description: `Multiple ${duplicateActions[0]} actions found. Perfect candidate for a reusable child flow!`,
+                    type: 'info'
+                });
+            }
+            
+            updateHintsPanel(hints);
+        }
+        
+        function findDuplicateActionTypes() {
+            const actionCounts = {};
+            flowNodes.forEach(node => {
+                if (node.action) {
+                    actionCounts[node.action] = (actionCounts[node.action] || 0) + 1;
+                }
+            });
+            
+            return Object.keys(actionCounts).filter(action => actionCounts[action] > 2);
+        }
+
+        function showHint(title, description, type = 'info') {
+            const hint = { title, description, type };
+            hintsQueue.push(hint);
+            updateHintsPanel(hintsQueue.slice(-3)); // Show last 3 hints
+        }
+        
+        function hasFilteringOptimization() {
+            // Check if user mentioned filtering in any node names
+            return flowNodes.some(n => 
+                n.name.toLowerCase().includes('filter') || 
+                n.name.toLowerCase().includes('odata') ||
+                n.name.toLowerCase().includes('where')
+            );
+        }
+        
+        function detectNestedLoops() {
+            // Simple detection: multiple apply-to-each nodes likely means nesting
+            const loops = flowNodes.filter(n => n.action === 'apply-to-each');
+            return loops.length > 1;
+        }
+        
+        function showChildFlowGuide() {
+            alert(`🔗 CHILD FLOW BEST PRACTICES\n\n` +
+                  `WHEN to break into child flows:\n` +
+                  `✅ More than 15 actions\n` +
+                  `✅ Reusable logic (error handling, notifications)\n` +
+                  `✅ Complex conditions or loops\n` +
+                  `✅ Different schedules or triggers\n` +
+                  `✅ Independent testing needed\n\n` +
+                  `BENEFITS:\n` +
+                  `💰 Up to 25 child flows share ONE Process license\n` +
+                  `🔄 Reusable across multiple parent flows\n` +
+                  `🧪 Test independently\n` +
+                  `📊 Better error isolation\n` +
+                  `⚡ Parallel execution possible\n\n` +
+                  `EXAMPLE Structure:\n` +
+                  `Parent Flow → Validate Data (child)\n` +
+                  `          → Process Items (child)\n` +
+                  `          → Send Notifications (child)\n` +
+                  `          → Log Results (child)\n\n` +
+                  `COST: £81.90 TOTAL for all flows!`);
+        }
+        
+        function showFilteringExamples() {
+            alert(`⚡ FILTERING BEST PRACTICES\n\n` +
+                  `❌ BAD (Slow & Expensive):\n` +
+                  `1. Get Items (10,000 records)\n` +
+                  `2. Apply to Each\n` +
+                  `3. Condition to filter\n` +
+                  `Result: 10,000 API calls, timeout risk\n\n` +
+                  `✅ GOOD (Fast & Efficient):\n` +
+                  `1. Get Items with OData filter\n` +
+                  `   $filter=Status eq 'Active'\n` +
+                  `   $top=100\n` +
+                  `   $select=Title,Modified\n` +
+                  `Result: 1 API call, 100 records\n\n` +
+                  `SHAREPOINT Examples:\n` +
+                  `📌 Status eq 'Approved'\n` +
+                  `📌 Modified ge datetime'2024-01-01T00:00:00Z'\n` +
+                  `📌 Title ne null and Amount gt 1000\n\n` +
+                  `DATAVERSE Examples:\n` +
+                  `📌 statuscode eq 1\n` +
+                  `📌 createdon ge 2024-01-01\n` +
+                  `📌 ownerid eq '{GUID}'\n\n` +
+                  `PRO TIPS:\n` +
+                  `🎯 Filter at source (database)\n` +
+                  `🎯 Use indexed columns\n` +
+                  `🎯 Combine with $orderby for sorting\n` +
+                  `🎯 Test in Graph/REST API explorer first`);
+        }
+
+        function updateHintsPanel(hints) {
+            const container = document.getElementById('hints-container');
+            if (hints.length === 0) {
+                container.innerHTML = '<div class="hint-item"><div class="hint-description">No suggestions at the moment</div></div>';
+                return;
+            }
+            
+            container.innerHTML = hints.map(hint => `
+                <div class="hint-item ${hint.type === 'warning' ? 'warning' : hint.type === 'critical' ? 'critical' : ''}">
+                    <div class="hint-title">
+                        ${hint.type === 'success' ? '✅' : hint.type === 'warning' ? '⚠️' : hint.type === 'critical' ? '🚨' : '💡'}
+                        ${hint.title}
+                    </div>
+                    <div class="hint-description">${hint.description}</div>
+                    ${hint.action ? '<span class="hint-action" onclick="applyHint()">Apply suggestion</span>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function showTemplates() {
+            document.getElementById('templates-modal').style.display = 'block';
+        }
+
+        function closeTemplates() {
+            document.getElementById('templates-modal').style.display = 'none';
+        }
+
+        function loadTemplate(templateType) {
+            clearCanvas();
+            
+            switch(templateType) {
+                case 'approval':
+                    // Create approval workflow
+                    setTimeout(() => {
+                        createNode({ type: 'trigger', action: 'when-item-created', name: 'When item created' }, 100, 100);
+                        createNode({ type: 'action', action: 'get-items', name: 'Get manager' }, 300, 100);
+                        createNode({ type: 'action', action: 'send-email', name: 'Send approval request' }, 500, 100);
+                        createNode({ type: 'control', action: 'condition', name: 'Check response' }, 700, 100);
+                        createNode({ type: 'action', action: 'update-item', name: 'Update status' }, 900, 50);
+                        createNode({ type: 'action', action: 'send-email', name: 'Send notification' }, 900, 150);
+                        showHint('Approval Template', 'Best practice: Add timeout handling for approvals that take too long.', 'success');
+                    }, 100);
+                    break;
+                    
+                case 'sync':
+                    setTimeout(() => {
+                        createNode({ type: 'trigger', action: 'recurrence', name: 'Daily at 2 AM' }, 100, 100);
+                        createNode({ type: 'action', action: 'get-items', name: 'Get with $filter=Modified ge LastSync' }, 300, 100);
+                        createNode({ type: 'control', action: 'apply-to-each', name: 'Process batch' }, 500, 100);
+                        createNode({ type: 'action', action: 'create-item', name: 'Sync to target' }, 700, 100);
+                        document.getElementById('concurrency').value = 10;
+                        showHint('Sync Template', '✅ OData filter included to sync only changed items. This reduces processing by 95%+!', 'success');
+                        showHint('Child Flow Tip', 'Consider breaking sync logic into child flow for reuse across multiple data sources', 'info');
+                    }, 100);
+                    break;
+                    
+                case 'ai-processing':
+                    setTimeout(() => {
+                        createNode({ type: 'trigger', action: 'when-file-modified', name: 'When document added' }, 100, 100);
+                        createNode({ type: 'ai', action: 'extract-info', name: 'Extract text (OCR)' }, 300, 100);
+                        createNode({ type: 'control', action: 'scope', name: 'Error handling scope' }, 500, 100);
+                        createNode({ type: 'ai', action: 'gpt-prompt', name: 'Analyze content' }, 700, 100);
+                        createNode({ type: 'action', action: 'create-item', name: 'Store results' }, 900, 100);
+                        showHint('AI Template', 'Wrapped AI actions in error scope. Consider caching results to avoid re-processing.', 'success');
+                    }, 100);
+                    break;
+                    
+                case 'child-flows':
+                    setTimeout(() => {
+                        createNode({ type: 'trigger', action: 'when-item-created', name: 'Main trigger' }, 100, 100);
+                        createNode({ type: 'action', action: 'get-items', name: 'Get data (filtered)' }, 300, 100);
+                        createNode({ type: 'action', action: 'http-action', name: 'Call Child: Validate' }, 500, 50);
+                        createNode({ type: 'action', action: 'http-action', name: 'Call Child: Process' }, 500, 150);
+                        createNode({ type: 'action', action: 'http-action', name: 'Call Child: Notify' }, 500, 250);
+                        createNode({ type: 'control', action: 'scope', name: 'Error handling' }, 700, 150);
+                        showHint('Child Flow Pattern', '🔗 Each HTTP action calls a child flow. All 4 child flows share ONE Process license (£81.90 total)!', 'success');
+                        showHint('Benefit', 'Each child flow can be tested independently and reused by other parent flows', 'info');
+                    }, 100);
+                    break;
+                    
+                case 'filter-pattern':
+                    setTimeout(() => {
+                        createNode({ type: 'trigger', action: 'recurrence', name: 'Every hour' }, 100, 100);
+                        createNode({ type: 'action', action: 'get-items', name: 'Get Items\n$filter=Status eq \'New\'\n$top=100\n$select=Title,ID' }, 300, 100);
+                        createNode({ type: 'control', action: 'apply-to-each', name: 'Process filtered items' }, 550, 100);
+                        createNode({ type: 'action', action: 'update-item', name: 'Update status' }, 750, 100);
+                        showHint('Filtering Excellence', '⚡ OData filter reduces data by 95%+. Only 100 "New" items retrieved instead of 10,000 total items!', 'success');
+                        showHint('Performance', 'Processing time reduced from 30 minutes to 30 seconds with proper filtering', 'info');
+                    }, 100);
+                    break;
+                    
+                case 'dataverse-sync':
+                    setTimeout(() => {
+                        createNode({ type: 'trigger', action: 'recurrence', name: 'Every 15 min' }, 100, 100);
+                        createNode({ type: 'dataverse', action: 'list-rows', name: 'List Rows\n$filter=modifiedon ge [LastSync]\n$select=name,id\n$top=5000' }, 300, 100);
+                        createNode({ type: 'control', action: 'apply-to-each', name: 'Process batch (Concurrency: 50)' }, 550, 100);
+                        createNode({ type: 'dataverse', action: 'update-row', name: 'Update/Create in target' }, 750, 100);
+                        createNode({ type: 'action', action: 'update-item', name: 'Update LastSync timestamp' }, 950, 100);
+                        document.getElementById('concurrency').value = 50;
+                        showHint('Dataverse Sync', '⚡ Optimized for Dataverse: 50 concurrent connections (max: 52), pagination ready, incremental sync via modifiedon', 'success');
+                        showHint('API Limits', 'Dataverse allows 500K API calls/day, 60K per 5 min. This pattern maximizes throughput within limits', 'info');
+                    }, 100);
+                    break;
+                    
+                case 'dataverse-bulk':
+                    setTimeout(() => {
+                        createNode({ type: 'trigger', action: 'when-file-modified', name: 'CSV file uploaded' }, 100, 100);
+                        createNode({ type: 'action', action: 'get-items', name: 'Parse CSV (up to 100K rows)' }, 300, 100);
+                        createNode({ type: 'control', action: 'scope', name: 'Batch scope' }, 500, 50);
+                        createNode({ type: 'dataverse', action: 'changeset', name: 'Changeset (1000 records)' }, 700, 50);
+                        createNode({ type: 'control', action: 'scope', name: 'Error handling' }, 500, 150);
+                        createNode({ type: 'action', action: 'send-email', name: 'Send completion report' }, 900, 100);
+                        showHint('Bulk Operations', '📦 Changeset processes 1000 records in single transaction - atomic, fast, efficient!', 'success');
+                        showHint('Pattern', 'Break large datasets into 1000-record changesets. Each changeset = 1 API call instead of 1000!', 'info');
+                    }, 100);
+                    break;
+            }
+            
+            closeTemplates();
+            updateCalculations();
+        }
+
+        function checkForIssues() {
+            const issues = [];
+            const itemsPerRun = parseInt(document.getElementById('items-per-run').value) || 100;
+            
+            // Check for nested loops
+            const loops = flowNodes.filter(n => n.action === 'apply-to-each').length;
+            if (loops > 1) {
+                issues.push('⚠️ Nested loops detected - performance impact');
+            }
+            
+            // Check for premium connectors
+            const premium = flowNodes.filter(n => n.type === 'premium').length;
+            if (premium > 0) {
+                issues.push('💰 Premium connectors require licensing');
+            }
+            
+            // Check for high item count
+            if (itemsPerRun > 5000 && loops > 0) {
+                issues.push('⏱️ Timeout risk with large datasets');
+            }
+            
+            // Check for AI usage
+            const ai = flowNodes.filter(n => n.type === 'ai').length;
+            if (ai > 0) {
+                issues.push('🤖 AI actions consume credits');
+            }
+            
+            const issuesList = document.getElementById('issues-list');
+            if (issues.length > 0) {
+                issuesList.innerHTML = issues.map(i => `<div style="margin-bottom: 8px;">${i}</div>`).join('');
+            } else {
+                issuesList.innerHTML = '✅ No issues detected';
+            }
+            
+            // Provide proactive suggestions based on issues
+            if (issues.length > 0) {
+                const topIssue = issues[0];
+                if (topIssue.includes('Nested loops')) {
+                    showHint('Optimization Available', 'Replace nested Apply to Each with Select action for 10x performance improvement', 'success');
+                } else if (topIssue.includes('Timeout risk')) {
+                    showHint('Prevent Timeout', 'Enable pagination or reduce batch size to stay under 30-minute limit', 'warning');
+                } else if (topIssue.includes('Premium')) {
+                    showHint('License Tip', 'Process license (£81.90) covers unlimited premium actions vs per-user pricing', 'info');
+                }
+            }
+        }
+
+        function updateNodeCount() {
+            document.getElementById('node-count').textContent = flowNodes.length;
+        }
+
+        function updateConnectionCount() {
+            document.getElementById('connection-count').textContent = connections.length;
+        }
+
+        function clearCanvas() {
+            if (confirm('Clear all nodes and connections?')) {
+                flowNodes = [];
+                connections = [];
+                nodeIdCounter = 0;
+                connectionIdCounter = 0;
+                
+                const container = document.getElementById('flow-container');
+                container.innerHTML = `
+                    <div class="drop-zone" id="drop-zone">
+                        Drag actions here to start building your flow
+                    </div>
+                `;
+                
+                document.getElementById('svg-layer').innerHTML = '';
+                updateCalculations();
+                updateNodeCount();
+                updateConnectionCount();
+            }
+        }
+
+        function exportFlow() {
+            const flowData = {
+                nodes: flowNodes.map(n => ({
+                    id: n.id,
+                    type: n.type,
+                    action: n.action,
+                    name: n.name,
+                    x: n.x,
+                    y: n.y
+                })),
+                connections: connections,
+                configuration: {
+                    dailyRuns: document.getElementById('daily-runs').value,
+                    itemsPerRun: document.getElementById('items-per-run').value,
+                    concurrency: document.getElementById('concurrency').value,
+                    errorRate: document.getElementById('error-rate').value
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(flowData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `flow-design-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (mode === 'analyze') {
+                // Show analysis overlay
+                alert('Analysis mode - Click nodes to see detailed metrics');
+            }
+        }
+
+        function zoomIn() {
+            zoomLevel = Math.min(2, zoomLevel + 0.1);
+            applyZoom();
+        }
+
+        function zoomOut() {
+            zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const container = document.getElementById('flow-container');
+            container.style.transform = `translate(-50%, -50%) scale(${zoomLevel})`;
+        }
+
+        function setupCanvas() {
+            // Redraw connections on window resize
+            window.addEventListener('resize', drawConnections);
+        }
+
+        function updateNodeName(nodeId, newName) {
+            const node = flowNodes.find(n => n.id === nodeId);
+            if (node) {
+                node.name = newName;
+                const element = document.getElementById(nodeId);
+                const header = element.querySelector('.node-header span:last-child');
+                header.textContent = newName;
+            }
+        }
+    </script>
+</body>
+</html>

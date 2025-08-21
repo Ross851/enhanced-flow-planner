@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate Visual Flow Builder - SEE THE RIGHT WAY vs WRONG WAY</title>
+    <style>
+        :root {
+            --ms-blue: #0078d4;
+            --ms-blue-dark: #004578;
+            --ms-green: #107c10;
+            --ms-red: #d13438;
+            --ms-red-dark: #a80000;
+            --ms-orange: #ff8c00;
+            --ms-purple: #5c2d91;
+            --ms-gray-10: #faf9f8;
+            --ms-gray-20: #f3f2f1;
+            --ms-gray-30: #edebe9;
+            --ms-gray-90: #605e5c;
+            --ms-gray-130: #323130;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--ms-blue-dark);
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .comparison-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .toggle-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active-wrong {
+            background: var(--ms-red);
+            color: white;
+        }
+
+        .toggle-btn.active-right {
+            background: var(--ms-green);
+            color: white;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 1fr 350px;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1400px) {
+            .main-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Action Palette */
+        .action-palette {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .palette-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        .palette-section {
+            margin-bottom: 25px;
+        }
+
+        .palette-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .draggable-action {
+            background: var(--ms-gray-10);
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: grab;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .draggable-action:hover {
+            background: var(--ms-blue);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .draggable-action.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .action-icon {
+            font-size: 20px;
+        }
+
+        .action-info {
+            flex: 1;
+        }
+
+        .action-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .action-tip {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* Flow Canvases */
+        .flow-canvas {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 600px;
+            position: relative;
+        }
+
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--ms-gray-30);
+        }
+
+        .canvas-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wrong-way {
+            color: var(--ms-red);
+        }
+
+        .right-way {
+            color: var(--ms-green);
+        }
+
+        .api-counter {
+            background: var(--ms-gray-130);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .api-counter.high {
+            background: var(--ms-red);
+            animation: pulse-warning 2s infinite;
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Flow Steps */
+        .flow-step {
+            background: var(--ms-gray-10);
+            border: 2px solid var(--ms-gray-30);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .flow-step.trigger {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flow-step.action {
+            border-color: var(--ms-blue);
+        }
+
+        .flow-step.loop {
+            border: 3px solid var(--ms-orange);
+            background: rgba(255, 140, 0, 0.05);
+            padding: 20px;
+        }
+
+        .flow-step.nested-loop {
+            border: 3px solid var(--ms-red);
+            background: rgba(209, 52, 56, 0.05);
+            margin-left: 30px;
+        }
+
+        .flow-step.filter {
+            border-color: var(--ms-green);
+            background: rgba(16, 124, 16, 0.05);
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .step-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .step-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-api {
+            background: var(--ms-red);
+            color: white;
+        }
+
+        .badge-efficient {
+            background: var(--ms-green);
+            color: white;
+        }
+
+        .step-detail {
+            font-size: 14px;
+            color: var(--ms-gray-90);
+            margin-top: 5px;
+        }
+
+        .step-warning {
+            background: var(--ms-red);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .step-success {
+            background: var(--ms-green);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        /* Loop Container */
+        .loop-container {
+            border: 3px dashed var(--ms-orange);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            min-height: 100px;
+            background: rgba(255, 140, 0, 0.02);
+        }
+
+        .loop-container.drop-target {
+            background: rgba(0, 120, 212, 0.1);
+            border-color: var(--ms-blue);
+        }
+
+        .actions-inside-loop {
+            margin-left: 20px;
+            padding-left: 20px;
+            border-left: 3px solid var(--ms-orange);
+        }
+
+        /* Connector Arrow */
+        .connector-arrow {
+            text-align: center;
+            font-size: 24px;
+            color: var(--ms-gray-90);
+            margin: 10px 0;
+        }
+
+        /* Impact Panel */
+        .impact-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .impact-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--ms-gray-130);
+        }
+
+        .impact-comparison {
+            display: grid;
+            gap: 20px;
+        }
+
+        .impact-item {
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid;
+        }
+
+        .impact-wrong {
+            border-color: var(--ms-red);
+            background: rgba(209, 52, 56, 0.05);
+        }
+
+        .impact-right {
+            border-color: var(--ms-green);
+            background: rgba(16, 124, 16, 0.05);
+        }
+
+        .impact-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--ms-gray-90);
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Best Practice Tips */
+        .best-practice {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .best-practice-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .best-practice-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Interactive Elements */
+        .add-action-btn {
+            background: var(--ms-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .add-action-btn:hover {
+            background: var(--ms-blue-dark);
+        }
+
+        .clear-flow-btn {
+            background: var(--ms-gray-90);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Dropdown for filters */
+        .filter-dropdown {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid var(--ms-green);
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        /* Multiplier indicator */
+        .multiplier-indicator {
+            background: var(--ms-red);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            position: absolute;
+            top: -10px;
+            right: 10px;
+        }
+
+        /* Flow execution path */
+        .execution-path {
+            border-left: 3px solid var(--ms-blue);
+            margin-left: 20px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .execution-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--ms-blue);
+            border-radius: 50%;
+            position: absolute;
+            left: -7px;
+            top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔨 Visual Flow Builder - See the Impact in Real-Time</h1>
+            <p style="font-size: 18px; color: var(--ms-gray-90);">
+                Build your flow and watch API calls multiply - Learn the RIGHT way vs WRONG way
+            </p>
+            <div class="comparison-toggle">
+                <button class="toggle-btn active-wrong" onclick="showComparison('both')">
+                    Show Both Ways
+                </button>
+                <button class="toggle-btn" onclick="showComparison('wrong')">
+                    ❌ Wrong Way Only
+                </button>
+                <button class="toggle-btn" onclick="showComparison('right')">
+                    ✅ Right Way Only
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Action Palette -->
+            <div class="action-palette">
+                <h3 class="palette-title">📦 Drag Actions to Build</h3>
+                
+                <!-- Triggers -->
+                <div class="palette-section">
+                    <div class="palette-section-title">Triggers</div>
+                    <div class="draggable-action" draggable="true" data-action="trigger-sharepoint">
+                        <span class="action-icon">📄</span>
+                        <div class="action-info">
+                            <div class="action-name">When item created</div>
+                            <div class="action-tip">SharePoint trigger</div>
+                        </div>
+                    </div>
+                    <div class="draggable-action" draggable="true" data-action="trigger-email">
+                        <span class="action-icon">📧</span>
+                        <div class="action-info">
+                            <div class="action-name">When email arrives</div>
+                            <div class="action-tip">Outlook trigger</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Operations -->
+                <div class="palette-section">
+                    <div class="palette-section-title">⚠️ DANGER ZONE</div>
+                    <div class="draggable-action" draggable="true" data-action="get-items">
+                        <span class="action-icon">📋</span>
+                        <div class="action-info">
+                            <div class="action-name">Get items</div>
+                            <div class="action-tip">Gets ALL items!</div>
+                        </div>
+                    </div>
+                    <div class="draggable-action" draggable="true" data-action="apply-to-each">
+                        <span class="action-icon">🔁</span>
+                        <div class="action-info">
+                            <div class="action-name">Apply to each</div>
+                            <div class="action-tip">MULTIPLIES API calls!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GOOD Practices -->
+                <div class="palette-section">
+                    <div class="palette-section-title">✅ BEST PRACTICES</div>
+                    <div class="draggable-action" draggable="true" data-action="get-items-filtered">
+                        <span class="action-icon">🎯</span>
+                        <div class="action-info">
+                            <div class="action-name">Get items (Filtered)</div>
+                            <div class="action-tip">With OData filter!</div>
+                        </div>
+                    </div>
+                    <div class="draggable-action" draggable="true" data-action="filter-array">
+                        <span class="action-icon">🔍</span>
+                        <div class="action-info">
+                            <div class="action-name">Filter array</div>
+                            <div class="action-tip">In-memory, no API!</div>
+                        </div>
+                    </div>
+                    <div class="draggable-action" draggable="true" data-action="select">
+                        <span class="action-icon">📝</span>
+                        <div class="action-info">
+                            <div class="action-name">Select</div>
+                            <div class="action-tip">Map without loop!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Inside Loops -->
+                <div class="palette-section">
+                    <div class="palette-section-title">Actions (Use Inside Loops)</div>
+                    <div class="draggable-action" draggable="true" data-action="get-item">
+                        <span class="action-icon">📄</span>
+                        <div class="action-info">
+                            <div class="action-name">Get item</div>
+                            <div class="action-tip">1 API call each!</div>
+                        </div>
+                    </div>
+                    <div class="draggable-action" draggable="true" data-action="update-item">
+                        <span class="action-icon">✏️</span>
+                        <div class="action-info">
+                            <div class="action-name">Update item</div>
+                            <div class="action-tip">1 API call each!</div>
+                        </div>
+                    </div>
+                    <div class="draggable-action" draggable="true" data-action="send-email">
+                        <span class="action-icon">📧</span>
+                        <div class="action-info">
+                            <div class="action-name">Send email</div>
+                            <div class="action-tip">1 API call each!</div>
+                        </div>
+                    </div>
+                    <div class="draggable-action" draggable="true" data-action="get-user">
+                        <span class="action-icon">👤</span>
+                        <div class="action-info">
+                            <div class="action-name">Get user profile</div>
+                            <div class="action-tip">1 API call each!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wrong Way Canvas -->
+            <div class="flow-canvas" id="wrongWayCanvas">
+                <div class="canvas-header">
+                    <div class="canvas-title wrong-way">
+                        <span>❌</span>
+                        <span>WRONG WAY (Common Mistake)</span>
+                    </div>
+                    <div class="api-counter high" id="wrongApiCount">0 API Calls</div>
+                </div>
+                
+                <div id="wrongFlowSteps">
+                    <!-- Example Wrong Way Flow -->
+                    <div class="flow-step trigger">
+                        <div class="step-header">
+                            <span class="step-name">📄 When item created (SharePoint)</span>
+                        </div>
+                        <div class="step-detail">Triggers when new invoice arrives</div>
+                    </div>
+                    
+                    <div class="connector-arrow">↓</div>
+                    
+                    <div class="flow-step action">
+                        <div class="step-header">
+                            <span class="step-name">📋 Get items - ALL Customers</span>
+                            <span class="step-badge badge-api">1 API</span>
+                        </div>
+                        <div class="step-detail">Gets ALL 1000 customers (no filter!)</div>
+                        <div class="step-warning">
+                            ⚠️ BAD: Getting ALL items when you only need one!
+                        </div>
+                    </div>
+                    
+                    <div class="connector-arrow">↓</div>
+                    
+                    <div class="flow-step loop">
+                        <div class="multiplier-indicator">×1000</div>
+                        <div class="step-header">
+                            <span class="step-name">🔁 Apply to each - Loop through ALL customers</span>
+                            <span class="step-badge badge-api">MULTIPLIER!</span>
+                        </div>
+                        <div class="step-detail">Loops through all 1000 customers to find match</div>
+                        
+                        <div class="actions-inside-loop">
+                            <div class="flow-step action">
+                                <div class="step-header">
+                                    <span class="step-name">Condition: Check if customer matches</span>
+                                    <span class="step-badge badge-api">0 API</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flow-step action">
+                                <div class="step-header">
+                                    <span class="step-name">👤 Get user profile</span>
+                                    <span class="step-badge badge-api">1000 APIs!</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flow-step action">
+                                <div class="step-header">
+                                    <span class="step-name">📧 Send email notification</span>
+                                    <span class="step-badge badge-api">1000 APIs!</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="step-warning">
+                            🚨 DISASTER: 1000 items × 2 API actions = 2000 API calls!
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="clear-flow-btn" onclick="clearFlow('wrong')">Clear Flow</button>
+            </div>
+
+            <!-- Right Way Canvas -->
+            <div class="flow-canvas" id="rightWayCanvas">
+                <div class="canvas-header">
+                    <div class="canvas-title right-way">
+                        <span>✅</span>
+                        <span>RIGHT WAY (Best Practice)</span>
+                    </div>
+                    <div class="api-counter" id="rightApiCount">3 API Calls</div>
+                </div>
+                
+                <div id="rightFlowSteps">
+                    <!-- Example Right Way Flow -->
+                    <div class="flow-step trigger">
+                        <div class="step-header">
+                            <span class="step-name">📄 When item created (SharePoint)</span>
+                        </div>
+                        <div class="step-detail">Triggers when new invoice arrives</div>
+                    </div>
+                    
+                    <div class="connector-arrow">↓</div>
+                    
+                    <div class="flow-step filter">
+                        <div class="step-header">
+                            <span class="step-name">🎯 Get items (FILTERED)</span>
+                            <span class="step-badge badge-efficient">1 API</span>
+                        </div>
+                        <div class="step-detail">
+                            OData Filter: CustomerID eq '@{triggerBody()?['CustomerID']}'
+                        </div>
+                        <select class="filter-dropdown">
+                            <option>Filter: CustomerID eq 'specific_id'</option>
+                            <option>Filter: Status eq 'Active'</option>
+                            <option>Filter: Modified gt '2024-01-01'</option>
+                            <option>Top: 1 (Get only first match)</option>
+                        </select>
+                        <div class="step-success">
+                            ✅ GOOD: Returns only 1 matching customer, not 1000!
+                        </div>
+                    </div>
+                    
+                    <div class="connector-arrow">↓</div>
+                    
+                    <div class="flow-step action">
+                        <div class="step-header">
+                            <span class="step-name">👤 Get user profile (single)</span>
+                            <span class="step-badge badge-efficient">1 API</span>
+                        </div>
+                        <div class="step-detail">Direct lookup - no loop needed!</div>
+                    </div>
+                    
+                    <div class="connector-arrow">↓</div>
+                    
+                    <div class="flow-step action">
+                        <div class="step-header">
+                            <span class="step-name">📧 Send email notification</span>
+                            <span class="step-badge badge-efficient">1 API</span>
+                        </div>
+                        <div class="step-detail">Single email - no loop needed!</div>
+                        <div class="step-success">
+                            ✅ RESULT: Only 3 API calls total vs 2001 in wrong way!
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="clear-flow-btn" onclick="clearFlow('right')">Clear Flow</button>
+            </div>
+
+            <!-- Impact Panel -->
+            <div class="impact-panel">
+                <h3 class="impact-title">📊 Real-Time Impact Analysis</h3>
+                
+                <div class="impact-comparison">
+                    <div class="impact-item impact-wrong">
+                        <h4 style="color: var(--ms-red); margin-bottom: 15px;">❌ Wrong Way Impact</h4>
+                        <div class="impact-metric">
+                            <span class="metric-label">Total API Calls:</span>
+                            <span class="metric-value" style="color: var(--ms-red);">2,001</span>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="metric-label">Execution Time:</span>
+                            <span class="metric-value" style="color: var(--ms-red);">~84 seconds</span>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="metric-label">Throttling Risk:</span>
+                            <span class="metric-value" style="color: var(--ms-red);">CRITICAL</span>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="metric-label">Monthly Cost:</span>
+                            <span class="metric-value" style="color: var(--ms-red);">£81.90</span>
+                        </div>
+                    </div>
+                    
+                    <div class="impact-item impact-right">
+                        <h4 style="color: var(--ms-green); margin-bottom: 15px;">✅ Right Way Impact</h4>
+                        <div class="impact-metric">
+                            <span class="metric-label">Total API Calls:</span>
+                            <span class="metric-value" style="color: var(--ms-green);">3</span>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="metric-label">Execution Time:</span>
+                            <span class="metric-value" style="color: var(--ms-green);">~2 seconds</span>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="metric-label">Throttling Risk:</span>
+                            <span class="metric-value" style="color: var(--ms-green);">NONE</span>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="metric-label">Monthly Cost:</span>
+                            <span class="metric-value" style="color: var(--ms-green);">£0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="best-practice">
+                    <div class="best-practice-title">💡 KEY LEARNING</div>
+                    <div class="best-practice-content">
+                        <strong>ALWAYS filter at source!</strong><br>
+                        • Use OData filters in Get Items: $filter=CustomerID eq 'ABC123'<br>
+                        • Use $top=1 to get only first match<br>
+                        • Use $select to get only needed columns<br>
+                        • Use Filter Array for in-memory filtering (no API calls)<br>
+                        • NEVER loop through all items to find one!
+                    </div>
+                </div>
+                
+                <div class="best-practice" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); margin-top: 15px;">
+                    <div class="best-practice-title">🚨 THE MULTIPLICATION RULE</div>
+                    <div class="best-practice-content">
+                        <strong>Apply to Each = MULTIPLICATION, not addition!</strong><br>
+                        • 1000 items × 1 action = 1,000 API calls<br>
+                        • 1000 items × 3 actions = 3,000 API calls<br>
+                        • Nested: 100 × 50 × 2 actions = 10,000 API calls!<br>
+                        <br>
+                        <strong>Every action inside Apply to Each happens FOR EVERY ITEM!</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drag and drop functionality
+        let draggedElement = null;
+        let wrongApiCount = 2001;
+        let rightApiCount = 3;
+
+        // Initialize drag events
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDragAndDrop();
+            updateApiCounters();
+        });
+
+        function initializeDragAndDrop() {
+            // Make actions draggable
+            const draggables = document.querySelectorAll('.draggable-action');
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', handleDragStart);
+                draggable.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Make canvases droppable
+            const canvases = document.querySelectorAll('.flow-canvas');
+            canvases.forEach(canvas => {
+                canvas.addEventListener('dragover', handleDragOver);
+                canvas.addEventListener('drop', handleDrop);
+                canvas.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'copy';
+            
+            // Highlight drop zone
+            const canvas = e.currentTarget;
+            canvas.style.background = 'rgba(0, 120, 212, 0.05)';
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            const canvas = e.currentTarget;
+            canvas.style.background = 'white';
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            const canvas = e.currentTarget;
+            canvas.style.background = 'white';
+            
+            if (draggedElement) {
+                const actionType = draggedElement.getAttribute('data-action');
+                const canvasId = canvas.id;
+                
+                addActionToFlow(actionType, canvasId);
+            }
+            
+            return false;
+        }
+
+        function addActionToFlow(actionType, canvasId) {
+            const isWrongWay = canvasId === 'wrongWayCanvas';
+            let apiIncrease = 0;
+            let stepHTML = '';
+            
+            // Create appropriate step based on action type
+            switch(actionType) {
+                case 'apply-to-each':
+                    apiIncrease = isWrongWay ? 1000 : 0;
+                    stepHTML = createLoopStep(isWrongWay);
+                    break;
+                case 'get-items':
+                    apiIncrease = 1;
+                    stepHTML = createGetItemsStep(false);
+                    break;
+                case 'get-items-filtered':
+                    apiIncrease = 1;
+                    stepHTML = createGetItemsStep(true);
+                    break;
+                case 'filter-array':
+                    apiIncrease = 0;
+                    stepHTML = createFilterArrayStep();
+                    break;
+                default:
+                    apiIncrease = 1;
+                    stepHTML = createActionStep(actionType);
+            }
+            
+            // Add to appropriate canvas
+            const flowContainer = document.getElementById(isWrongWay ? 'wrongFlowSteps' : 'rightFlowSteps');
+            flowContainer.innerHTML += '<div class="connector-arrow">↓</div>' + stepHTML;
+            
+            // Update API count
+            if (isWrongWay) {
+                wrongApiCount += apiIncrease;
+            } else {
+                rightApiCount += apiIncrease;
+            }
+            
+            updateApiCounters();
+        }
+
+        function createLoopStep(isWrong) {
+            return `
+                <div class="flow-step loop">
+                    <div class="multiplier-indicator">×1000</div>
+                    <div class="step-header">
+                        <span class="step-name">🔁 Apply to each</span>
+                        <span class="step-badge badge-api">MULTIPLIER!</span>
+                    </div>
+                    <div class="step-detail">Loops through items</div>
+                    ${isWrong ? '<div class="step-warning">⚠️ Every action inside multiplies!</div>' : ''}
+                    <div class="loop-container drop-target">
+                        <p style="color: var(--ms-gray-90); text-align: center;">Drop actions here (they will multiply!)</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createGetItemsStep(filtered) {
+            if (filtered) {
+                return `
+                    <div class="flow-step filter">
+                        <div class="step-header">
+                            <span class="step-name">🎯 Get items (FILTERED)</span>
+                            <span class="step-badge badge-efficient">1 API</span>
+                        </div>
+                        <div class="step-detail">With OData filter - returns only needed items</div>
+                        <div class="step-success">✅ GOOD: Filters at source, not in memory!</div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="flow-step action">
+                        <div class="step-header">
+                            <span class="step-name">📋 Get items (ALL)</span>
+                            <span class="step-badge badge-api">1 API</span>
+                        </div>
+                        <div class="step-detail">Gets ALL items - no filter!</div>
+                        <div class="step-warning">⚠️ BAD: Getting everything when you need specific items!</div>
+                    </div>
+                `;
+            }
+        }
+
+        function createFilterArrayStep() {
+            return `
+                <div class="flow-step filter">
+                    <div class="step-header">
+                        <span class="step-name">🔍 Filter array</span>
+                        <span class="step-badge badge-efficient">0 API</span>
+                    </div>
+                    <div class="step-detail">In-memory filtering - no API calls!</div>
+                    <div class="step-success">✅ GOOD: Filters without API calls!</div>
+                </div>
+            `;
+        }
+
+        function createActionStep(actionType) {
+            const actionNames = {
+                'get-item': '📄 Get item',
+                'update-item': '✏️ Update item',
+                'send-email': '📧 Send email',
+                'get-user': '👤 Get user profile'
+            };
+            
+            return `
+                <div class="flow-step action">
+                    <div class="step-header">
+                        <span class="step-name">${actionNames[actionType] || actionType}</span>
+                        <span class="step-badge badge-api">1 API</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateApiCounters() {
+            const wrongCounter = document.getElementById('wrongApiCount');
+            const rightCounter = document.getElementById('rightApiCount');
+            
+            wrongCounter.textContent = `${wrongApiCount.toLocaleString()} API Calls`;
+            rightCounter.textContent = `${rightApiCount.toLocaleString()} API Calls`;
+            
+            // Add warning class if high
+            if (wrongApiCount > 1000) {
+                wrongCounter.classList.add('high');
+            }
+        }
+
+        function clearFlow(type) {
+            if (type === 'wrong') {
+                document.getElementById('wrongFlowSteps').innerHTML = '';
+                wrongApiCount = 0;
+            } else {
+                document.getElementById('rightFlowSteps').innerHTML = '';
+                rightApiCount = 0;
+            }
+            updateApiCounters();
+        }
+
+        function showComparison(mode) {
+            const wrongCanvas = document.getElementById('wrongWayCanvas');
+            const rightCanvas = document.getElementById('rightWayCanvas');
+            
+            if (mode === 'both') {
+                wrongCanvas.style.display = 'block';
+                rightCanvas.style.display = 'block';
+            } else if (mode === 'wrong') {
+                wrongCanvas.style.display = 'block';
+                rightCanvas.style.display = 'none';
+            } else {
+                wrongCanvas.style.display = 'none';
+                rightCanvas.style.display = 'block';
+            }
+            
+            // Update button states
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active-wrong', 'active-right');
+            });
+            
+            if (mode === 'both') {
+                event.target.classList.add('active-wrong');
+            } else if (mode === 'wrong') {
+                event.target.classList.add('active-wrong');
+            } else {
+                event.target.classList.add('active-right');
+            }
+        }
+    </script>
+</body>
+</html>
